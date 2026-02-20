@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@theme {
+    /* Brand Blue Palette */
+    --color-brand-primary: #0284C7;
+    /* Sky 600 */
+    --color-brand-secondary: #0EA5E9;
+    /* Sky 500 */
+    --color-brand-dark: #0C4A6E;
+    /* Sky 900 */
+    --color-brand-light: #F0F9FF;
+    /* Sky 50 */
+
+    --font-display: "Poppins", sans-serif;
+}
+
+@layer base {
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+    html {
+        font-family: "Poppins", sans-serif;
+    }
+}

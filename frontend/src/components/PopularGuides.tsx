@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Navigation, Star } from 'lucide-react';
+import { Navigation } from 'lucide-react';
 
 const guides = [
     {

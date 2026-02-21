@@ -1,10 +1,34 @@
-import { useState } from 'react';
-import { Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '../context/AuthContext';
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    setIsProfileOpen(false);
+    setIsOpen(false);
+    navigate('/');
+  };
 
   return (
     <nav className="fixed w-full z-50 bg-[#F0F9FF]/90 backdrop-blur-md border-b border-sky-100">
@@ -27,13 +51,63 @@ const Navbar = () => {
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link to="/login" className="text-brand-dark font-semibold hover:text-brand-primary">Log In</Link>
-            <Link
-              to="/signup"
-              className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-sky-200"
-            >
-              Sign Up
-            </Link>
+            {!isAuthenticated ? (
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-sky-200 cursor-pointer"
+              >
+                Log In / Sign Up
+              </button>
+            ) : (
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center gap-2 focus:outline-none"
+                >
+                  {user?.picture ? (
+                    <img
+                      src={user.picture}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-full border-2 border-sky-100 object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-lg border-2 border-sky-100">
+                      {user?.name?.charAt(0) || 'U'}
+                    </div>
+                  )}
+                </button>
+
+                <AnimatePresence>
+                  {isProfileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 10 }}
+                      className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-sky-100 overflow-hidden"
+                    >
+                      <div className="p-4 border-b border-gray-100 bg-sky-50/50">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                      <div className="p-2">
+                        <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-2 transition-colors">
+                          <UserIcon size={18} />
+                          My Profile
+                        </button>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors mt-1"
+                        >
+                          <LogOut size={18} />
+                          Log Out
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -62,13 +136,49 @@ const Navbar = () => {
               <Link to="/guides" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary">Local Guides</Link>
               <Link to="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary">About</Link>
               <div className="pt-4 flex flex-col gap-3">
-                <Link to="/login" className="block w-full text-center px-6 py-3 border border-sky-200 rounded-xl font-semibold text-brand-dark hover:bg-sky-50">Log In</Link>
-                <Link to="/signup" className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary">Sign Up</Link>
+                {!isAuthenticated ? (
+                  <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
+                    Log In / Sign Up
+                  </button>
+                ) : (
+                  <div className="border border-sky-100 rounded-xl overflow-hidden bg-sky-50/30">
+                    <div className="p-4 flex items-center gap-3 border-b border-sky-100 bg-white">
+                      {user?.picture ? (
+                        <img
+                          src={user.picture}
+                          alt="Profile"
+                          className="w-12 h-12 rounded-full object-cover shadow-sm"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-xl shadow-sm">
+                          {user?.name?.charAt(0) || 'U'}
+                        </div>
+                      )}
+                      <div className="overflow-hidden">
+                        <p className="font-semibold text-gray-900 truncate">{user?.name}</p>
+                        <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                      </div>
+                    </div>
+                    <div className="p-2 space-y-1 bg-white">
+                      <button className="w-full text-left px-4 py-3 font-medium text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-3">
+                        <UserIcon size={20} className="text-gray-400" />
+                        My Profile
+                      </button>
+                      <button onClick={handleLogout} className="w-full text-left px-4 py-3 font-medium text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3">
+                        <LogOut size={20} className="text-red-400" />
+                        Log Out
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </nav>
   );
 };

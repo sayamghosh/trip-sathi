@@ -22,7 +22,7 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
         const user = await User.findByIdAndUpdate(
             userId,
             { phone, address },
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         if (!user) {

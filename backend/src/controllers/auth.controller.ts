@@ -70,8 +70,11 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
             }
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Google login error:', error);
-        res.status(500).json({ message: 'Internal server error during authentication' });
+        res.status(500).json({
+            message: 'Internal server error during authentication',
+            details: error?.message || 'Unknown error'
+        });
     }
 };

@@ -1,0 +1,55 @@
+{
+  "indexes": [
+    {
+      "v": 2,
+      "key": {
+        "_id": 1
+      },
+      "name": "_id_"
+    },
+    {
+      "v": 2,
+      "key": {
+        "phone": 1
+      },
+      "name": "phone_1",
+      "unique": true
+    },
+    {
+      "v": 2,
+      "key": {
+        "role": 1
+      },
+      "name": "role_1"
+    },
+    {
+      "v": 2,
+      "key": {
+        "googleId": 1
+      },
+      "name": "googleId_1",
+      "unique": true
+    },
+    {
+      "v": 2,
+      "key": {
+        "email": 1
+      },
+      "name": "email_1",
+      "unique": true
+    }
+  ],
+  "allUsers": [
+    {
+      "_id": "69995aa20f66efd6f39c3182",
+      "googleId": "101661044348488317895",
+      "email": "ssayamghosh@gmail.com",
+      "name": "Sayam Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKLnHfmCWWVKHWD7SQ4elDrsHcPSBbdWvSFCG9_nj8U2i8WRe3H=s96-c",
+      "role": "traveller",
+      "createdAt": "2026-02-21T07:11:30.482Z",
+      "updatedAt": "2026-02-21T07:11:30.482Z",
+      "__v": 0
+    }
+  ]
+}

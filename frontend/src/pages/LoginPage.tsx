@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../context/AuthContext';
 import { googleLoginAPI } from '../services/auth.service';
 
@@ -22,7 +22,7 @@ const LoginPage: React.FC = () => {
                 login(authData);
 
                 // Redirect to homepage or user dashboard
-                navigate('/');
+                navigate({ to: '/' });
             }
         } catch (err: any) {
             console.error('Login failed', err);

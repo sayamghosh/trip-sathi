@@ -41,13 +41,13 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
             user = new User({
                 googleId,
                 email,
-                name,
-                picture,
+                name: name || '',
+                picture: picture || '',
             });
             await user.save();
         } else if (user.picture !== picture) {
-            user.picture = picture;
-            user.name = name; // Also sync name while we're at it
+            user.picture = picture || '';
+            user.name = name || ''; // Also sync name while we're at it
             await user.save();
         }
 

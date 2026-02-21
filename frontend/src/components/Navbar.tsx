@@ -3,9 +3,11 @@ import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
@@ -50,15 +52,12 @@ const Navbar = () => {
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
             {!isAuthenticated ? (
-              <>
-                <Link to="/login" className="text-brand-dark font-semibold hover:text-brand-primary">Log In</Link>
-                <Link
-                  to="/signup"
-                  className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-sky-200"
-                >
-                  Sign Up
-                </Link>
-              </>
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-sky-200 cursor-pointer"
+              >
+                Log In / Sign Up
+              </button>
             ) : (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -138,10 +137,9 @@ const Navbar = () => {
               <Link to="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary">About</Link>
               <div className="pt-4 flex flex-col gap-3">
                 {!isAuthenticated ? (
-                  <>
-                    <Link to="/login" onClick={() => setIsOpen(false)} className="block w-full text-center px-6 py-3 border border-sky-200 rounded-xl font-semibold text-brand-dark hover:bg-sky-50">Log In</Link>
-                    <Link to="/signup" onClick={() => setIsOpen(false)} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary">Sign Up</Link>
-                  </>
+                  <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
+                    Log In / Sign Up
+                  </button>
                 ) : (
                   <div className="border border-sky-100 rounded-xl overflow-hidden bg-sky-50/30">
                     <div className="p-4 flex items-center gap-3 border-b border-sky-100 bg-white">
@@ -179,6 +177,8 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
     </nav>
   );
 };

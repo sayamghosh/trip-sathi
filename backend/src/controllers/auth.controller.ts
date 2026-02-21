@@ -45,6 +45,10 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
                 picture,
             });
             await user.save();
+        } else if (user.picture !== picture) {
+            user.picture = picture;
+            user.name = name; // Also sync name while we're at it
+            await user.save();
         }
 
         // Generate JWT

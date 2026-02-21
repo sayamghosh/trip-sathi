@@ -17,3 +17,9 @@ export const googleLoginAPI = async (idToken: string): Promise<AuthResponse> => 
     const response = await axios.post(`${API_URL}/api/auth/google`, { idToken });
     return response.data;
 };
+
+// Called from the "Become a Tour Guide" onboarding page — always sets role to 'guide'
+export const guideLoginAPI = async (idToken: string): Promise<AuthResponse> => {
+    const response = await axios.post(`${API_URL}/api/auth/google/guide`, { idToken });
+    return response.data;
+};

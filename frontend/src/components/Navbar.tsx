@@ -47,7 +47,12 @@ const Navbar = () => {
             <Link to="/" className="text-gray-600 font-medium hover:text-brand-primary transition-colors">Packages</Link>
             <Link to="/guides" className="text-gray-600 font-medium hover:text-brand-primary transition-colors">Local Guides</Link>
             <Link to="/about" className="text-gray-600 font-medium hover:text-brand-primary transition-colors">About</Link>
-            <Link to="/become-a-guide" className="text-brand-primary font-bold hover:text-brand-dark transition-colors border-2 border-brand-primary/20 bg-brand-primary/5 px-4 py-1.5 rounded-full hover:border-brand-primary/40 hover:bg-brand-primary/10">Become a Tour Guide</Link>
+            {/* Show Guide Dashboard for logged-in guides, Become a Guide for guests */}
+            {isAuthenticated && user?.role === 'guide' ? (
+              <Link to="/guide/dashboard" className="text-brand-primary font-bold hover:text-brand-dark transition-colors border-2 border-brand-primary/20 bg-brand-primary/5 px-4 py-1.5 rounded-full hover:border-brand-primary/40 hover:bg-brand-primary/10">Guide Dashboard</Link>
+            ) : !isAuthenticated ? (
+              <Link to="/become-a-guide" className="text-brand-primary font-bold hover:text-brand-dark transition-colors border-2 border-brand-primary/20 bg-brand-primary/5 px-4 py-1.5 rounded-full hover:border-brand-primary/40 hover:bg-brand-primary/10">Become a Tour Guide</Link>
+            ) : null}
           </div>
 
           {/* Action Buttons */}
@@ -136,7 +141,11 @@ const Navbar = () => {
               <Link to="/" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Packages</Link>
               <Link to="/guides" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Local Guides</Link>
               <Link to="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>About</Link>
-              <Link to="/become-a-guide" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Become a Tour Guide</Link>
+              {isAuthenticated && user?.role === 'guide' ? (
+                <Link to="/guide/dashboard" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Guide Dashboard</Link>
+              ) : !isAuthenticated ? (
+                <Link to="/become-a-guide" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Become a Tour Guide</Link>
+              ) : null}
               <div className="pt-4 flex flex-col gap-3">
                 {!isAuthenticated ? (
                   <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">

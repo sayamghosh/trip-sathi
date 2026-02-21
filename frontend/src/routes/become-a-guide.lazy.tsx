@@ -23,8 +23,8 @@ function BecomeAGuidePage() {
       if (credentialResponse.credential) {
         const authData = await guideLoginAPI(credentialResponse.credential);
         login(authData);
-        // After onboarding login, redirect to complete profile
-        navigate({ to: '/dashboard/profile' });
+        // If new guide has no phone, take them to profile completion first; otherwise go to dashboard
+        navigate({ to: '/guide/dashboard' });
       }
     } catch (err: any) {
       console.error('Login failed', err);

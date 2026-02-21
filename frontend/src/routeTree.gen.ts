@@ -16,6 +16,7 @@ const GuidesLazyRouteImport = createFileRoute('/guides')()
 const BecomeAGuideLazyRouteImport = createFileRoute('/become-a-guide')()
 const AboutLazyRouteImport = createFileRoute('/about')()
 const IndexLazyRouteImport = createFileRoute('/')()
+const GuideDashboardLazyRouteImport = createFileRoute('/guide/dashboard')()
 const DashboardProfileLazyRouteImport = createFileRoute('/dashboard/profile')()
 
 const GuidesLazyRoute = GuidesLazyRouteImport.update({
@@ -40,6 +41,13 @@ const IndexLazyRoute = IndexLazyRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+const GuideDashboardLazyRoute = GuideDashboardLazyRouteImport.update({
+  id: '/guide/dashboard',
+  path: '/guide/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/guide/dashboard.lazy').then((d) => d.Route),
+)
 const DashboardProfileLazyRoute = DashboardProfileLazyRouteImport.update({
   id: '/dashboard/profile',
   path: '/dashboard/profile',
@@ -54,6 +62,7 @@ export interface FileRoutesByFullPath {
   '/become-a-guide': typeof BecomeAGuideLazyRoute
   '/guides': typeof GuidesLazyRoute
   '/dashboard/profile': typeof DashboardProfileLazyRoute
+  '/guide/dashboard': typeof GuideDashboardLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
@@ -61,6 +70,7 @@ export interface FileRoutesByTo {
   '/become-a-guide': typeof BecomeAGuideLazyRoute
   '/guides': typeof GuidesLazyRoute
   '/dashboard/profile': typeof DashboardProfileLazyRoute
+  '/guide/dashboard': typeof GuideDashboardLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -69,6 +79,7 @@ export interface FileRoutesById {
   '/become-a-guide': typeof BecomeAGuideLazyRoute
   '/guides': typeof GuidesLazyRoute
   '/dashboard/profile': typeof DashboardProfileLazyRoute
+  '/guide/dashboard': typeof GuideDashboardLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -78,8 +89,15 @@ export interface FileRouteTypes {
     | '/become-a-guide'
     | '/guides'
     | '/dashboard/profile'
+    | '/guide/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/become-a-guide' | '/guides' | '/dashboard/profile'
+  to:
+    | '/'
+    | '/about'
+    | '/become-a-guide'
+    | '/guides'
+    | '/dashboard/profile'
+    | '/guide/dashboard'
   id:
     | '__root__'
     | '/'
@@ -87,6 +105,7 @@ export interface FileRouteTypes {
     | '/become-a-guide'
     | '/guides'
     | '/dashboard/profile'
+    | '/guide/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +114,7 @@ export interface RootRouteChildren {
   BecomeAGuideLazyRoute: typeof BecomeAGuideLazyRoute
   GuidesLazyRoute: typeof GuidesLazyRoute
   DashboardProfileLazyRoute: typeof DashboardProfileLazyRoute
+  GuideDashboardLazyRoute: typeof GuideDashboardLazyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -127,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guide/dashboard': {
+      id: '/guide/dashboard'
+      path: '/guide/dashboard'
+      fullPath: '/guide/dashboard'
+      preLoaderRoute: typeof GuideDashboardLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/profile': {
       id: '/dashboard/profile'
       path: '/dashboard/profile'
@@ -143,6 +170,7 @@ const rootRouteChildren: RootRouteChildren = {
   BecomeAGuideLazyRoute: BecomeAGuideLazyRoute,
   GuidesLazyRoute: GuidesLazyRoute,
   DashboardProfileLazyRoute: DashboardProfileLazyRoute,
+  GuideDashboardLazyRoute: GuideDashboardLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

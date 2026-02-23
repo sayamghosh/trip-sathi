@@ -58,7 +58,8 @@ function TourPlanDetailsPage() {
                     <ArrowLeft size={20} /> Back to Dashboard
                 </Link>
                 <Link
-                    to={`/guide/tour-plans/${id}/edit`}
+                    to="/guide/tour-plans/$id/edit"
+                    params={{ id }}
                     className="bg-blue-600 text-white px-6 py-2 rounded-xl font-semibold hover:bg-blue-700 transition shadow-md flex items-center gap-2"
                 >
                     <Edit2 size={18} /> Edit Plan

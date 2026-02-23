@@ -244,14 +244,16 @@ function GuideDashboardPage() {
                       </div>
                       <div className="flex items-center gap-2 transition-opacity">
                         <Link
-                          to={`/guide/tour-plans/${plan._id}`}
+                          to="/guide/tour-plans/$id"
+                          params={{ id: plan._id }}
                           className="p-2 bg-white rounded-lg text-gray-600 hover:text-blue-600 hover:bg-white shadow-sm transition-all border border-gray-100"
                           title="View Details"
                         >
                           <Eye size={18} />
                         </Link>
                         <Link
-                          to={`/guide/tour-plans/${plan._id}/edit`}
+                          to="/guide/tour-plans/$id/edit"
+                          params={{ id: plan._id }}
                           className="p-2 bg-white rounded-lg text-gray-600 hover:text-amber-600 hover:bg-white shadow-sm transition-all border border-gray-100"
                           title="Edit Plan"
                         >

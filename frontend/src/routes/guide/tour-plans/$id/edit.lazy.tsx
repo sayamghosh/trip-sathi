@@ -60,7 +60,7 @@ function EditTourPlanPage() {
     return (
         <div className="container mx-auto px-4 py-24">
             <div className="max-w-5xl mx-auto mb-8">
-                <Link to={`/guide/tour-plans/${id}`} className="text-gray-600 hover:text-blue-600 flex items-center gap-2 transition-colors font-medium">
+                <Link to="/guide/tour-plans/$id" params={{ id }} className="text-gray-600 hover:text-blue-600 flex items-center gap-2 transition-colors font-medium">
                     <ArrowLeft size={20} /> Back to Details
                 </Link>
                 <h1 className="text-3xl font-bold text-gray-900 mt-4">Edit Tour Plan</h1>
@@ -70,7 +70,7 @@ function EditTourPlanPage() {
                 <CreateTourPlanForm
                     initialData={plan}
                     editId={id}
-                    onSuccess={() => navigate({ to: `/guide/tour-plans/${id}` })}
+                    onSuccess={() => navigate({ to: '/guide/tour-plans/$id', params: { id } })}
                 />
             </div>
         </div>

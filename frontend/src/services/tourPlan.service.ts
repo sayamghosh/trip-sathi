@@ -26,6 +26,13 @@ export const getTourPlanById = async (id: string): Promise<any> => {
     return response.data;
 };
 
+export const updateTourPlan = async (id: string, data: any): Promise<any> => {
+    const response = await axios.put(`${API_URL}/api/tour-plans/${id}`, data, {
+        headers: getAuthHeaders()
+    });
+    return response.data;
+};
+
 export const uploadImage = async (formData: FormData): Promise<{ url: string }> => {
     const response = await axios.post(`${API_URL}/api/upload`, formData, {
         headers: {
@@ -40,6 +47,7 @@ const tourPlanService = {
     createTourPlan,
     getTourPlansByGuide,
     getTourPlanById,
+    updateTourPlan,
     uploadImage
 };
 

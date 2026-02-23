@@ -21,6 +21,15 @@ const DashboardProfileLazyRouteImport = createFileRoute('/dashboard/profile')()
 const GuideTourPlansCreateLazyRouteImport = createFileRoute(
   '/guide/tour-plans/create',
 )()
+const GuideTourPlansIdLazyRouteImport = createFileRoute(
+  '/guide/tour-plans/$id',
+)()
+const GuideTourPlansIdIndexLazyRouteImport = createFileRoute(
+  '/guide/tour-plans/$id/',
+)()
+const GuideTourPlansIdEditLazyRouteImport = createFileRoute(
+  '/guide/tour-plans/$id/edit',
+)()
 
 const GuidesLazyRoute = GuidesLazyRouteImport.update({
   id: '/guides',
@@ -66,6 +75,29 @@ const GuideTourPlansCreateLazyRoute =
   } as any).lazy(() =>
     import('./routes/guide/tour-plans/create.lazy').then((d) => d.Route),
   )
+const GuideTourPlansIdLazyRoute = GuideTourPlansIdLazyRouteImport.update({
+  id: '/guide/tour-plans/$id',
+  path: '/guide/tour-plans/$id',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/guide/tour-plans/$id.lazy').then((d) => d.Route),
+)
+const GuideTourPlansIdIndexLazyRoute =
+  GuideTourPlansIdIndexLazyRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => GuideTourPlansIdLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/guide/tour-plans/$id/index.lazy').then((d) => d.Route),
+  )
+const GuideTourPlansIdEditLazyRoute =
+  GuideTourPlansIdEditLazyRouteImport.update({
+    id: '/edit',
+    path: '/edit',
+    getParentRoute: () => GuideTourPlansIdLazyRoute,
+  } as any).lazy(() =>
+    import('./routes/guide/tour-plans/$id/edit.lazy').then((d) => d.Route),
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
@@ -74,7 +106,10 @@ export interface FileRoutesByFullPath {
   '/guides': typeof GuidesLazyRoute
   '/dashboard/profile': typeof DashboardProfileLazyRoute
   '/guide/dashboard': typeof GuideDashboardLazyRoute
+  '/guide/tour-plans/$id': typeof GuideTourPlansIdLazyRouteWithChildren
   '/guide/tour-plans/create': typeof GuideTourPlansCreateLazyRoute
+  '/guide/tour-plans/$id/edit': typeof GuideTourPlansIdEditLazyRoute
+  '/guide/tour-plans/$id/': typeof GuideTourPlansIdIndexLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
@@ -84,6 +119,8 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof DashboardProfileLazyRoute
   '/guide/dashboard': typeof GuideDashboardLazyRoute
   '/guide/tour-plans/create': typeof GuideTourPlansCreateLazyRoute
+  '/guide/tour-plans/$id/edit': typeof GuideTourPlansIdEditLazyRoute
+  '/guide/tour-plans/$id': typeof GuideTourPlansIdIndexLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -93,7 +130,10 @@ export interface FileRoutesById {
   '/guides': typeof GuidesLazyRoute
   '/dashboard/profile': typeof DashboardProfileLazyRoute
   '/guide/dashboard': typeof GuideDashboardLazyRoute
+  '/guide/tour-plans/$id': typeof GuideTourPlansIdLazyRouteWithChildren
   '/guide/tour-plans/create': typeof GuideTourPlansCreateLazyRoute
+  '/guide/tour-plans/$id/edit': typeof GuideTourPlansIdEditLazyRoute
+  '/guide/tour-plans/$id/': typeof GuideTourPlansIdIndexLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -104,7 +144,10 @@ export interface FileRouteTypes {
     | '/guides'
     | '/dashboard/profile'
     | '/guide/dashboard'
+    | '/guide/tour-plans/$id'
     | '/guide/tour-plans/create'
+    | '/guide/tour-plans/$id/edit'
+    | '/guide/tour-plans/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -114,6 +157,8 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/guide/dashboard'
     | '/guide/tour-plans/create'
+    | '/guide/tour-plans/$id/edit'
+    | '/guide/tour-plans/$id'
   id:
     | '__root__'
     | '/'
@@ -122,7 +167,10 @@ export interface FileRouteTypes {
     | '/guides'
     | '/dashboard/profile'
     | '/guide/dashboard'
+    | '/guide/tour-plans/$id'
     | '/guide/tour-plans/create'
+    | '/guide/tour-plans/$id/edit'
+    | '/guide/tour-plans/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +180,7 @@ export interface RootRouteChildren {
   GuidesLazyRoute: typeof GuidesLazyRoute
   DashboardProfileLazyRoute: typeof DashboardProfileLazyRoute
   GuideDashboardLazyRoute: typeof GuideDashboardLazyRoute
+  GuideTourPlansIdLazyRoute: typeof GuideTourPlansIdLazyRouteWithChildren
   GuideTourPlansCreateLazyRoute: typeof GuideTourPlansCreateLazyRoute
 }
 
@@ -186,8 +235,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GuideTourPlansCreateLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guide/tour-plans/$id': {
+      id: '/guide/tour-plans/$id'
+      path: '/guide/tour-plans/$id'
+      fullPath: '/guide/tour-plans/$id'
+      preLoaderRoute: typeof GuideTourPlansIdLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guide/tour-plans/$id/': {
+      id: '/guide/tour-plans/$id/'
+      path: '/'
+      fullPath: '/guide/tour-plans/$id/'
+      preLoaderRoute: typeof GuideTourPlansIdIndexLazyRouteImport
+      parentRoute: typeof GuideTourPlansIdLazyRoute
+    }
+    '/guide/tour-plans/$id/edit': {
+      id: '/guide/tour-plans/$id/edit'
+      path: '/edit'
+      fullPath: '/guide/tour-plans/$id/edit'
+      preLoaderRoute: typeof GuideTourPlansIdEditLazyRouteImport
+      parentRoute: typeof GuideTourPlansIdLazyRoute
+    }
   }
 }
+
+interface GuideTourPlansIdLazyRouteChildren {
+  GuideTourPlansIdEditLazyRoute: typeof GuideTourPlansIdEditLazyRoute
+  GuideTourPlansIdIndexLazyRoute: typeof GuideTourPlansIdIndexLazyRoute
+}
+
+const GuideTourPlansIdLazyRouteChildren: GuideTourPlansIdLazyRouteChildren = {
+  GuideTourPlansIdEditLazyRoute: GuideTourPlansIdEditLazyRoute,
+  GuideTourPlansIdIndexLazyRoute: GuideTourPlansIdIndexLazyRoute,
+}
+
+const GuideTourPlansIdLazyRouteWithChildren =
+  GuideTourPlansIdLazyRoute._addFileChildren(GuideTourPlansIdLazyRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
@@ -196,6 +279,7 @@ const rootRouteChildren: RootRouteChildren = {
   GuidesLazyRoute: GuidesLazyRoute,
   DashboardProfileLazyRoute: DashboardProfileLazyRoute,
   GuideDashboardLazyRoute: GuideDashboardLazyRoute,
+  GuideTourPlansIdLazyRoute: GuideTourPlansIdLazyRouteWithChildren,
   GuideTourPlansCreateLazyRoute: GuideTourPlansCreateLazyRoute,
 }
 export const routeTree = rootRouteImport

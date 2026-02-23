@@ -32,20 +32,22 @@ const getInitialData = () => {
     };
 };
 
-export default function CreateTourPlanForm() {
+export default function CreateTourPlanForm({ initialData, editId, onSuccess }: { initialData?: any, editId?: string, onSuccess?: () => void }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeDayIndex, setActiveDayIndex] = useState(0);
 
     const { register, control, handleSubmit, watch, reset } = useForm({
-        defaultValues: getInitialData()
+        defaultValues: initialData || getInitialData()
     });
 
     useEffect(() => {
+        if (editId) return; // Don't save draft when editing existing plan
+
         const subscription = watch((value) => {
             localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(value));
         });
         return () => subscription.unsubscribe();
-    }, [watch]);
+    }, [watch, editId]);
 
     const { fields: dayFields, append: appendDay, remove: removeDay } = useFieldArray({
         control,
@@ -73,21 +75,32 @@ export default function CreateTourPlanForm() {
             locations: data.locations.split(',').map((l: string) => l.trim()).filter(Boolean)
         };
         try {
-            // API call to save tour plan
-            await tourPlanService.createTourPlan(formattedData);
-            toast.success('Tour Plan Created Successfully!');
-            localStorage.removeItem(LOCAL_STORAGE_KEY);
-            // reset form after success
-            reset({
-                title: '',
-                description: '',
-                basePrice: 0,
-                durationDays: 1,
-                durationNights: 0,
-                locations: '',
-                days: [{ dayNumber: 1, title: '', activities: [] }]
-            });
-            setActiveDayIndex(0);
+            if (editId) {
+                await tourPlanService.updateTourPlan(editId, formattedData);
+                toast.success('Tour Plan Updated Successfully!');
+            } else {
+                await tourPlanService.createTourPlan(formattedData);
+                toast.success('Tour Plan Created Successfully!');
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+            }
+
+            if (onSuccess) {
+                onSuccess();
+            }
+
+            if (!editId) {
+                // reset form after success only in create mode
+                reset({
+                    title: '',
+                    description: '',
+                    basePrice: 0,
+                    durationDays: 1,
+                    durationNights: 0,
+                    locations: '',
+                    days: [{ dayNumber: 1, title: '', activities: [] }]
+                });
+                setActiveDayIndex(0);
+            }
             // optionally redirect
         } catch (error) {
             console.error(error);
@@ -137,9 +150,18 @@ export default function CreateTourPlanForm() {
 
             {/* Day Wise Itinerary */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                <div className="p-6 border-b border-gray-100">
-                    <h2 className="text-xl font-semibold text-gray-800">Day-wise Itinerary</h2>
-                    <p className="text-sm text-gray-500 mt-1">Manage activities for each day of the tour.</p>
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+                    <div>
+                        <h2 className="text-xl font-semibold text-gray-800">Day-wise Itinerary</h2>
+                        <p className="text-sm text-gray-500 mt-1">Manage activities for each day of the tour.</p>
+                    </div>
+                    {editId && (
+                        <div className="text-right">
+                            <span className="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full uppercase tracking-wider border border-amber-100 italic">
+                                Editing Existing Plan
+                            </span>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex flex-col md:flex-row min-h-[500px]">
@@ -216,9 +238,16 @@ export default function CreateTourPlanForm() {
             </div>
 
             {/* Submit */}
-            <div className="pt-6 border-t flex justify-end">
+            <div className="pt-6 border-t flex justify-end gap-4 items-center">
+                <button
+                    type="button"
+                    onClick={() => window.history.back()}
+                    className="px-6 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-100 transition"
+                >
+                    Cancel
+                </button>
                 <button type="submit" disabled={isSubmitting} className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50 shadow-md">
-                    {isSubmitting ? 'Saving Plan...' : 'Publish Tour Plan'}
+                    {isSubmitting ? 'Saving Changes...' : (editId ? 'Save Changes' : 'Publish Tour Plan')}
                 </button>
             </div>
         </form>

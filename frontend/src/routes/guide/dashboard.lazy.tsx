@@ -1,4 +1,4 @@
-import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
+import { createLazyFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useAuth } from '../../context/AuthContext';
 import { useEffect, useState } from 'react';
 import tourPlanService from '../../services/tourPlan.service';
@@ -227,19 +227,37 @@ function GuideDashboardPage() {
             ) : (
               <div className="space-y-3">
                 {plans.map(plan => (
-                  <div key={plan._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-sky-50 transition-colors">
+                  <div key={plan._id} className="group flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-sky-50 transition-colors">
                     <div className="flex-1 min-w-0 pr-4">
                       <p className="text-sm font-semibold text-gray-800 truncate">{plan.title}</p>
                       <p className="text-xs text-gray-400 mt-0.5">{plan.durationDays}D/{plan.durationNights}N · ₹{plan.basePrice}</p>
                     </div>
-                    <div className="flex items-center gap-5 text-center shrink-0">
-                      <div>
-                        <p className="text-sm font-bold text-gray-700">{plan.views || 0}</p>
-                        <p className="text-[10px] text-gray-400 uppercase tracking-wide">Views</p>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <div className="flex items-center gap-5 text-center pr-4 border-r border-gray-200">
+                        <div>
+                          <p className="text-sm font-bold text-gray-700">{plan.views || 0}</p>
+                          <p className="text-[10px] text-gray-400 uppercase tracking-wide">Views</p>
+                        </div>
+                        <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700`}>
+                          Published
+                        </span>
                       </div>
-                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700`}>
-                        Published
-                      </span>
+                      <div className="flex items-center gap-2 transition-opacity">
+                        <Link
+                          to={`/guide/tour-plans/${plan._id}`}
+                          className="p-2 bg-white rounded-lg text-gray-600 hover:text-blue-600 hover:bg-white shadow-sm transition-all border border-gray-100"
+                          title="View Details"
+                        >
+                          <Eye size={18} />
+                        </Link>
+                        <Link
+                          to={`/guide/tour-plans/${plan._id}/edit`}
+                          className="p-2 bg-white rounded-lg text-gray-600 hover:text-amber-600 hover:bg-white shadow-sm transition-all border border-gray-100"
+                          title="Edit Plan"
+                        >
+                          <Edit size={18} />
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))}

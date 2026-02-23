@@ -41,3 +41,30 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
         res.status(500).json({ message: 'Error retrieving tour plan', error: error.message });
     }
 };
+
+export const updateTourPlan = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const guideId = (req as any).user.id;
+        const updateData = req.body;
+
+        const plan = await TourPlan.findOne({ _id: id as string, guideId });
+
+        if (!plan) {
+            res.status(404).json({ message: 'Tour plan not found or you are not authorized' });
+            return;
+        }
+
+        const { _id, ...planData } = updateData;
+
+        const updatedPlan = await TourPlan.findByIdAndUpdate(
+            id,
+            { ...planData, guideId },
+            { new: true, runValidators: true }
+        );
+
+        res.status(200).json({ message: 'Tour plan updated successfully', tourPlan: updatedPlan });
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error updating tour plan', error: error.message });
+    }
+};

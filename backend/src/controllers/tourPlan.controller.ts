@@ -1,6 +1,19 @@
 import type { Request, Response } from 'express';
 import TourPlan from '../models/tourPlan.model.js';
 
+export const getAllTourPlans = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const limit = parseInt(req.query.limit as string) || 0;
+        const plans = await TourPlan.find()
+            .populate('guideId', 'name profileImage')
+            .sort({ createdAt: -1 })
+            .limit(limit);
+        res.status(200).json(plans);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error retrieving tour plans', error: error.message });
+    }
+};
+
 export const createTourPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const guideId = (req as any).user.id;
@@ -31,7 +44,9 @@ export const getTourPlansByGuide = async (req: Request, res: Response): Promise<
 export const getTourPlanById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const plan = await TourPlan.findById(id).populate('days.activities.hotelRef');
+        const plan = await TourPlan.findById(id)
+            .populate('guideId', 'name profileImage')
+            .populate('days.activities.hotelRef');
         if (!plan) {
             res.status(404).json({ message: 'Tour plan not found' });
             return;

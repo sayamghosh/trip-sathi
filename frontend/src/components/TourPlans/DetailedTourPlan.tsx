@@ -24,6 +24,10 @@ interface TourPlan {
     durationNights: number;
     locations: string[];
     days: Day[];
+    guideId?: {
+        name: string;
+        profileImage?: string;
+    } | null;
 }
 
 export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
@@ -42,6 +46,22 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
             {/* Hero Section */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
                 <div className="p-8 md:p-12">
+                    {plan.guideId && (
+                        <div className="flex items-center gap-4 mb-6">
+                            {plan.guideId.profileImage ? (
+                                <img
+                                    src={plan.guideId.profileImage}
+                                    alt={plan.guideId.name}
+                                    className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                                />
+                            ) : (
+                                <div className="w-12 h-12 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm">
+                                    {plan.guideId.name?.[0]?.toUpperCase() ?? 'G'}
+                                </div>
+                            )}
+                            <span className="text-lg font-medium text-gray-800">{plan.guideId.name}</span>
+                        </div>
+                    )}
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                         {plan.locations.map((loc, i) => (
                             <span key={i} className="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-sm font-medium flex items-center gap-1">

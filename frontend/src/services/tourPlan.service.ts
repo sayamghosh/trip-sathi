@@ -14,6 +14,12 @@ export const createTourPlan = async (data: any): Promise<any> => {
     return response.data;
 };
 
+export const getAllTourPlans = async (limit?: number): Promise<any[]> => {
+    const url = `${API_URL}/api/tour-plans/public${limit ? `?limit=${limit}` : ''}`;
+    const response = await axios.get(url);
+    return response.data;
+};
+
 export const getTourPlansByGuide = async (): Promise<any[]> => {
     const response = await axios.get(`${API_URL}/api/tour-plans`, {
         headers: getAuthHeaders()

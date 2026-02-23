@@ -1,0 +1,46 @@
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    return { Authorization: `Bearer ${token}` };
+};
+
+export const createTourPlan = async (data: any): Promise<any> => {
+    const response = await axios.post(`${API_URL}/api/tour-plans`, data, {
+        headers: getAuthHeaders()
+    });
+    return response.data;
+};
+
+export const getTourPlansByGuide = async (): Promise<any[]> => {
+    const response = await axios.get(`${API_URL}/api/tour-plans`, {
+        headers: getAuthHeaders()
+    });
+    return response.data;
+};
+
+export const getTourPlanById = async (id: string): Promise<any> => {
+    const response = await axios.get(`${API_URL}/api/tour-plans/${id}`);
+    return response.data;
+};
+
+export const uploadImage = async (formData: FormData): Promise<{ url: string }> => {
+    const response = await axios.post(`${API_URL}/api/upload`, formData, {
+        headers: {
+            ...getAuthHeaders(),
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    return response.data;
+};
+
+const tourPlanService = {
+    createTourPlan,
+    getTourPlansByGuide,
+    getTourPlanById,
+    uploadImage
+};
+
+export default tourPlanService;

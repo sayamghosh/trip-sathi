@@ -9,6 +9,8 @@ import { AuthProvider } from './context/AuthContext';
 
 const router = createRouter({ routeTree });
 
+import { Toaster } from 'react-hot-toast';
+
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your_google_client_id_here';
 
 // Register the router instance for type safety
@@ -22,6 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthProvider>
       <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+        <Toaster position="top-center" reverseOrder={false} />
         <RouterProvider router={router} />
       </GoogleOAuthProvider>
     </AuthProvider>

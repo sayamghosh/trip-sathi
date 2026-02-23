@@ -4,6 +4,9 @@ import dotenv from 'dotenv';
 import { connectDB } from './config/db.js';
 import authRoutes from './routes/auth.routes.js';
 import profileRoutes from './routes/profile.routes.js';
+import hotelRoutes from './routes/hotel.routes.js';
+import tourPlanRoutes from './routes/tourPlan.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
 
 dotenv.config();
 
@@ -20,6 +23,9 @@ connectDB();
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/hotels', hotelRoutes);
+app.use('/api/tour-plans', tourPlanRoutes);
+app.use('/api/upload', uploadRoutes);
 
 app.get('/', (req, res) => {
     res.send('Trip Sathi API is running');

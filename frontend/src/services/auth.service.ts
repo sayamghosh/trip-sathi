@@ -23,3 +23,11 @@ export const guideLoginAPI = async (idToken: string): Promise<AuthResponse> => {
     const response = await axios.post(`${API_URL}/api/auth/google/guide`, { idToken });
     return response.data;
 };
+
+
+
+const authService = {
+    googleLoginAPI,
+    guideLoginAPI
+};
+export default authService;

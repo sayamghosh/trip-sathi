@@ -1,6 +1,8 @@
 import { createLazyFileRoute, useNavigate } from '@tanstack/react-router';
 import { useAuth } from '../../context/AuthContext';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import tourPlanService from '../../services/tourPlan.service';
+import toast from 'react-hot-toast';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
@@ -13,52 +15,69 @@ export const Route = createLazyFileRoute('/guide/dashboard')({
   component: GuideDashboardPage,
 });
 
-// ── Dummy Data ──────────────────────────────────────────────────────────────
+// ── Dummy Chart Data (Since real tracking data is not yet available) ─────────
 const viewsData = [
-  { week: 'Mon', views: 12 },
-  { week: 'Tue', views: 28 },
-  { week: 'Wed', views: 19 },
-  { week: 'Thu', views: 45 },
-  { week: 'Fri', views: 38 },
-  { week: 'Sat', views: 72 },
-  { week: 'Sun', views: 55 },
+  { week: 'Mon', views: 0 },
+  { week: 'Tue', views: 0 },
+  { week: 'Wed', views: 0 },
+  { week: 'Thu', views: 0 },
+  { week: 'Fri', views: 0 },
+  { week: 'Sat', views: 0 },
+  { week: 'Sun', views: 0 },
 ];
 
 const ctrData = [
-  { week: 'Mon', ctr: 3.2 },
-  { week: 'Tue', ctr: 5.1 },
-  { week: 'Wed', ctr: 4.8 },
-  { week: 'Thu', ctr: 7.3 },
-  { week: 'Fri', ctr: 6.5 },
-  { week: 'Sat', ctr: 9.1 },
-  { week: 'Sun', ctr: 8.4 },
-];
-
-const myPlans = [
-  { id: 1, name: 'Old City Heritage Walk', views: 145, ctr: '8.2%', duration: '3 hrs', price: '₹800', status: 'Published' },
-  { id: 2, name: 'Street Food Safari', views: 98, ctr: '6.5%', duration: '2 hrs', price: '₹600', status: 'Published' },
-  { id: 3, name: 'Sunset Viewpoints Trek', views: 61, ctr: '4.1%', duration: '4 hrs', price: '₹1,200', status: 'Draft' },
-];
-
-const plansBarData = myPlans.map(p => ({ name: p.name.split(' ').slice(0, 2).join(' '), views: p.views }));
-
-const stats = [
-  { label: 'Total Views', value: '304', change: '+18%', icon: <Eye className="text-sky-500" size={20} />, bg: 'bg-sky-50', color: 'text-sky-600' },
-  { label: 'Avg CTR', value: '6.3%', change: '+2.1%', icon: <MousePointerClick className="text-violet-500" size={20} />, bg: 'bg-violet-50', color: 'text-violet-600' },
-  { label: 'Avg Rating', value: '4.8★', change: '+0.2', icon: <Star className="text-amber-500" size={20} />, bg: 'bg-amber-50', color: 'text-amber-600' },
-  { label: 'Active Plans', value: `${myPlans.filter(p => p.status === 'Published').length}`, change: '1 draft', icon: <Map className="text-emerald-500" size={20} />, bg: 'bg-emerald-50', color: 'text-emerald-600' },
+  { week: 'Mon', ctr: 0 },
+  { week: 'Tue', ctr: 0 },
+  { week: 'Wed', ctr: 0 },
+  { week: 'Thu', ctr: 0 },
+  { week: 'Fri', ctr: 0 },
+  { week: 'Sat', ctr: 0 },
+  { week: 'Sun', ctr: 0 },
 ];
 
 function GuideDashboardPage() {
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [plans, setPlans] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated) navigate({ to: '/become-a-guide' });
-    else if (user?.role !== 'guide') navigate({ to: '/' });
+    if (!isAuthenticated) {
+      navigate({ to: '/become-a-guide' });
+    } else if (user?.role !== 'guide') {
+      navigate({ to: '/' });
+    } else {
+      fetchPlans();
+    }
   }, [isAuthenticated, user]);
 
+  const fetchPlans = async () => {
+    try {
+      setIsLoading(true);
+      const data = await tourPlanService.getTourPlansByGuide();
+      setPlans(data);
+    } catch (error) {
+      console.error('Failed to fetch plans', error);
+      toast.error('Failed to load tour plans');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (!user) return null;
+
+  const plansBarData = plans.slice(0, 5).map(p => ({
+    name: p.title.split(' ').slice(0, 2).join(' '),
+    views: p.views || 0
+  }));
+
+  const stats = [
+    { label: 'Total Views', value: plans.reduce((acc, p) => acc + (p.views || 0), 0).toString(), change: '0%', icon: <Eye className="text-sky-500" size={20} />, bg: 'bg-sky-50', color: 'text-sky-600' },
+    { label: 'Avg CTR', value: '0%', change: '0%', icon: <MousePointerClick className="text-violet-500" size={20} />, bg: 'bg-violet-50', color: 'text-violet-600' },
+    { label: 'Avg Rating', value: '0★', change: '0', icon: <Star className="text-amber-500" size={20} />, bg: 'bg-amber-50', color: 'text-amber-600' },
+    { label: 'Active Plans', value: `${plans.length}`, change: '0 drafts', icon: <Map className="text-emerald-500" size={20} />, bg: 'bg-emerald-50', color: 'text-emerald-600' },
+  ];
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] pt-24 pb-16 px-4 font-sans">
@@ -115,7 +134,7 @@ function GuideDashboardPage() {
                 <p className="text-xs text-gray-400 mt-0.5">This week</p>
               </div>
               <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold bg-emerald-50 px-2.5 py-1 rounded-full">
-                <TrendingUp size={12} /> +18%
+                <TrendingUp size={12} /> 0%
               </div>
             </div>
             <ResponsiveContainer width="100%" height={200}>
@@ -143,7 +162,7 @@ function GuideDashboardPage() {
                 <p className="text-xs text-gray-400 mt-0.5">% of viewers who clicked</p>
               </div>
               <div className="flex items-center gap-1 text-violet-600 text-xs font-bold bg-violet-50 px-2.5 py-1 rounded-full">
-                <TrendingUp size={12} /> +2.1%
+                <TrendingUp size={12} /> 0%
               </div>
             </div>
             <ResponsiveContainer width="100%" height={200}>
@@ -166,46 +185,66 @@ function GuideDashboardPage() {
           <div className="lg:col-span-1 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <h2 className="text-base font-bold text-gray-900 mb-1">Views by Plan</h2>
             <p className="text-xs text-gray-400 mb-6">All-time</p>
-            <ResponsiveContainer width="100%" height={180}>
-              <BarChart data={plansBarData} layout="vertical" barSize={14}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
-                <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} width={80} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', fontSize: 12 }} />
-                <Bar dataKey="views" fill="#0ea5e9" radius={[0, 6, 6, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {plans.length > 0 ? (
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={plansBarData} layout="vertical" barSize={14}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
+                  <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: '#64748b' }} width={80} axisLine={false} tickLine={false} />
+                  <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', fontSize: 12 }} />
+                  <Bar dataKey="views" fill="#0ea5e9" radius={[0, 6, 6, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[180px] flex items-center justify-center text-gray-400 text-sm italic">
+                No plans yet
+              </div>
+            )}
           </div>
 
           {/* My Tour Plans Table */}
           <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-base font-bold text-gray-900">My Tour Plans</h2>
-              <button className="text-xs text-brand-primary font-semibold hover:underline">+ Add Plan</button>
+              <h2 className="text-base font-bold text-gray-900">My Tour Packages</h2>
+              <button onClick={() => navigate({ to: '/guide/tour-plans/create' })} className="px-4 py-2 bg-brand-primary text-white rounded-lg text-sm font-semibold hover:bg-brand-dark transition-colors shadow-sm">+ Create New Package</button>
             </div>
-            <div className="space-y-3">
-              {myPlans.map(plan => (
-                <div key={plan.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-sky-50 transition-colors">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-800 truncate">{plan.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{plan.duration} · {plan.price}</p>
-                  </div>
-                  <div className="flex items-center gap-5 ml-4 text-center shrink-0">
-                    <div>
-                      <p className="text-sm font-bold text-gray-700">{plan.views}</p>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-wide">Views</p>
+            {isLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="h-16 bg-gray-100 animate-pulse rounded-xl"></div>
+                ))}
+              </div>
+            ) : plans.length === 0 ? (
+              <div className="text-center py-10 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                <p className="text-gray-500 font-medium">You haven't created any tour plans yet.</p>
+                <button
+                  onClick={() => navigate({ to: '/guide/tour-plans/create' })}
+                  className="mt-3 text-brand-primary font-bold text-sm hover:underline"
+                >
+                  Create your first plan →
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {plans.map(plan => (
+                  <div key={plan._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-sky-50 transition-colors">
+                    <div className="flex-1 min-w-0 pr-4">
+                      <p className="text-sm font-semibold text-gray-800 truncate">{plan.title}</p>
+                      <p className="text-xs text-gray-400 mt-0.5">{plan.durationDays}D/{plan.durationNights}N · ₹{plan.basePrice}</p>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold text-gray-700">{plan.ctr}</p>
-                      <p className="text-[10px] text-gray-400 uppercase tracking-wide">CTR</p>
+                    <div className="flex items-center gap-5 text-center shrink-0">
+                      <div>
+                        <p className="text-sm font-bold text-gray-700">{plan.views || 0}</p>
+                        <p className="text-[10px] text-gray-400 uppercase tracking-wide">Views</p>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700`}>
+                        Published
+                      </span>
                     </div>
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${plan.status === 'Published' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                      {plan.status}
-                    </span>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

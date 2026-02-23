@@ -8,7 +8,8 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
         const { phone, address } = req.body;
 
         // The user ID comes from the JWT middleware (set as req.user in middleware)
-        const userId = (req as any).userId;
+        const userInReq = (req as any).user;
+        const userId = userInReq?.id;
         if (!userId) {
             res.status(401).json({ message: 'Not authenticated' });
             return;

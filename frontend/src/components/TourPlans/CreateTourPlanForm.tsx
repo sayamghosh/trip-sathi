@@ -22,6 +22,7 @@ const getInitialData = () => {
         durationDays: 1,
         durationNights: 0,
         locations: '', // comma separated string for ease of use
+        bannerImages: [],
         days: [
             {
                 dayNumber: 1,
@@ -35,10 +36,13 @@ const getInitialData = () => {
 export default function CreateTourPlanForm({ initialData, editId, onSuccess }: { initialData?: any, editId?: string, onSuccess?: () => void }) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeDayIndex, setActiveDayIndex] = useState(0);
+    const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
-    const { register, control, handleSubmit, watch, reset } = useForm({
+    const { register, control, handleSubmit, watch, reset, setValue } = useForm({
         defaultValues: initialData || getInitialData()
     });
+
+    const bannerImages = watch('bannerImages') || [];
 
     useEffect(() => {
         if (editId) return; // Don't save draft when editing existing plan
@@ -65,6 +69,22 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
             toast.error('Failed to upload image. Try again.');
             return null;
         }
+    };
+
+    const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            setIsUploadingBanner(true);
+            const url = await handleImageUpload(e.target.files[0]);
+            if (url) {
+                setValue('bannerImages', [...(watch('bannerImages') || []), url], { shouldDirty: true });
+            }
+            setIsUploadingBanner(false);
+        }
+    };
+
+    const removeBannerImage = (indexToRemove: number) => {
+        const current = watch('bannerImages') || [];
+        setValue('bannerImages', current.filter((_: any, i: number) => i !== indexToRemove), { shouldDirty: true });
     };
 
     const onSubmit = async (data: any) => {
@@ -97,6 +117,7 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
                     durationDays: 1,
                     durationNights: 0,
                     locations: '',
+                    bannerImages: [],
                     days: [{ dayNumber: 1, title: '', activities: [] }]
                 });
                 setActiveDayIndex(0);
@@ -144,6 +165,34 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
                     <div>
                         <label className="block text-sm font-medium text-gray-700">Total Nights</label>
                         <input type="number" {...register('durationNights')} required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-2 border" />
+                    </div>
+                    <div className="md:col-span-2 mt-4 border-t pt-4">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Banner Images (Shown on Landing Page Packages)</label>
+                        <div className="flex gap-3 flex-wrap">
+                            {bannerImages.map((img: string, i: number) => (
+                                <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border shadow-sm group bg-gray-100">
+                                    <img src={img} alt="Banner" className="w-full h-full object-cover" />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeBannerImage(i)}
+                                        className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-red-500"
+                                    >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            ))}
+                            {isUploadingBanner && (
+                                <div className="w-24 h-24 border-2 border-gray-200 bg-gray-50 rounded-xl flex items-center justify-center shadow-inner">
+                                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                                </div>
+                            )}
+                            <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 cursor-pointer bg-gray-50 transition-colors">
+                                <UploadCloud size={24} className="mb-1" />
+                                <span className="text-xs font-medium">Upload</span>
+                                <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} />
+                            </label>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">Upload beautiful high-quality images to attract travelers from the main landing page.</p>
                     </div>
                 </div>
             </div>

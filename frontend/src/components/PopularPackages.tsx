@@ -11,6 +11,7 @@ interface TourPlan {
     durationDays: number;
     durationNights: number;
     basePrice: number;
+    bannerImages?: string[];
     days: { activities: { images: string[] }[] }[];
     guideId: {
         name: string;
@@ -19,6 +20,9 @@ interface TourPlan {
 }
 
 const getFirstImage = (plan: TourPlan): string => {
+    if (plan.bannerImages && plan.bannerImages.length > 0) {
+        return plan.bannerImages[0];
+    }
     for (const day of plan.days ?? []) {
         for (const activity of day.activities ?? []) {
             if (activity.images?.length > 0) return activity.images[0];

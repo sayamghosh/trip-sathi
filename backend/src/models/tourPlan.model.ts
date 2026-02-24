@@ -23,6 +23,7 @@ export interface ITourPlan extends Document {
     durationDays: number;
     durationNights: number;
     locations: string[]; // e.g. ["Port Blair", "Havelock"]
+    bannerImages?: string[]; // Images for the landing page banner
     days: IDayPlan[];
 }
 
@@ -49,6 +50,7 @@ const TourPlanSchema: Schema = new Schema({
     durationDays: { type: Number, required: true },
     durationNights: { type: Number, required: true },
     locations: [{ type: String }],
+    bannerImages: [{ type: String }],
     days: [DayPlanSchema]
 }, { timestamps: true });
 

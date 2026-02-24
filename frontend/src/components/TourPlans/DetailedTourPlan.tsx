@@ -23,6 +23,7 @@ interface TourPlan {
     durationDays: number;
     durationNights: number;
     locations: string[];
+    bannerImages?: string[];
     days: Day[];
     guideId?: {
         name: string;
@@ -45,6 +46,16 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
         <div className="max-w-5xl mx-auto space-y-8">
             {/* Hero Section */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                {plan.bannerImages && plan.bannerImages.length > 0 && (
+                    <div className="w-full h-64 md:h-96 relative">
+                        <img
+                            src={plan.bannerImages[0]}
+                            alt={plan.title}
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    </div>
+                )}
                 <div className="p-8 md:p-12">
                     {plan.guideId && (
                         <div className="flex items-center gap-4 mb-6">

@@ -37,6 +37,7 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeDayIndex, setActiveDayIndex] = useState(0);
     const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+    const [isDraggingBanner, setIsDraggingBanner] = useState(false);
 
     const { register, control, handleSubmit, watch, reset, setValue } = useForm({
         defaultValues: initialData || getInitialData()
@@ -80,6 +81,29 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
             }
             setIsUploadingBanner(false);
         }
+    };
+
+    const handleBannerDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDraggingBanner(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            setIsUploadingBanner(true);
+            const url = await handleImageUpload(e.dataTransfer.files[0]);
+            if (url) {
+                setValue('bannerImages', [...(watch('bannerImages') || []), url], { shouldDirty: true });
+            }
+            setIsUploadingBanner(false);
+        }
+    };
+
+    const handleBannerDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDraggingBanner(true);
+    };
+
+    const handleBannerDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDraggingBanner(false);
     };
 
     const removeBannerImage = (indexToRemove: number) => {
@@ -186,7 +210,12 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
                                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                                 </div>
                             )}
-                            <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 cursor-pointer bg-gray-50 transition-colors">
+                            <label
+                                className={`w-24 h-24 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${isDraggingBanner ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-300 text-gray-500 hover:text-blue-600 hover:border-blue-500 bg-gray-50'}`}
+                                onDrop={handleBannerDrop}
+                                onDragOver={handleBannerDragOver}
+                                onDragLeave={handleBannerDragLeave}
+                            >
                                 <UploadCloud size={24} className="mb-1" />
                                 <span className="text-xs font-medium">Upload</span>
                                 <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} />
@@ -314,6 +343,7 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
     const [editingIndex, setEditingIndex] = useState<number | null>(null);
     const [modalData, setModalData] = useState<any>({ type: 'transfer', title: '', description: '', duration: '', images: [] });
     const [isUploading, setIsUploading] = useState(false);
+    const [isDraggingActivity, setIsDraggingActivity] = useState(false);
 
     const openModal = (type: string, index: number | null = null) => {
         if (index !== null) {
@@ -357,6 +387,29 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
             }
             setIsUploading(false);
         }
+    };
+
+    const handleActivityDrop = async (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDraggingActivity(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            setIsUploading(true);
+            const url = await handleImageUpload(e.dataTransfer.files[0]);
+            if (url) {
+                setModalData((prev: any) => ({ ...prev, images: [...prev.images, url] }));
+            }
+            setIsUploading(false);
+        }
+    };
+
+    const handleActivityDragOver = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDraggingActivity(true);
+    };
+
+    const handleActivityDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        setIsDraggingActivity(false);
     };
 
     const removeImage = (indexToRemove: number) => {
@@ -561,7 +614,12 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
                                                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
                                             </div>
                                         )}
-                                        <label className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center text-gray-500 hover:text-blue-600 hover:border-blue-500 cursor-pointer bg-gray-50 transition-colors">
+                                        <label
+                                            className={`w-24 h-24 border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-colors ${isDraggingActivity ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-300 text-gray-500 hover:text-blue-600 hover:border-blue-500 bg-gray-50'}`}
+                                            onDrop={handleActivityDrop}
+                                            onDragOver={handleActivityDragOver}
+                                            onDragLeave={handleActivityDragLeave}
+                                        >
                                             <UploadCloud size={24} className="mb-1" />
                                             <span className="text-xs font-medium">Upload</span>
                                             <input type="file" className="hidden" accept="image/*" onChange={handleFileUpload} />

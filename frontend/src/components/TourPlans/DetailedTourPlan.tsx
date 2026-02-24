@@ -47,13 +47,53 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
             {/* Hero Section */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
                 {plan.bannerImages && plan.bannerImages.length > 0 && (
-                    <div className="w-full h-64 md:h-96 relative">
-                        <img
-                            src={plan.bannerImages[0]}
-                            alt={plan.title}
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    <div className="w-full h-[400px] md:h-[500px] relative">
+                        {plan.bannerImages.length === 1 && (
+                            <img src={plan.bannerImages[0]} alt={plan.title} className="w-full h-full object-cover" />
+                        )}
+
+                        {plan.bannerImages.length === 2 && (
+                            <div className="flex h-full w-full gap-1">
+                                <img src={plan.bannerImages[0]} alt={plan.title} className="w-1/2 h-full object-cover" />
+                                <img src={plan.bannerImages[1]} alt={plan.title} className="w-1/2 h-full object-cover" />
+                            </div>
+                        )}
+
+                        {plan.bannerImages.length === 3 && (
+                            <div className="flex h-full w-full gap-1">
+                                <div className="w-2/3 h-full">
+                                    <img src={plan.bannerImages[0]} alt={plan.title} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="w-1/3 h-full flex flex-col gap-1">
+                                    <img src={plan.bannerImages[1]} alt={plan.title} className="w-full h-1/2 object-cover" />
+                                    <img src={plan.bannerImages[2]} alt={plan.title} className="w-full h-1/2 object-cover" />
+                                </div>
+                            </div>
+                        )}
+
+                        {plan.bannerImages.length >= 4 && (
+                            <div className="flex h-full w-full gap-1">
+                                <div className="w-1/2 lg:w-2/3 h-full">
+                                    <img src={plan.bannerImages[0]} alt={plan.title} className="w-full h-full object-cover" />
+                                </div>
+                                <div className="w-1/2 lg:w-1/3 h-full flex flex-col gap-1">
+                                    <img src={plan.bannerImages[1]} alt={plan.title} className="w-full h-1/2 object-cover" />
+                                    <div className="flex w-full h-1/2 gap-1">
+                                        <img src={plan.bannerImages[2]} alt={plan.title} className="w-1/2 h-full object-cover" />
+                                        <div className="w-1/2 h-full relative">
+                                            <img src={plan.bannerImages[3]} alt={plan.title} className="w-full h-full object-cover" />
+                                            {plan.bannerImages.length > 4 && (
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-xl md:text-2xl cursor-pointer hover:bg-black/60 transition-colors">
+                                                    +{plan.bannerImages.length - 4} More
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent pointer-events-none"></div>
                     </div>
                 )}
                 <div className="p-8 md:p-12">

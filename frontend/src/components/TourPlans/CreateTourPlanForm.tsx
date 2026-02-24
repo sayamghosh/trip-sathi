@@ -38,6 +38,7 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
     const [activeDayIndex, setActiveDayIndex] = useState(0);
     const [isUploadingBanner, setIsUploadingBanner] = useState(false);
     const [isDraggingBanner, setIsDraggingBanner] = useState(false);
+    const [draggedBannerIndex, setDraggedBannerIndex] = useState<number | null>(null);
 
     const { register, control, handleSubmit, watch, reset, setValue } = useForm({
         defaultValues: initialData || getInitialData()
@@ -104,6 +105,27 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
     const handleBannerDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
         setIsDraggingBanner(false);
+    };
+
+    const handleBannerReorderStart = (index: number) => {
+        setDraggedBannerIndex(index);
+    };
+
+    const handleBannerReorderDrop = (dropIndex: number) => {
+        if (draggedBannerIndex === null || draggedBannerIndex === dropIndex) return;
+
+        const currentImages = watch('bannerImages') || [];
+        const newImages = [...currentImages];
+        const [draggedImage] = newImages.splice(draggedBannerIndex, 1);
+        newImages.splice(dropIndex, 0, draggedImage);
+
+        setValue('bannerImages', newImages, { shouldDirty: true });
+        setDraggedBannerIndex(null);
+    };
+
+    const handleBannerReorderDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        // Necessary to allow dropping
+        e.preventDefault();
     };
 
     const removeBannerImage = (indexToRemove: number) => {
@@ -194,12 +216,22 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
                         <label className="block text-sm font-medium text-gray-700 mb-2">Banner Images (Shown on Landing Page Packages)</label>
                         <div className="flex gap-3 flex-wrap">
                             {bannerImages.map((img: string, i: number) => (
-                                <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border shadow-sm group bg-gray-100">
-                                    <img src={img} alt="Banner" className="w-full h-full object-cover" />
+                                <div
+                                    key={i}
+                                    className="relative w-24 h-24 rounded-xl overflow-hidden border shadow-sm group bg-gray-100 cursor-move"
+                                    draggable
+                                    onDragStart={() => handleBannerReorderStart(i)}
+                                    onDragOver={handleBannerReorderDragOver}
+                                    onDrop={() => handleBannerReorderDrop(i)}
+                                >
+                                    <img src={img} alt="Banner" className="w-full h-full object-cover select-none pointer-events-none" />
                                     <button
                                         type="button"
-                                        onClick={() => removeBannerImage(i)}
-                                        className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-red-500"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeBannerImage(i);
+                                        }}
+                                        className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-red-500 z-10"
                                     >
                                         <X size={12} />
                                     </button>
@@ -344,6 +376,7 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
     const [modalData, setModalData] = useState<any>({ type: 'transfer', title: '', description: '', duration: '', images: [] });
     const [isUploading, setIsUploading] = useState(false);
     const [isDraggingActivity, setIsDraggingActivity] = useState(false);
+    const [draggedActivityIndex, setDraggedActivityIndex] = useState<number | null>(null);
 
     const openModal = (type: string, index: number | null = null) => {
         if (index !== null) {
@@ -410,6 +443,26 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
     const handleActivityDragLeave = (e: React.DragEvent<HTMLLabelElement>) => {
         e.preventDefault();
         setIsDraggingActivity(false);
+    };
+
+    const handleActivityReorderStart = (index: number) => {
+        setDraggedActivityIndex(index);
+    };
+
+    const handleActivityReorderDrop = (dropIndex: number) => {
+        if (draggedActivityIndex === null || draggedActivityIndex === dropIndex) return;
+
+        setModalData((prev: any) => {
+            const newImages = [...prev.images];
+            const [draggedImage] = newImages.splice(draggedActivityIndex, 1);
+            newImages.splice(dropIndex, 0, draggedImage);
+            return { ...prev, images: newImages };
+        });
+        setDraggedActivityIndex(null);
+    };
+
+    const handleActivityReorderDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
     };
 
     const removeImage = (indexToRemove: number) => {
@@ -598,12 +651,22 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
                                     <label className="block text-sm font-semibold text-gray-700 mb-2">Activity Images</label>
                                     <div className="flex gap-3 flex-wrap">
                                         {modalData.images.map((img: string, i: number) => (
-                                            <div key={i} className="relative w-24 h-24 rounded-xl overflow-hidden border shadow-sm group bg-gray-100">
-                                                <img src={img} alt="Activity" className="w-full h-full object-cover" />
+                                            <div
+                                                key={i}
+                                                className="relative w-24 h-24 rounded-xl overflow-hidden border shadow-sm group bg-gray-100 cursor-move"
+                                                draggable
+                                                onDragStart={() => handleActivityReorderStart(i)}
+                                                onDragOver={handleActivityReorderDragOver}
+                                                onDrop={() => handleActivityReorderDrop(i)}
+                                            >
+                                                <img src={img} alt="Activity" className="w-full h-full object-cover select-none pointer-events-none" />
                                                 <button
                                                     type="button"
-                                                    onClick={() => removeImage(i)}
-                                                    className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-red-500"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        removeImage(i);
+                                                    }}
+                                                    className="absolute top-1 right-1 bg-black/50 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition hover:bg-red-500 z-10"
                                                 >
                                                     <X size={12} />
                                                 </button>

@@ -216,7 +216,7 @@ export default function TravelerDetailedTourPlan() {
             </div>
 
             {/* ═══════════ STICKY TAB NAVIGATION ═══════════ */}
-            <div className="sticky top-16 md:top-[64px] bg-white border-b border-gray-200 z-30 shadow-sm">
+            <div className="sticky top-16 md:top-[80px] bg-white border-b border-gray-200 z-30 shadow-sm">
                 <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         <div className="flex">
@@ -278,7 +278,7 @@ export default function TravelerDetailedTourPlan() {
 
                     {/* ═══ LEFT: Day Sidebar ═══ */}
                     {activeTab === 'itinerary' && (
-                        <div className="hidden lg:block w-[180px] shrink-0">
+                        <div className="hidden lg:block w-[180px] shrink-0 sticky top-[150px]">
                             <div className="sticky top-[140px]">
                                 <h4 className="text-sm font-bold text-gray-800 mb-3">Day Plan</h4>
                                 <ul className="space-y-0.5">

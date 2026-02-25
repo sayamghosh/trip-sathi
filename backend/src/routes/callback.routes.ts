@@ -4,7 +4,7 @@ import { createCallbackRequest, getGuideCallbacks, markCallbackAsRead } from '..
 
 const router = express.Router();
 
-router.post('/', createCallbackRequest);
+router.post('/', authMiddleware, createCallbackRequest);
 router.get('/mine', authMiddleware, isGuide, getGuideCallbacks);
 router.patch('/:id/read', authMiddleware, isGuide, markCallbackAsRead);
 

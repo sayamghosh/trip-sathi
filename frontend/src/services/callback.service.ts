@@ -8,8 +8,28 @@ export interface CallbackRequestPayload {
     requesterName?: string;
 }
 
-export const requestCallback = async (payload: CallbackRequestPayload) => {
-    const response = await axios.post(`${API_URL}/api/callbacks`, payload);
+export interface CallbackResponse {
+    message: string;
+    callback: any;
+    user?: {
+        id: string;
+        email: string;
+        name: string;
+        picture: string;
+        role: string;
+        phone?: string;
+        address?: string;
+    };
+}
+
+export const requestCallback = async (payload: CallbackRequestPayload): Promise<CallbackResponse> => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        throw new Error('AUTH_REQUIRED');
+    }
+    const response = await axios.post(`${API_URL}/api/callbacks`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
     return response.data;
 };
 

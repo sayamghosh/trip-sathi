@@ -3,13 +3,14 @@ import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
 import { Link, useNavigate } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useAuthFlow } from '../context/AuthFlowContext';
 import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +60,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-4">
             {!isAuthenticated ? (
               <button
-                onClick={() => setIsLoginModalOpen(true)}
+                onClick={openLoginModal}
                 className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-sky-200 cursor-pointer"
               >
                 Log In / Sign Up
@@ -148,7 +149,7 @@ const Navbar = () => {
               ) : null}
               <div className="pt-4 flex flex-col gap-3">
                 {!isAuthenticated ? (
-                  <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
+                  <button onClick={() => { setIsOpen(false); openLoginModal(); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
                     Log In / Sign Up
                   </button>
                 ) : (
@@ -189,7 +190,7 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </nav>
   );
 };

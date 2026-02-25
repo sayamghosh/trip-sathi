@@ -1,9 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Star, ArrowRight, CheckCircle, Info } from 'lucide-react';
+import toast from 'react-hot-toast';
+import axios from 'axios';
 import { getAllTourPlans } from '../services/tourPlan.service';
 import { requestCallback } from '../services/callback.service';
+import { useAuth } from '../context/AuthContext';
+import { useAuthFlow } from '../context/AuthFlowContext';
 
 interface TourPlan {
     _id: string;
@@ -74,6 +78,8 @@ const PopularPackages = () => {
     const [userName, setUserName] = useState('');
     const [callbackError, setCallbackError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
+    const { user, isAuthenticated, updateUser } = useAuth();
+    const { pendingAction, requestAuth, clearPendingAction } = useAuthFlow();
 
     useEffect(() => {
         getAllTourPlans(4)
@@ -82,29 +88,112 @@ const PopularPackages = () => {
             .finally(() => setLoading(false));
     }, []);
 
-    const openContactModal = (plan: TourPlan) => {
+    const contactStorageKey = user?.id ? `callbackContact:${user.id}` : null;
+
+    const loadStoredContact = useCallback(() => {
+        if (!contactStorageKey) return { name: '', phone: '' };
+        try {
+            const raw = localStorage.getItem(contactStorageKey);
+            if (!raw) return { name: '', phone: '' };
+            const parsed = JSON.parse(raw);
+            return { name: parsed?.name ?? '', phone: parsed?.phone ?? '' };
+        } catch {
+            return { name: '', phone: '' };
+        }
+    }, [contactStorageKey]);
+
+    const persistContact = useCallback((name: string, phone: string) => {
+        if (!contactStorageKey) return;
+        localStorage.setItem(contactStorageKey, JSON.stringify({ name, phone }));
+    }, [contactStorageKey]);
+
+    const prefillContactFields = useCallback(() => {
+        if (!user) {
+            setUserName('');
+            setUserPhone('');
+            return;
+        }
+        const stored = loadStoredContact();
+        setUserName(stored.name || user.name || '');
+        setUserPhone(stored.phone || user.phone || '');
+    }, [user, loadStoredContact]);
+
+    const openContactModal = useCallback((plan: TourPlan) => {
+        if (!isAuthenticated) {
+            requestAuth({ type: 'CALL_GUIDE', payload: { plan } });
+            toast('Sign in to call the guide', { icon: '🔐' });
+            return;
+        }
         setSelectedPlan(plan);
+        prefillContactFields();
         setContactOpen(true);
         setCallbackError(null);
-    };
+    }, [isAuthenticated, prefillContactFields, requestAuth]);
+
+    const resumePendingAction = useCallback(() => {
+        if (!pendingAction || !isAuthenticated) return;
+        if (pendingAction.type === 'CALL_GUIDE') {
+            const plan = pendingAction.payload?.plan as TourPlan | undefined;
+            if (plan) {
+                setSelectedPlan(plan);
+                prefillContactFields();
+                setContactOpen(true);
+                setCallbackError(null);
+            }
+        }
+        clearPendingAction();
+    }, [pendingAction, isAuthenticated, prefillContactFields, clearPendingAction]);
+
+    useEffect(() => {
+        resumePendingAction();
+    }, [resumePendingAction]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setContactOpen(false);
+            setSelectedPlan(null);
+        }
+    }, [isAuthenticated]);
 
     const handleSubmitCallback = async () => {
         if (!selectedPlan) return;
-        if (!userPhone.trim()) {
+        if (!isAuthenticated || !user) {
+            requestAuth({ type: 'CALL_GUIDE', payload: { plan: selectedPlan } });
+            return;
+        }
+        const trimmedPhone = userPhone.trim();
+        if (!trimmedPhone) {
             setCallbackError('Please enter your phone number');
             return;
         }
         try {
             setSubmitting(true);
             setCallbackError(null);
-            await requestCallback({ tourPlanId: selectedPlan._id, requesterPhone: userPhone.trim(), requesterName: userName.trim() || undefined });
+            const trimmedName = userName.trim();
+            const response = await requestCallback({
+                tourPlanId: selectedPlan._id,
+                requesterPhone: trimmedPhone,
+                requesterName: trimmedName || undefined,
+            });
+            if (response?.user) {
+                updateUser(response.user);
+            }
+            persistContact(trimmedName || response?.user?.name || user.name || '', trimmedPhone);
+            toast.success('Callback request sent to the guide!');
             setContactOpen(false);
             setUserPhone('');
             setUserName('');
             setSelectedPlan(null);
-            alert('Callback request sent to the guide!');
-        } catch (error: any) {
-            setCallbackError(error?.response?.data?.message || 'Could not send request, please try again');
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                setContactOpen(false);
+                requestAuth({ type: 'CALL_GUIDE', payload: { plan: selectedPlan } });
+                toast.error('Please sign in to call the guide.');
+            } else if ((error as Error)?.message === 'AUTH_REQUIRED') {
+                requestAuth({ type: 'CALL_GUIDE', payload: { plan: selectedPlan } });
+            } else {
+                setCallbackError((axios.isAxiosError(error) && error.response?.data?.message) || 'Could not send request, please try again');
+            }
         } finally {
             setSubmitting(false);
         }

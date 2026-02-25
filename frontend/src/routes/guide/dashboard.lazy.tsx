@@ -2,6 +2,7 @@ import { createLazyFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useAuth } from '../../context/AuthContext';
 import { useEffect, useState } from 'react';
 import tourPlanService from '../../services/tourPlan.service';
+import callbackService from '../../services/callback.service';
 import toast from 'react-hot-toast';
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
@@ -41,6 +42,7 @@ function GuideDashboardPage() {
   const navigate = useNavigate();
   const [plans, setPlans] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [callbacks, setCallbacks] = useState<any[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -49,6 +51,7 @@ function GuideDashboardPage() {
       navigate({ to: '/' });
     } else {
       fetchPlans();
+      fetchCallbacks();
     }
   }, [isAuthenticated, user]);
 
@@ -62,6 +65,15 @@ function GuideDashboardPage() {
       toast.error('Failed to load tour plans');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchCallbacks = async () => {
+    try {
+      const data = await callbackService.getGuideCallbacks();
+      setCallbacks(data || []);
+    } catch (error) {
+      console.error('Failed to fetch callbacks', error);
     }
   };
 
@@ -268,6 +280,36 @@ function GuideDashboardPage() {
           </div>
         </div>
 
+      </div>
+
+      {/* Callback Requests */}
+      <div className="mt-10 bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-base font-bold text-gray-900">Callback Requests</h2>
+            <p className="text-xs text-gray-400">Travellers asking you to call them back</p>
+          </div>
+          <span className="text-xs font-semibold bg-emerald-50 text-emerald-600 px-3 py-1 rounded-full">{callbacks.length} pending</span>
+        </div>
+        {callbacks.length === 0 ? (
+          <div className="text-sm text-gray-500 bg-gray-50 rounded-xl p-4 text-center">No callback requests yet.</div>
+        ) : (
+          <div className="space-y-3">
+            {callbacks.map((cb: any) => (
+              <div key={cb._id} className="flex items-start justify-between bg-gray-50 rounded-xl p-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">{cb.requesterName || 'Traveller'}</p>
+                  <p className="text-sm text-gray-700">Phone: <span className="font-bold">{cb.requesterPhone}</span></p>
+                  <p className="text-xs text-gray-500 mt-1">Plan: {cb.tourPlanId?.title || 'Tour plan'}</p>
+                </div>
+                <div className="text-right text-xs text-gray-500">
+                  <p>{new Date(cb.createdAt).toLocaleString()}</p>
+                  <p className="mt-1 inline-flex items-center gap-1 bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-semibold">Pending</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

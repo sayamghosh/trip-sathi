@@ -5,7 +5,7 @@ export const getAllTourPlans = async (req: Request, res: Response): Promise<void
     try {
         const limit = parseInt(req.query.limit as string) || 0;
         const plans = await TourPlan.find()
-            .populate('guideId', 'name profileImage')
+            .populate('guideId', 'name profileImage phone address')
             .sort({ createdAt: -1 })
             .limit(limit);
         res.status(200).json(plans);
@@ -45,7 +45,7 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
     try {
         const { id } = req.params;
         const plan = await TourPlan.findById(id)
-            .populate('guideId', 'name profileImage')
+            .populate('guideId', 'name profileImage phone address')
             .populate('days.activities.hotelRef');
         if (!plan) {
             res.status(404).json({ message: 'Tour plan not found' });

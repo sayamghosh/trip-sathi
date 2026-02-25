@@ -18,7 +18,9 @@ const getFirstImage = (plan: TourPlanSummary): string => {
     }
     for (const day of plan.days ?? []) {
         for (const activity of day.activities ?? []) {
-            if (activity.images?.length > 0) activity.images[0];
+            if (activity.images && activity.images.length > 0) {
+                return activity.images[0];
+            }
         }
     }
     return `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80`;
@@ -295,12 +297,12 @@ const PopularPackages = () => {
                                             </div>
                                             <div className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Verified</div>
                                         </div>
-                                            <button
-                                                className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-brand-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md hover:bg-brand-dark transition-colors"
-                                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); openContactModal(plan); }}
-                                            >
-                                                Call the guide
-                                            </button>
+                                        <button
+                                            className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-brand-primary text-white text-sm font-semibold px-4 py-2.5 rounded-xl shadow-md hover:bg-brand-dark transition-colors"
+                                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); openContactModal(plan); }}
+                                        >
+                                            Call the guide
+                                        </button>
                                     </div>
                                 </motion.div>
                             </Link>

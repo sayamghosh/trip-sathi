@@ -57,3 +57,31 @@ export const getGuideCallbacks = async (req: Request, res: Response): Promise<vo
         res.status(500).json({ message: 'Error fetching callback requests', error: error.message });
     }
 };
+
+export const markCallbackAsRead = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const guideId = (req as any).user.id;
+        const { id } = req.params;
+
+        if (!id) {
+            res.status(400).json({ message: 'Callback id is required' });
+            return;
+        }
+
+        const callback = await CallbackRequest.findOneAndUpdate(
+            { _id: id, guideId },
+            { status: 'contacted' },
+            { new: true }
+        ).populate('tourPlanId', 'title locations');
+
+        if (!callback) {
+            res.status(404).json({ message: 'Callback not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Callback marked as contacted', callback });
+    } catch (error: any) {
+        console.error('Mark callback as read error', error);
+        res.status(500).json({ message: 'Error updating callback status', error: error.message });
+    }
+};

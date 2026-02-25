@@ -21,9 +21,18 @@ export const getGuideCallbacks = async () => {
     return response.data;
 };
 
+export const markCallbackAsRead = async (id: string) => {
+    const token = localStorage.getItem('token');
+    const response = await axios.patch(`${API_URL}/api/callbacks/${id}/read`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data;
+};
+
 const callbackService = {
     requestCallback,
     getGuideCallbacks,
+    markCallbackAsRead,
 };
 
 export default callbackService;

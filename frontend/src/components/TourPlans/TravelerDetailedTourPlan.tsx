@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import {
-    MapPin, Calendar, Briefcase, Hotel, Utensils,
+    MapPin, Hotel,
     Info, ChevronRight, Check, Clock, Image,
     Car, Eye, UtensilsCrossed
 } from 'lucide-react';

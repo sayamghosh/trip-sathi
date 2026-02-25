@@ -7,6 +7,7 @@ import {
   YAxis,
   Tooltip,
   CartesianGrid,
+  type TooltipProps,
 } from 'recharts';
 
 interface InsightChartProps {
@@ -20,6 +21,11 @@ interface InsightChartProps {
 }
 
 export function InsightChart({ title, subtitle, data, dataKey, stroke = '#0ea5e9', icon, suffix }: InsightChartProps) {
+  const tooltipFormatter: TooltipProps<number, string>['formatter'] = (value) => {
+    const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
+    return [`${numericValue}${suffix ?? ''}`, title] as [string, string];
+  };
+
   return (
     <div className="rounded-2xl border border-slate-200 bg-white/80 p-4 shadow-sm">
       <div className="mb-4 flex items-center justify-between">
@@ -42,7 +48,7 @@ export function InsightChart({ title, subtitle, data, dataKey, stroke = '#0ea5e9
                 boxShadow: '0 6px 25px rgba(15, 23, 42, 0.12)',
                 fontSize: 12,
               }}
-              formatter={(value: number) => [`${value}${suffix ?? ''}`, title] as [string, string]}
+              formatter={tooltipFormatter}
             />
             <Line type="monotone" dataKey={dataKey} stroke={stroke} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 5 }} />
           </LineChart>

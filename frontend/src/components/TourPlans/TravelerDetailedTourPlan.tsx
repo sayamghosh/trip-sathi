@@ -259,7 +259,7 @@ export default function TravelerDetailedTourPlan() {
     const activityCount = getStatsCount('sightseeing');
 
     return (
-        <div className="min-h-screen bg-[#f5f5f5] pb-20 pt-20 font-sans text-gray-800">
+        <div className="min-h-screen bg-[#f5f5f5] pb-28 lg:pb-20 pt-20 font-sans text-gray-800">
 
             {/* ═══════════ HERO SECTION ═══════════ */}
             <div className="bg-white border-b border-gray-200">
@@ -335,7 +335,7 @@ export default function TravelerDetailedTourPlan() {
             </div>
 
             {/* ═══════════ STICKY TAB NAVIGATION ═══════════ */}
-            <div className="sticky top-16 md:top-[80px] bg-white border-b border-gray-200 z-30 shadow-sm">
+            <div className="sticky top-20 md:top-[80px] bg-white border-b border-gray-200 z-30 shadow-sm">
                 <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         <div className="flex">
@@ -783,6 +783,30 @@ export default function TravelerDetailedTourPlan() {
 
                 </div>
             </div>
+
+            {/* ═══════════ MOBILE STICKY BOTTOM BAR ═══════════ */}
+            <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 p-4 shadow-[0_-8px_15px_-3px_rgba(0,0,0,0.05)] lg:hidden flex justify-between items-center gap-4">
+                <div className="flex flex-col">
+                    <span className="text-[11px] text-gray-400 line-through leading-none mb-1">
+                        ₹{Math.round(plan.basePrice * 1.2).toLocaleString('en-IN')}
+                    </span>
+                    <div className="flex items-end gap-1 leading-none">
+                        <span className="text-xl font-black text-gray-900 leading-none">
+                            ₹{plan.basePrice.toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-medium">/Adult</span>
+                    </div>
+                </div>
+                <button
+                    className="flex-1 bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 text-sm disabled:opacity-70 whitespace-nowrap"
+                    onClick={openContactModal}
+                    disabled={submitting}
+                    type="button"
+                >
+                    REQUEST CALLBACK <ChevronRight size={16} />
+                </button>
+            </div>
+
             {plan && (
                 <ContactModal
                     open={contactOpen}

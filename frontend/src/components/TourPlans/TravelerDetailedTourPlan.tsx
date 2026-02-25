@@ -225,8 +225,8 @@ export default function TravelerDetailedTourPlan() {
                                     key={tab}
                                     onClick={() => setActiveTab(tab.toLowerCase() as any)}
                                     className={`py-4 px-5 text-sm font-bold tracking-wide transition-colors border-b-[3px] ${activeTab === tab.toLowerCase()
-                                            ? 'border-brand-primary text-brand-primary'
-                                            : 'border-transparent text-gray-500 hover:text-gray-800'
+                                        ? 'border-brand-primary text-brand-primary'
+                                        : 'border-transparent text-gray-500 hover:text-gray-800'
                                         }`}
                                 >
                                     {tab}
@@ -287,8 +287,8 @@ export default function TravelerDetailedTourPlan() {
                                             <button
                                                 onClick={() => scrollToDay(day.dayNumber)}
                                                 className={`w-full text-left px-3 py-2.5 rounded-md text-sm font-medium transition-all flex items-center gap-2.5 ${activeDay === day.dayNumber
-                                                        ? 'bg-brand-primary text-white shadow-sm'
-                                                        : 'text-gray-600 hover:bg-gray-100'
+                                                    ? 'bg-brand-primary text-white shadow-sm'
+                                                    : 'text-gray-600 hover:bg-gray-100'
                                                     }`}
                                             >
                                                 <span className={`w-2 h-2 rounded-full shrink-0 ${activeDay === day.dayNumber ? 'bg-white' : 'bg-gray-300'
@@ -314,10 +314,10 @@ export default function TravelerDetailedTourPlan() {
                                         <div
                                             key={day.dayNumber}
                                             ref={(el) => { dayRefs.current[day.dayNumber] = el; }}
-                                            className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden scroll-mt-[140px]"
+                                            className="bg-white rounded-lg border border-gray-200 shadow-sm scroll-mt-[140px]"
                                         >
                                             {/* Day Header */}
-                                            <div className="px-5 py-4 border-b border-gray-100 flex flex-wrap items-center gap-3">
+                                            <div className="sticky top-[130px] md:top-[140px] z-20 bg-white rounded-t-lg px-5 py-4 border-b border-gray-100 flex flex-wrap items-center gap-3">
                                                 <span className="bg-[#eb6120] text-white font-bold px-3 py-1 rounded text-sm">
                                                     Day {day.dayNumber}
                                                 </span>

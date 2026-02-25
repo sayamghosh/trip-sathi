@@ -572,8 +572,8 @@ export default function TravelerDetailedTourPlan() {
                     </div>
 
                     {/* ═══ RIGHT: Sticky Pricing Sidebar ═══ */}
-                    <div className="w-full lg:w-[300px] shrink-0">
-                        <div className="sticky top-[140px] space-y-5">
+                    <div className="sticky top-[140px] w-full lg:w-[300px] shrink-0">
+                        <div className="space-y-5">
 
                             {/* Price Card */}
                             <div className="bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden">

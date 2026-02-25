@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
-import { MapPin, Clock, Star, ArrowRight } from 'lucide-react';
+import { MapPin, Clock, Star, ArrowRight, CheckCircle, Info } from 'lucide-react';
 import { getAllTourPlans } from '../services/tourPlan.service';
 
 interface TourPlan {
@@ -36,6 +36,16 @@ const formatPrice = (price: number) =>
 
 const formatDuration = (days: number, nights: number) =>
     `${nights} Night${nights !== 1 ? 's' : ''} / ${days} Day${days !== 1 ? 's' : ''}`;
+
+const buildFeatureList = (plan: TourPlan) => {
+    const locations = plan.locations?.filter(Boolean) ?? [];
+    const cityHighlight = locations.length > 0 ? `${locations.slice(0, 2).join(' · ')}` : 'Signature highlights';
+    return [
+        `${plan.durationDays} Days / ${plan.durationNights} Nights itinerary`,
+        `${cityHighlight}`,
+        'Local guide & curated experiences',
+    ];
+};
 
 const SkeletonCard = () => (
     <div className="bg-white rounded-[24px] border border-gray-100 shadow-lg overflow-hidden animate-pulse">
@@ -76,7 +86,7 @@ const PopularPackages = () => {
                     </Link>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {loading ? (
                         Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
                     ) : plans.length === 0 ? (
@@ -89,9 +99,9 @@ const PopularPackages = () => {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     transition={{ delay: index * 0.1 }}
                                     viewport={{ once: true }}
-                                    className="bg-white rounded-[24px] border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-full"
+                                    className="bg-[#F8FAFF] rounded-[20px] border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-full overflow-hidden"
                                 >
-                                    <div className="h-[220px] overflow-hidden rounded-t-[24px] relative">
+                                    <div className="h-[220px] overflow-hidden relative">
                                         <img
                                             src={getFirstImage(plan)}
                                             alt={plan.title}
@@ -101,51 +111,77 @@ const PopularPackages = () => {
                                                     'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80';
                                             }}
                                         />
-                                        <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 text-xs font-bold text-gray-800">
+                                        <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold text-gray-800 shadow-sm">
                                             <Clock size={14} className="text-brand-primary" />
                                             {formatDuration(plan.durationDays, plan.durationNights)}
                                         </div>
                                     </div>
 
-                                    <div className="p-5">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="text-lg font-bold text-gray-900 leading-tight group-hover:text-brand-primary transition-colors">
-                                                {plan.title}
-                                            </h3>
+                                    <div className="p-5 flex flex-col gap-3">
+                                        <div className="flex items-start gap-3">
+                                            <div className="flex-1">
+                                                <h3 className="text-lg font-extrabold text-gray-900 leading-tight group-hover:text-brand-primary transition-colors line-clamp-2">
+                                                    {plan.title}
+                                                </h3>
+                                                <div className="flex flex-wrap gap-1 mt-2 text-[12px] text-gray-500 font-medium">
+                                                    {(plan.locations ?? []).slice(0, 3).map((loc) => (
+                                                        <span key={loc} className="inline-flex items-center gap-1 bg-white border border-gray-100 rounded-full px-2 py-1">
+                                                            <MapPin size={12} className="text-brand-primary" /> {loc}
+                                                        </span>
+                                                    ))}
+                                                    {(!plan.locations || plan.locations.length === 0) && (
+                                                        <span className="inline-flex items-center gap-1 bg-white border border-gray-100 rounded-full px-2 py-1">
+                                                            <MapPin size={12} className="text-brand-primary" /> India
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
                                             <div className="flex items-center gap-1 text-xs font-bold bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
                                                 <Star size={12} fill="currentColor" /> 5.0
                                             </div>
                                         </div>
 
-                                        <p className="text-gray-500 text-sm flex items-center gap-1 mb-4">
-                                            <MapPin size={14} />
-                                            {plan.locations?.join(', ') || 'India'}
-                                        </p>
+                                        <ul className="space-y-2 text-sm text-gray-700">
+                                            {buildFeatureList(plan).map((feature) => (
+                                                <li key={feature} className="flex items-start gap-2">
+                                                    <CheckCircle size={16} className="text-emerald-500 mt-0.5" />
+                                                    <span>{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
 
-                                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                                            <div>
-                                                <p className="text-gray-400 text-[10px] uppercase font-bold">Starts From</p>
-                                                <p className="text-xl font-bold text-brand-primary">{formatPrice(plan.basePrice)}</p>
+                                        <div className="mt-auto bg-gradient-to-r from-[#e3f2ff] via-white to-[#f4fbff] border border-sky-100 rounded-xl p-4 shadow-inner flex items-center justify-between gap-4">
+                                            <div className="flex flex-col gap-1">
+                                                <div className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-full">
+                                                    <Info size={12} /> Limited season offer
+                                                </div>
+                                                <div className="text-xs text-gray-500">All taxes & fees included</div>
                                             </div>
+                                            <div className="text-right">
+                                                <p className="text-[11px] uppercase tracking-wide text-gray-500">Per person</p>
+                                                <p className="text-2xl font-black text-brand-primary leading-tight">{formatPrice(plan.basePrice)}</p>
+                                            </div>
+                                        </div>
 
-                                            {/* Guided By Badge */}
-                                            <div className="flex items-center gap-2 pl-3 border-l border-gray-100">
+                                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                                            <div className="flex items-center gap-2">
                                                 {plan.guideId?.profileImage ? (
                                                     <img
                                                         src={plan.guideId.profileImage}
-                                                        className="w-8 h-8 rounded-full border border-gray-200 object-cover"
+                                                        className="w-10 h-10 rounded-full border border-gray-200 object-cover"
                                                         alt={plan.guideId.name}
                                                     />
                                                 ) : (
-                                                    <div className="w-8 h-8 rounded-full border border-gray-200 bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-xs">
+                                                    <div className="w-10 h-10 rounded-full border border-gray-200 bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm">
                                                         {plan.guideId?.name?.[0]?.toUpperCase() ?? 'G'}
                                                     </div>
                                                 )}
                                                 <div>
-                                                    <p className="text-[10px] text-gray-400">Guided by</p>
-                                                    <p className="text-xs font-bold text-gray-700">{plan.guideId?.name ?? 'Guide'}</p>
+                                                    <p className="text-[11px] text-gray-500">Guided by</p>
+                                                    <p className="text-sm font-semibold text-gray-800">{plan.guideId?.name ?? 'Experienced Guide'}</p>
                                                 </div>
                                             </div>
+                                            <div className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">Verified</div>
                                         </div>
                                     </div>
                                 </motion.div>

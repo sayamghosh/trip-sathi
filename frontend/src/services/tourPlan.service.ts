@@ -1,4 +1,5 @@
 import axios from 'axios';
+import type { TourPlanDetailed, TourPlanSummary } from '../types/tourPlan';
 
 const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -14,20 +15,20 @@ export const createTourPlan = async (data: any): Promise<any> => {
     return response.data;
 };
 
-export const getAllTourPlans = async (limit?: number): Promise<any[]> => {
+export const getAllTourPlans = async (limit?: number): Promise<TourPlanSummary[]> => {
     const url = `${API_URL}/api/tour-plans/public${limit ? `?limit=${limit}` : ''}`;
     const response = await axios.get(url);
     return response.data;
 };
 
-export const getTourPlansByGuide = async (): Promise<any[]> => {
+export const getTourPlansByGuide = async (): Promise<TourPlanSummary[]> => {
     const response = await axios.get(`${API_URL}/api/tour-plans`, {
         headers: getAuthHeaders()
     });
     return response.data;
 };
 
-export const getTourPlanById = async (id: string): Promise<any> => {
+export const getTourPlanById = async (id: string): Promise<TourPlanDetailed> => {
     const response = await axios.get(`${API_URL}/api/tour-plans/${id}`);
     return response.data;
 };

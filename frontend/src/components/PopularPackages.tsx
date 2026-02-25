@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+﻿import { useCallback, useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Star, ArrowRight, CheckCircle, Info } from 'lucide-react';
@@ -8,32 +8,17 @@ import { getAllTourPlans } from '../services/tourPlan.service';
 import { requestCallback } from '../services/callback.service';
 import { useAuth } from '../context/AuthContext';
 import { useAuthFlow } from '../context/AuthFlowContext';
+import ContactModal from './guide/ContactModal';
+import type { TourPlanSummary } from '../types/tourPlan';
 
-interface TourPlan {
-    _id: string;
-    title: string;
-    locations: string[];
-    durationDays: number;
-    durationNights: number;
-    basePrice: number;
-    bannerImages?: string[];
-    days: { activities: { images: string[] }[] }[];
-    guideId: {
-        _id?: string;
-        name: string;
-        profileImage?: string;
-        phone?: string;
-        address?: string;
-    } | null;
-}
 
-const getFirstImage = (plan: TourPlan): string => {
+const getFirstImage = (plan: TourPlanSummary): string => {
     if (plan.bannerImages && plan.bannerImages.length > 0) {
         return plan.bannerImages[0];
     }
     for (const day of plan.days ?? []) {
         for (const activity of day.activities ?? []) {
-            if (activity.images?.length > 0) return activity.images[0];
+            if (activity.images?.length > 0) activity.images[0];
         }
     }
     return `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80`;
@@ -45,7 +30,7 @@ const formatPrice = (price: number) =>
 const formatDuration = (days: number, nights: number) =>
     `${nights} Night${nights !== 1 ? 's' : ''} / ${days} Day${days !== 1 ? 's' : ''}`;
 
-const buildFeatureList = (plan: TourPlan) => {
+const buildFeatureList = (plan: TourPlanSummary) => {
     const locations = plan.locations?.filter(Boolean) ?? [];
     const cityHighlight = locations.length > 0 ? `${locations.slice(0, 2).join(' · ')}` : 'Signature highlights';
     return [
@@ -70,10 +55,10 @@ const SkeletonCard = () => (
 );
 
 const PopularPackages = () => {
-    const [plans, setPlans] = useState<TourPlan[]>([]);
+    const [plans, setPlans] = useState<TourPlanSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [contactOpen, setContactOpen] = useState(false);
-    const [selectedPlan, setSelectedPlan] = useState<TourPlan | null>(null);
+    const [selectedPlan, setSelectedPlan] = useState<TourPlanSummary | null>(null);
     const [userPhone, setUserPhone] = useState('');
     const [userName, setUserName] = useState('');
     const [callbackError, setCallbackError] = useState<string | null>(null);
@@ -118,7 +103,7 @@ const PopularPackages = () => {
         setUserPhone(stored.phone || user.phone || '');
     }, [user, loadStoredContact]);
 
-    const openContactModal = useCallback((plan: TourPlan) => {
+    const openContactModal = useCallback((plan: TourPlanSummary) => {
         if (!isAuthenticated) {
             requestAuth({ type: 'CALL_GUIDE', payload: { plan } });
             toast('Sign in to call the guide', { icon: '🔐' });
@@ -133,7 +118,7 @@ const PopularPackages = () => {
     const resumePendingAction = useCallback(() => {
         if (!pendingAction || !isAuthenticated) return;
         if (pendingAction.type === 'CALL_GUIDE') {
-            const plan = pendingAction.payload?.plan as TourPlan | undefined;
+            const plan = pendingAction.payload?.plan as TourPlanSummary | undefined;
             if (plan) {
                 setSelectedPlan(plan);
                 prefillContactFields();
@@ -343,112 +328,3 @@ const PopularPackages = () => {
 };
 
 export default PopularPackages;
-
-// ─── Contact Modal ────────────────────────────────────────────────────────
-function ContactModal({
-    open,
-    onClose,
-    plan,
-    userPhone,
-    setUserPhone,
-    userName,
-    setUserName,
-    error,
-    onSubmit,
-    submitting,
-}: {
-    open: boolean;
-    onClose: () => void;
-    plan: TourPlan;
-    userPhone: string;
-    setUserPhone: (v: string) => void;
-    userName: string;
-    setUserName: (v: string) => void;
-    error: string | null;
-    onSubmit: () => void;
-    submitting: boolean;
-}) {
-    if (!open) return null;
-
-    const guide = plan.guideId;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
-                <button
-                    onClick={onClose}
-                    className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
-                    aria-label="Close"
-                >
-                    X
-                </button>
-
-                <div className="flex items-center gap-3 mb-4">
-                    {guide?.profileImage ? (
-                        <img src={guide.profileImage} alt={guide.name} className="w-12 h-12 rounded-full object-cover border" />
-                    ) : (
-                        <div className="w-12 h-12 rounded-full bg-brand-primary/10 text-brand-primary font-bold flex items-center justify-center border">
-                            {guide?.name?.[0]?.toUpperCase() ?? 'G'}
-                        </div>
-                    )}
-                    <div>
-                        <p className="text-xs uppercase text-gray-500">Call the guide</p>
-                        <p className="text-lg font-bold text-gray-900">{guide?.name ?? 'Guide'}</p>
-                        {guide?.address && <p className="text-xs text-gray-500">{guide.address}</p>}
-                    </div>
-                </div>
-
-                <div className="bg-sky-50 border border-sky-100 rounded-xl p-3 mb-4 text-sm text-gray-700">
-                    <p className="font-semibold text-brand-primary">Direct contact</p>
-                    {guide?.phone ? (
-                        <p className="mt-1">Phone: <span className="font-bold">{guide.phone}</span></p>
-                    ) : (
-                        <p className="mt-1 text-gray-500">Guide has not added a phone number yet.</p>
-                    )}
-                </div>
-
-                <div className="space-y-3">
-                    <div>
-                        <label className="text-xs font-semibold text-gray-700">Your name (optional)</label>
-                        <input
-                            type="text"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
-                            placeholder="Enter your name"
-                        />
-                    </div>
-                    <div>
-                        <label className="text-xs font-semibold text-gray-700">Your phone number (for callback)</label>
-                        <input
-                            type="tel"
-                            value={userPhone}
-                            onChange={(e) => setUserPhone(e.target.value)}
-                            className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
-                            placeholder="e.g., +91 98765 43210"
-                        />
-                    </div>
-                    <p className="text-[12px] text-gray-500">We share this with the guide so they can call you back.</p>
-                    {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>}
-                </div>
-
-                <div className="mt-5 flex items-center justify-end gap-3">
-                    <button
-                        onClick={onClose}
-                        className="text-sm font-semibold text-gray-600 hover:text-gray-800"
-                        disabled={submitting}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onSubmit}
-                        disabled={submitting}
-                        className="px-4 py-2 text-sm font-semibold text-white bg-brand-primary rounded-lg shadow hover:bg-brand-dark transition-colors disabled:opacity-70"
-                    >
-                        {submitting ? 'Sending...' : 'Request callback'}
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-}

@@ -1,50 +1,82 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from '@tanstack/react-router';
 import {
     MapPin, Hotel,
     Info, ChevronRight, Check, Clock, Image,
     Car, Eye, UtensilsCrossed
 } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import { getTourPlanById } from '../../services/tourPlan.service';
+import { requestCallback } from '../../services/callback.service';
+import { useAuth } from '../../context/AuthContext';
+import { useAuthFlow } from '../../context/AuthFlowContext';
+import ContactModal from '../guide/ContactModal';
+import type { TourPlanDetailed, TourPlanDay } from '../../types/tourPlan';
 
-interface Activity {
-    type: string;
-    title: string;
-    description?: string;
-    duration?: string;
-    images?: string[];
-    hotelRef?: any;
-}
-
-interface Day {
-    dayNumber: number;
-    title: string;
-    activities: Activity[];
-}
-
-interface TourPlan {
+type PendingPlanPayload = {
     _id: string;
     title: string;
-    description: string;
-    basePrice: number;
-    durationDays: number;
-    durationNights: number;
-    locations: string[];
-    bannerImages?: string[];
-    days: Day[];
-    guideId?: {
-        name: string;
-        profileImage?: string;
-    } | null;
-}
+    guideId?: TourPlanDetailed['guideId'];
+};
 
 export default function TravelerDetailedTourPlan() {
     const { id } = useParams({ strict: false });
-    const [plan, setPlan] = useState<TourPlan | null>(null);
+    const [plan, setPlan] = useState<TourPlanDetailed | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'itinerary' | 'policies' | 'summary'>('itinerary');
     const [activeDay, setActiveDay] = useState(1);
     const dayRefs = useRef<Record<number, HTMLDivElement | null>>({});
+    const [contactOpen, setContactOpen] = useState(false);
+    const [userPhone, setUserPhone] = useState('');
+    const [userName, setUserName] = useState('');
+    const [callbackError, setCallbackError] = useState<string | null>(null);
+    const [submitting, setSubmitting] = useState(false);
+    const { user, isAuthenticated, updateUser } = useAuth();
+    const { pendingAction, requestAuth, clearPendingAction } = useAuthFlow();
+    const contactStorageKey = user?.id ? `callbackContact:${user.id}` : null;
+
+    const loadStoredContact = useCallback(() => {
+        if (!contactStorageKey) return { name: '', phone: '' };
+        try {
+            const raw = localStorage.getItem(contactStorageKey);
+            if (!raw) return { name: '', phone: '' };
+            const parsed = JSON.parse(raw);
+            return { name: parsed?.name ?? '', phone: parsed?.phone ?? '' };
+        } catch {
+            return { name: '', phone: '' };
+        }
+    }, [contactStorageKey]);
+
+    const persistContact = useCallback((name: string, phone: string) => {
+        if (!contactStorageKey) return;
+        localStorage.setItem(contactStorageKey, JSON.stringify({ name, phone }));
+    }, [contactStorageKey]);
+
+    const prefillContactFields = useCallback(() => {
+        if (!user) {
+            setUserName('');
+            setUserPhone('');
+            return;
+        }
+        const stored = loadStoredContact();
+        setUserName(stored.name || user.name || '');
+        setUserPhone(stored.phone || user.phone || '');
+    }, [user, loadStoredContact]);
+
+    const queueAuthFlow = useCallback(() => {
+        if (!plan) return;
+        requestAuth({
+            type: 'CALL_GUIDE',
+            payload: {
+                plan: {
+                    _id: plan._id,
+                    title: plan.title,
+                    guideId: plan.guideId,
+                },
+            },
+        });
+    }, [plan, requestAuth]);
 
     useEffect(() => {
         if (!id) return;
@@ -53,6 +85,93 @@ export default function TravelerDetailedTourPlan() {
             .catch(console.error)
             .finally(() => setLoading(false));
     }, [id]);
+
+    const openContactModal = useCallback(() => {
+        if (!plan) return;
+        if (!isAuthenticated) {
+            queueAuthFlow();
+            toast('Sign in to call the guide', { icon: '🔐' });
+            return;
+        }
+        prefillContactFields();
+        setContactOpen(true);
+        setCallbackError(null);
+    }, [plan, isAuthenticated, queueAuthFlow, prefillContactFields]);
+
+    const closeContactModal = useCallback(() => {
+        if (submitting) return;
+        setContactOpen(false);
+        setCallbackError(null);
+        setUserPhone('');
+        setUserName('');
+    }, [submitting]);
+
+    const resumePendingAction = useCallback(() => {
+        if (!pendingAction || !isAuthenticated || !plan) return;
+        if (pendingAction.type !== 'CALL_GUIDE') return;
+        const pendingPlan = pendingAction.payload?.plan as PendingPlanPayload | undefined;
+        if (pendingPlan && pendingPlan._id === plan._id) {
+            prefillContactFields();
+            setContactOpen(true);
+            setCallbackError(null);
+        }
+        clearPendingAction();
+    }, [pendingAction, isAuthenticated, plan, prefillContactFields, clearPendingAction]);
+
+    useEffect(() => {
+        resumePendingAction();
+    }, [resumePendingAction]);
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            setContactOpen(false);
+            setUserPhone('');
+            setUserName('');
+        }
+    }, [isAuthenticated]);
+
+    const handleSubmitCallback = useCallback(async () => {
+        if (!plan) return;
+        if (!isAuthenticated || !user) {
+            queueAuthFlow();
+            return;
+        }
+        const trimmedPhone = userPhone.trim();
+        if (!trimmedPhone) {
+            setCallbackError('Please enter your phone number');
+            return;
+        }
+        try {
+            setSubmitting(true);
+            setCallbackError(null);
+            const trimmedName = userName.trim();
+            const response = await requestCallback({
+                tourPlanId: plan._id,
+                requesterPhone: trimmedPhone,
+                requesterName: trimmedName || undefined,
+            });
+            if (response?.user) {
+                updateUser(response.user);
+            }
+            persistContact(trimmedName || response?.user?.name || user.name || '', trimmedPhone);
+            toast.success('Callback request sent to the guide!');
+            setContactOpen(false);
+            setUserPhone('');
+            setUserName('');
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                setContactOpen(false);
+                queueAuthFlow();
+                toast.error('Please sign in to call the guide.');
+            } else if ((error as Error)?.message === 'AUTH_REQUIRED') {
+                queueAuthFlow();
+            } else {
+                setCallbackError((axios.isAxiosError(error) && error.response?.data?.message) || 'Could not send request, please try again');
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    }, [plan, isAuthenticated, user, userPhone, userName, queueAuthFlow, updateUser, persistContact]);
 
     // Scroll spy: update active day based on scroll position
     useEffect(() => {
@@ -103,7 +222,7 @@ export default function TravelerDetailedTourPlan() {
         return count;
     };
 
-    const getDayCounts = (day: Day) => {
+    const getDayCounts = (day: TourPlanDay) => {
         const counts: Record<string, number> = {};
         day.activities.forEach(act => {
             const t = act.type.toLowerCase();
@@ -594,12 +713,22 @@ export default function TravelerDetailedTourPlan() {
                                     </div>
                                     <p className="text-[11px] text-gray-400 mb-5">Excluding applicable taxes</p>
 
-                                    <button className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-sm tracking-wide">
+                                    <button
+                                        className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-sm tracking-wide disabled:opacity-70"
+                                        onClick={openContactModal}
+                                        disabled={submitting}
+                                        type="button"
+                                    >
                                         REQUEST CALLBACK <ChevronRight size={16} />
                                     </button>
                                     <p className="text-center text-[11px] text-gray-500 mt-2.5 flex items-center justify-center gap-1">
                                         <Check size={13} className="text-green-500" /> Connect directly with your assigned guide
                                     </p>
+                                    {plan.guideId?.phone && (
+                                        <p className="text-center text-xs text-gray-600 mt-1">
+                                            Guide phone: <span className="font-semibold text-gray-900">{plan.guideId.phone}</span>
+                                        </p>
+                                    )}
                                 </div>
 
                                 {/* Guide Info */}
@@ -619,6 +748,9 @@ export default function TravelerDetailedTourPlan() {
                                         <div>
                                             <p className="text-[11px] text-gray-400 font-medium">Your Local Guide</p>
                                             <p className="font-bold text-gray-900 text-sm">{plan.guideId?.name || 'Assigned Guide'}</p>
+                                            {plan.guideId?.phone && (
+                                                <p className="text-xs text-gray-600 mt-0.5">Phone: {plan.guideId.phone}</p>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -651,6 +783,20 @@ export default function TravelerDetailedTourPlan() {
 
                 </div>
             </div>
+            {plan && (
+                <ContactModal
+                    open={contactOpen}
+                    onClose={closeContactModal}
+                    plan={{ title: plan.title, guideId: plan.guideId }}
+                    userPhone={userPhone}
+                    setUserPhone={setUserPhone}
+                    userName={userName}
+                    setUserName={setUserName}
+                    error={callbackError}
+                    onSubmit={handleSubmitCallback}
+                    submitting={submitting}
+                />
+            )}
         </div>
     );
 }

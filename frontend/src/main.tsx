@@ -6,6 +6,11 @@ import './index.css';
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
+import { AuthFlowProvider } from './context/AuthFlowContext';
+
+const router = createRouter({ routeTree });
+
+import { Toaster } from 'react-hot-toast';
 
 const router = createRouter({ routeTree });
 
@@ -21,9 +26,12 @@ declare module '@tanstack/react-router' {
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <AuthProvider>
-      <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-        <RouterProvider router={router} />
-      </GoogleOAuthProvider>
+      <AuthFlowProvider>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <Toaster position="top-center" reverseOrder={false} />
+          <RouterProvider router={router} />
+        </GoogleOAuthProvider>
+      </AuthFlowProvider>
     </AuthProvider>
   </React.StrictMode>,
 );

@@ -15,20 +15,32 @@ function BecomeAGuidePage() {
   const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [pendingCredential, setPendingCredential] = useState<string | null>(null);
 
   const handleSuccess = async (credentialResponse: any) => {
+    if (!credentialResponse?.credential) {
+      setError('Missing Google credential. Please try again.');
+      return;
+    }
     try {
       setLoading(true);
       setError(null);
-      if (credentialResponse.credential) {
-        const authData = await guideLoginAPI(credentialResponse.credential);
-        login(authData);
-        // If new guide has no phone, take them to profile completion first; otherwise go to dashboard
-        navigate({ to: '/guide/dashboard' });
-      }
+      // Try direct login first; if server already has contact info, this succeeds and skips modal
+      const authData = await guideLoginAPI(credentialResponse.credential);
+      login(authData);
+      navigate({ to: '/guide/dashboard' });
     } catch (err: any) {
-      console.error('Login failed', err);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      const message = err?.response?.data?.message;
+      const needsContact = message?.toLowerCase().includes('phone number and address');
+      if (needsContact) {
+        setPendingCredential(credentialResponse.credential);
+        setShowModal(true);
+      } else {
+        setError(message || 'Login failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -38,8 +50,50 @@ function BecomeAGuidePage() {
     setError('Google Sign-In was unsuccessful. Try again later.');
   };
 
+  const handleSubmitContact = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const trimmedPhone = phone.trim();
+      const trimmedAddress = address.trim();
+
+      if (!trimmedPhone || !trimmedAddress) {
+        setError('Phone number and address are required to join as a guide.');
+        setLoading(false);
+        return;
+      }
+
+      if (!pendingCredential) {
+        setError('Missing Google credential. Please try signing in again.');
+        setLoading(false);
+        return;
+      }
+
+      const authData = await guideLoginAPI(pendingCredential, trimmedPhone, trimmedAddress);
+      login(authData);
+      setShowModal(false);
+      // Contact info is stored once; subsequent logins skip this step and go straight to dashboard
+      navigate({ to: '/guide/dashboard' });
+    } catch (err: any) {
+      console.error('Login failed', err);
+      setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-5 font-sans">
+      <ContactModal
+        open={showModal}
+        onClose={() => { if (!loading) { setShowModal(false); setPendingCredential(null); } }}
+        phone={phone}
+        address={address}
+        setPhone={setPhone}
+        setAddress={setAddress}
+        onSubmit={handleSubmitContact}
+        loading={loading}
+      />
       {/* Hero Section */}
       <section className="relative bg-brand-primary text-white py-24 px-4 overflow-hidden">
         {/* Decorative background elements */}
@@ -64,6 +118,10 @@ function BecomeAGuidePage() {
               <div className="flex items-center gap-2 text-yellow-400 font-bold mb-3 animate-bounce">
                 <span className="text-lg">Join now and get 3 months free access</span>
                 <ArrowDown className="w-5 h-5 hidden sm:block" />
+              </div>
+              <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-4 text-left shadow-lg mb-4">
+                <p className="text-sm text-sky-50 font-semibold">1) Tap Continue with Google</p>
+                <p className="text-sm text-sky-50 mb-3">2) We’ll then ask for your phone and address in a quick modal (only once).</p>
               </div>
               <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center md:justify-start">
                 {/* Animated glow wrapper */}
@@ -290,6 +348,87 @@ function BecomeAGuidePage() {
           </motion.div>
         </div>
       </section>
+    </div>
+  );
+}
+
+// ─── Contact Info Modal ───────────────────────────────────────────────────
+function ContactModal({
+  open,
+  onClose,
+  phone,
+  address,
+  setPhone,
+  setAddress,
+  onSubmit,
+  loading,
+}: {
+  open: boolean;
+  onClose: () => void;
+  phone: string;
+  address: string;
+  setPhone: (v: string) => void;
+  setAddress: (v: string) => void;
+  onSubmit: () => void;
+  loading: boolean;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-400 hover:text-gray-600"
+          aria-label="Close"
+        >
+          <XCircle size={20} />
+        </button>
+
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Add your contact info</h3>
+        <p className="text-sm text-gray-600 mb-4">Required once for guide verification. We won't ask again after this.</p>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-xs font-semibold text-gray-700">Phone number</label>
+            <input
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              type="tel"
+              placeholder="e.g., +91 98765 43210"
+              className="w-full rounded-xl border border-gray-200 bg-white text-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+          </div>
+          <div>
+            <label className="text-xs font-semibold text-gray-700">Address</label>
+            <input
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              type="text"
+              placeholder="City, State or full address"
+              className="w-full rounded-xl border border-gray-200 bg-white text-gray-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+            />
+          </div>
+          <p className="text-[12px] text-gray-500">Travellers will see this on your guide profile. You can edit it later in your profile settings.</p>
+        </div>
+
+        <div className="mt-6 flex items-center justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 text-sm font-semibold text-gray-600 hover:text-gray-800"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onSubmit}
+            disabled={loading}
+            className="px-5 py-2 text-sm font-semibold text-white bg-brand-primary rounded-lg shadow hover:bg-brand-dark transition-colors disabled:opacity-70"
+          >
+            {loading ? 'Saving...' : 'Save & continue'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

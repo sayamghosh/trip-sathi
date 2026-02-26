@@ -40,7 +40,15 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
 
         res.status(200).json({
             token,
-            user: { id: user._id, email: user.email, name: user.name, picture: user.picture, role: user.role }
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                picture: user.picture,
+                role: user.role,
+                phone: user.phone,
+                address: user.address,
+            }
         });
     } catch (error: any) {
         console.error('Google login error:', error);
@@ -51,23 +59,47 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
 // ─── Guide signup/login (sets role = 'guide') ────────────────────────────
 export const googleGuideLogin = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { idToken } = req.body;
+        const { idToken, phone, address } = req.body;
         if (!idToken) { res.status(400).json({ message: 'ID Token is required' }); return; }
 
         const { googleId, email, name, picture } = await verifyGoogleToken(idToken);
         if (!email) { res.status(400).json({ message: 'Email not found in token' }); return; }
 
+        const trimmedPhone = typeof phone === 'string' ? phone.trim() : '';
+        const trimmedAddress = typeof address === 'string' ? address.trim() : '';
+
         let user = await User.findOne({ email });
 
+        const needsContact = !user || user.role !== 'guide' || !user.phone || !user.address;
+
+        if (needsContact && (!trimmedPhone || !trimmedAddress)) {
+            res.status(400).json({ message: 'Phone number and address are required to register as a guide.' });
+            return;
+        }
+
         if (!user) {
-            // New user — create directly as guide
-            user = new User({ googleId, email, name: name || '', picture: picture || '', role: 'guide' });
+            // New user — create directly as guide with required contact info
+            user = new User({
+                googleId,
+                email,
+                name: name || '',
+                picture: picture || '',
+                role: 'guide',
+                phone: trimmedPhone,
+                address: trimmedAddress,
+            });
             await user.save();
         } else {
-            // Existing user — upgrade to guide and sync profile
+            // Existing user — upgrade to guide and sync profile/contact info if missing
             user.role = 'guide';
             user.picture = picture || user.picture;
             user.name = name || user.name;
+
+            if (needsContact) {
+                user.phone = trimmedPhone;
+                user.address = trimmedAddress;
+            }
+
             await user.save();
         }
 
@@ -76,7 +108,15 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
 
         res.status(200).json({
             token,
-            user: { id: user._id, email: user.email, name: user.name, picture: user.picture, role: user.role }
+            user: {
+                id: user._id,
+                email: user.email,
+                name: user.name,
+                picture: user.picture,
+                role: user.role,
+                phone: user.phone,
+                address: user.address,
+            }
         });
     } catch (error: any) {
         console.error('Guide login error:', error);

@@ -12,8 +12,6 @@ const router = createRouter({ routeTree });
 
 import { Toaster } from 'react-hot-toast';
 
-const router = createRouter({ routeTree });
-
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'your_google_client_id_here';
 
 // Register the router instance for type safety

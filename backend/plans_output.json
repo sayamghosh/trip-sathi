@@ -1,0 +1,105 @@
+[
+  {
+    "_id": "699be62f5525100a9ac69774",
+    "guideId": "6999fb40df95f57f25c45dd3",
+    "title": "Dream Andaman",
+    "description": "The Andaman and Nicobar Islands is a union territory of India comprising 836 islands, of which only 31 are inhabited. The islands are grouped into two main clusters: the northern Andaman Islands and the southern Nicobar Islands, separated by the 150 km-wide Ten Degree Channel.",
+    "basePrice": 15999,
+    "durationDays": 6,
+    "durationNights": 5,
+    "locations": [
+      "Port Blair",
+      "Havelock",
+      "Neil"
+    ],
+    "days": [
+      {
+        "dayNumber": 1,
+        "title": "Sightseeing in Port Blair",
+        "activities": [
+          {
+            "type": "transfer",
+            "title": "Private transfer from Airport to Hotel",
+            "description": "",
+            "duration": "30 min",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771820439/trip-sathi/lpub0wmsulegez9dfukc.jpg"
+            ],
+            "_id": "699be62f5525100a9ac69776"
+          },
+          {
+            "type": "sightseeing",
+            "title": "Cellular Jail",
+            "description": "Cellular Jail, located in Port Blair, Andaman and Nicobar Islands, is a historic colonial prison built by the British in 1906. It is also known as “Kala Pani”.\n\n🔹 Why It Was Built\n\nThe British used it to imprison Indian freedom fighters who opposed colonial rule. Prisoners were kept in extreme isolation to break their spirit.\n\n🔹 Structure\n\n7 wings (originally)\n\n693 solitary cells\n\nDesigned so prisoners could not see or communicate with each other\n\n🔹 Historical Importance\n\nMany famous freedom fighters were imprisoned here, including:\n\nVinayak Damodar Savarkar\n\nToday, it is a national memorial and a symbol of India’s struggle for independence. A light and sound show is conducted in the evening to narrate its history.\n\nIt stands as a reminder of the sacrifices made for India’s freedom 🇮🇳",
+            "duration": "2hr",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771820547/trip-sathi/eky6ltwuuhvq2bjhl3jv.jpg"
+            ],
+            "_id": "699be62f5525100a9ac69777"
+          },
+          {
+            "type": "hotel",
+            "title": "Hotel TSG Grand",
+            "description": "3 km from Airport",
+            "duration": "1 N",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771820681/trip-sathi/gniej1yhcrzddjeaq2gq.jpg"
+            ],
+            "_id": "699be62f5525100a9ac69778"
+          },
+          {
+            "type": "sightseeing",
+            "title": "Corbyn's Cove",
+            "description": "",
+            "duration": "2 hrs",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771820891/trip-sathi/ahzyjd8jsx5ikfzj3pji.jpg"
+            ],
+            "_id": "699be62f5525100a9ac69779"
+          }
+        ],
+        "_id": "699be62f5525100a9ac69775"
+      },
+      {
+        "dayNumber": 2,
+        "title": "Sightseeing in Havelock",
+        "activities": [
+          {
+            "type": "transfer",
+            "title": "Ferry Ride from Port Blair to Havelock- Shared Transfers (MAK)",
+            "description": "Take in the beautiful views as you take a Port Blair to Havelock Island ferry with your partner or family. Once on-board, you will be welcomes with tea/coffee for a refreshing experience. Feel the wind in your hair and grab beautiful views en route! Note: This is a shared ferry transfer service. In case of any delays, that cause the guests to miss the ferry, no refunds will be provided. Ferry tickets and timings are subject to availability. Govt. ferry would be provided based on the availability and operation. The ferry will be either Makruzz / Nautika Lite / Nautika 1",
+            "duration": "",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771821161/trip-sathi/whx68ykokn9d2ecf2ql7.jpg"
+            ],
+            "_id": "699be62f5525100a9ac6977b"
+          },
+          {
+            "type": "sightseeing",
+            "title": "Radhanagar Beach",
+            "description": "Radhanagar Beach (Beach No. 7) on Havelock Island (Swaraj Dweep), Andaman, is a renowned, pristine, Blue Flag-certified destination famous for its white sand, turquoise waters, and stunning sunsets. Often ranked among Asia's best, it offers calm, shallow waters ideal for swimming and, in specific zones, snorkeling and scuba diving",
+            "duration": "2 hr",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771821296/trip-sathi/rplqvi28ebcecetqsvp3.jpg"
+            ],
+            "_id": "699be62f5525100a9ac6977c"
+          },
+          {
+            "type": "hotel",
+            "title": "Silver Sand Village Resort",
+            "description": "",
+            "duration": "2 N",
+            "images": [
+              "https://res.cloudinary.com/dqcmkyff6/image/upload/v1771821434/trip-sathi/nipk8mwuzh78whsejj3z.jpg"
+            ],
+            "_id": "699be62f5525100a9ac6977d"
+          }
+        ],
+        "_id": "699be62f5525100a9ac6977a"
+      }
+    ],
+    "createdAt": "2026-02-23T05:31:27.832Z",
+    "updatedAt": "2026-02-23T06:01:34.190Z",
+    "__v": 0
+  }
+]

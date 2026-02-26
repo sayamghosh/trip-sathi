@@ -8,27 +8,7 @@ const Footer = () => {
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
 
-                {/* Newsletter / CTA Section */}
-                <div className="bg-brand-primary p-10 rounded-[32px] shadow-2xl shadow-blue-200 relative mb-20 max-w-5xl mx-auto text-center overflow-hidden">
 
-                    {/* Decorative Circles */}
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full translate-x-1/2 -translate-y-1/2"></div>
-                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-white opacity-10 rounded-full -translate-x-1/2 translate-y-1/2"></div>
-
-                    <h2 className="text-3xl font-bold text-white mb-8 max-w-lg mx-auto leading-snug font-display relative z-10">
-                        Subscribe to get latest package deals and exclusive offers from Trip-Sathi
-                    </h2>
-
-                    <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto relative z-10">
-                        <div className="flex-1 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl px-4 py-3 flex items-center gap-2 text-white placeholder-white/70">
-                            <svg className="w-5 h-5 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                            <input type="email" placeholder="Your email" className="outline-none flex-1 bg-transparent text-white placeholder-white/70" />
-                        </div>
-                        <button className="bg-white text-brand-primary px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-colors">
-                            Subscribe
-                        </button>
-                    </div>
-                </div>
 
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">

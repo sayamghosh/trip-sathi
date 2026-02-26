@@ -1,15 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from '@tanstack/react-router';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useAuthFlow } from '../context/AuthFlowContext';
 import LoginModal from './LoginModal';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
+  const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
   const navigate = useNavigate();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +28,7 @@ const Navbar = () => {
     logout();
     setIsProfileOpen(false);
     setIsOpen(false);
-    navigate('/');
+    navigate({ to: '/' });
   };
 
   return (
@@ -47,13 +48,19 @@ const Navbar = () => {
             <Link to="/" className="text-gray-600 font-medium hover:text-brand-primary transition-colors">Packages</Link>
             <Link to="/guides" className="text-gray-600 font-medium hover:text-brand-primary transition-colors">Local Guides</Link>
             <Link to="/about" className="text-gray-600 font-medium hover:text-brand-primary transition-colors">About</Link>
+            {/* Show Guide Dashboard for logged-in guides, Become a Guide for guests */}
+            {isAuthenticated && user?.role === 'guide' ? (
+              <Link to="/guide/dashboard" className="text-brand-primary font-bold hover:text-brand-dark transition-colors border-2 border-brand-primary/20 bg-brand-primary/5 px-4 py-1.5 rounded-full hover:border-brand-primary/40 hover:bg-brand-primary/10">Guide Dashboard</Link>
+            ) : !isAuthenticated ? (
+              <Link to="/become-a-guide" className="text-brand-primary font-bold hover:text-brand-dark transition-colors border-2 border-brand-primary/20 bg-brand-primary/5 px-4 py-1.5 rounded-full hover:border-brand-primary/40 hover:bg-brand-primary/10">Become a Tour Guide</Link>
+            ) : null}
           </div>
 
           {/* Action Buttons */}
           <div className="hidden md:flex items-center gap-4">
             {!isAuthenticated ? (
               <button
-                onClick={() => setIsLoginModalOpen(true)}
+                onClick={openLoginModal}
                 className="bg-brand-primary hover:bg-brand-secondary text-white px-6 py-2.5 rounded-full font-medium transition-colors shadow-lg shadow-sky-200 cursor-pointer"
               >
                 Log In / Sign Up
@@ -132,12 +139,17 @@ const Navbar = () => {
             className="md:hidden bg-white border-t border-sky-100 overflow-hidden"
           >
             <div className="px-6 pt-4 pb-8 space-y-4">
-              <Link to="/" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary">Packages</Link>
-              <Link to="/guides" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary">Local Guides</Link>
-              <Link to="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary">About</Link>
+              <Link to="/" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Packages</Link>
+              <Link to="/guides" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Local Guides</Link>
+              <Link to="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>About</Link>
+              {isAuthenticated && user?.role === 'guide' ? (
+                <Link to="/guide/dashboard" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Guide Dashboard</Link>
+              ) : !isAuthenticated ? (
+                <Link to="/become-a-guide" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Become a Tour Guide</Link>
+              ) : null}
               <div className="pt-4 flex flex-col gap-3">
                 {!isAuthenticated ? (
-                  <button onClick={() => { setIsOpen(false); setIsLoginModalOpen(true); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
+                  <button onClick={() => { setIsOpen(false); openLoginModal(); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
                     Log In / Sign Up
                   </button>
                 ) : (
@@ -178,7 +190,7 @@ const Navbar = () => {
         )}
       </AnimatePresence>
 
-      <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+      <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </nav>
   );
 };

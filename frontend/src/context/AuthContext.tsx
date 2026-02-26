@@ -8,6 +8,8 @@ interface User {
     name: string;
     picture: string;
     role: string;
+    phone?: string;
+    address?: string;
 }
 
 interface AuthContextType {
@@ -16,6 +18,7 @@ interface AuthContextType {
     login: (authData: AuthResponse) => void;
     logout: () => void;
     isAuthenticated: boolean;
+    updateUser: (updates: Partial<User>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -36,22 +39,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
     }, []);
 
+    const persistUser = (nextUser: User | null) => {
+        if (nextUser) {
+            localStorage.setItem('user', JSON.stringify(nextUser));
+        } else {
+            localStorage.removeItem('user');
+        }
+    };
+
     const login = (authData: AuthResponse) => {
         setUser(authData.user);
         setToken(authData.token);
         localStorage.setItem('token', authData.token);
-        localStorage.setItem('user', JSON.stringify(authData.user));
+        persistUser(authData.user as User);
     };
 
     const logout = () => {
         setUser(null);
         setToken(null);
         localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        persistUser(null);
+    };
+
+    const updateUser = (updates: Partial<User>) => {
+        setUser((prev) => {
+            if (!prev) return prev;
+            const nextUser = { ...prev, ...updates };
+            persistUser(nextUser);
+            return nextUser;
+        });
     };
 
     return (
-        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user }}>
+        <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user, updateUser }}>
             {children}
         </AuthContext.Provider>
     );

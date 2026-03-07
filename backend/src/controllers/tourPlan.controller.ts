@@ -57,6 +57,32 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
     }
 };
 
+export const searchTourPlans = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { destination } = req.query;
+        let query = {};
+        
+        if (destination && typeof destination === 'string' && destination.trim() !== '') {
+            const searchRegex = new RegExp(destination.trim(), 'i');
+            query = { 
+                $or: [
+                    { locations: { $regex: searchRegex } },
+                    { title: { $regex: searchRegex } },
+                    { description: { $regex: searchRegex } }
+                ]
+            };
+        }
+
+        const plans = await TourPlan.find(query)
+            .populate('guideId', 'name profileImage phone address')
+            .sort({ createdAt: -1 });
+            
+        res.status(200).json(plans);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error searching tour plans', error: error.message });
+    }
+};
+
 export const updateTourPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;

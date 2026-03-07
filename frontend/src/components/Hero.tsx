@@ -1,7 +1,27 @@
+import { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
 import bannerImg from '../assets/banner-tripsathi.png';
 
 const Hero = () => {
+    const [destination, setDestination] = useState('');
+    const navigate = useNavigate();
+
+    const handleSearch = () => {
+        if (destination.trim()) {
+            navigate({
+                to: '/search',
+                search: { destination: destination.trim() }
+            });
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
     return (
         <section className="relative px-4 sm:px-6 lg:px-8 pt-28 pb-12 bg-white">
             <div className="max-w-7xl mx-auto">
@@ -23,10 +43,16 @@ const Hero = () => {
                         <div className="bg-white p-1.5 rounded-full w-full max-w-2xl flex items-center shadow-lg mb-12">
                             <input 
                                 type="text" 
+                                value={destination}
+                                onChange={(e) => setDestination(e.target.value)}
+                                onKeyDown={handleKeyDown}
                                 placeholder="Where do you want to go?" 
                                 className="flex-1 bg-transparent outline-none text-gray-700 font-medium px-6 sm:text-base w-full placeholder-gray-500"
                             />
-                            <button className="bg-[#1868D5] hover:bg-blue-700 text-white px-8 py-3 rounded-full flex items-center gap-2 font-medium transition-colors cursor-pointer text-sm">
+                            <button 
+                                onClick={handleSearch}
+                                className="bg-[#1868D5] hover:bg-blue-700 text-white px-8 py-3 rounded-full flex items-center gap-2 font-medium transition-colors cursor-pointer text-sm"
+                            >
                                 <Search size={18} />
                                 <span className="hidden sm:inline">search</span>
                             </button>

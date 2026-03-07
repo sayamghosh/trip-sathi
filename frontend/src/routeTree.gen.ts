@@ -11,6 +11,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
 
 const GuidesLazyRouteImport = createFileRoute('/guides')()
 const BecomeAGuideLazyRouteImport = createFileRoute('/become-a-guide')()
@@ -49,6 +50,11 @@ const AboutLazyRoute = AboutLazyRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any).lazy(() => import('./routes/about.lazy').then((d) => d.Route))
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexLazyRoute = IndexLazyRouteImport.update({
   id: '/',
   path: '/',
@@ -107,6 +113,7 @@ const GuideTourPlansIdEditLazyRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/search': typeof SearchRoute
   '/about': typeof AboutLazyRoute
   '/become-a-guide': typeof BecomeAGuideLazyRoute
   '/guides': typeof GuidesLazyRouteWithChildren
@@ -120,6 +127,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/search': typeof SearchRoute
   '/about': typeof AboutLazyRoute
   '/become-a-guide': typeof BecomeAGuideLazyRoute
   '/guides': typeof GuidesLazyRouteWithChildren
@@ -133,6 +141,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexLazyRoute
+  '/search': typeof SearchRoute
   '/about': typeof AboutLazyRoute
   '/become-a-guide': typeof BecomeAGuideLazyRoute
   '/guides': typeof GuidesLazyRouteWithChildren
@@ -148,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/search'
     | '/about'
     | '/become-a-guide'
     | '/guides'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/search'
     | '/about'
     | '/become-a-guide'
     | '/guides'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/search'
     | '/about'
     | '/become-a-guide'
     | '/guides'
@@ -187,6 +199,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  SearchRoute: typeof SearchRoute
   AboutLazyRoute: typeof AboutLazyRoute
   BecomeAGuideLazyRoute: typeof BecomeAGuideLazyRoute
   GuidesLazyRoute: typeof GuidesLazyRouteWithChildren
@@ -217,6 +230,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -305,6 +325,7 @@ const GuideTourPlansIdLazyRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  SearchRoute: SearchRoute,
   AboutLazyRoute: AboutLazyRoute,
   BecomeAGuideLazyRoute: BecomeAGuideLazyRoute,
   GuidesLazyRoute: GuidesLazyRouteWithChildren,

@@ -50,12 +50,18 @@ export const uploadImage = async (formData: FormData): Promise<{ url: string }> 
     return response.data;
 };
 
+export const searchTourPlans = async (destination: string): Promise<TourPlanSummary[]> => {
+    const response = await axios.get(`${API_URL}/api/tour-plans/search?destination=${encodeURIComponent(destination)}`);
+    return response.data;
+};
+
 const tourPlanService = {
     createTourPlan,
     getTourPlansByGuide,
     getTourPlanById,
     updateTourPlan,
-    uploadImage
+    uploadImage,
+    searchTourPlans
 };
 
 export default tourPlanService;

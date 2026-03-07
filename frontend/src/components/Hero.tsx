@@ -52,7 +52,7 @@ const Hero = () => {
                 </div>
 
                 {/* Bottom Text Area */}
-                <div className="mt-16 text-center max-w-3xl mx-auto">
+                <div className="mt-4 text-center max-w-3xl mx-auto">
                     <h2 className="text-3xl md:text-[32px] font-bold text-gray-800 mb-3 tracking-tight">
                         Unforgettable Trips & Unbeatable Prices
                     </h2>

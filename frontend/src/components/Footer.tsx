@@ -1,13 +1,13 @@
-import React from 'react';
+
 
 const Footer = () => {
     return (
         <footer className="w-full bg-[#f8fafc] sm:bg-transparent p-0 sm:p-6 lg:p-8">
-            <div className="max-w-8xl mx-auto bg-[#1351D8] sm:rounded-3xl p-8 md:p-14 lg:p-16 text-white overflow-hidden">
+            <div className="max-w-[90rem] mx-auto bg-[#1351D8] sm:rounded-3xl p-8 md:p-14 lg:p-16 text-white overflow-hidden">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
                     {/* Left Section */}
                     <div className="lg:col-span-5 flex flex-col justify-between">
-                        <div className="text-xl font-bold mb-8 lg:mb-12">tripvio</div>
+                        <div className="text-xl font-bold mb-8 lg:mb-12">Trip Sathi</div>
                         <div>
                             <h2 className="text-3xl md:text-[2.5rem] font-medium mb-4 leading-tight">
                                 Get Fresh Deals & Travel Tips<br className="hidden md:block" /> in Your Inbox
@@ -33,7 +33,7 @@ const Footer = () => {
                     <div className="lg:col-span-6 lg:col-start-7 pt-2 lg:pt-0">
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
                             <div>
-                                <h4 className="font-semibold text-white mb-6">Tripvio</h4>
+                                <h4 className="font-semibold text-white mb-6">Trip Sathi</h4>
                                 <ul className="space-y-4 text-white/80 text-sm">
                                     <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
                                     <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
@@ -70,9 +70,9 @@ const Footer = () => {
                         <h4 className="font-semibold text-white mb-4">Contact</h4>
                         <div className="text-white/80 text-sm space-y-2">
                             <p className="flex flex-wrap items-center gap-2">
-                                Jl. Wanderlust No. 12, Jakarta, Indonesia 
+                                Kolkata, Madhyamgram - 700132. 
                                 <span className="hidden sm:inline opacity-50">•</span> 
-                                support@tripvio.com
+                                support@tripsathi.com
                             </p>
                             <p>+62 21 0000 1234</p>
                         </div>

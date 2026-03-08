@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import bannerImg from '../assets/banner-tripsathi.png';
 
 type SlideDirection = 'down' | 'up';
 
-const searchBarVariants = {
+const searchBarVariants: Variants = {
     enter: (direction: SlideDirection) => ({
         y: direction === 'down' ? -48 : 48,
         opacity: 0,

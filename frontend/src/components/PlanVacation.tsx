@@ -61,7 +61,7 @@ const PlanVacation = () => {
                             whileInView={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.3 }}
                             viewport={{ once: true }}
-                            className="bg-white p-6 rounded-[32px] shadow-2xl relative z-10 w-[370px] border border-gray-100"
+                            className="bg-white p-6 rounded-[32px] shadow-2xl relative z-[1] w-[370px] border border-gray-100"
                         >
                             <img
                                 src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"

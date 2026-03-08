@@ -7,7 +7,7 @@ import { searchTourPlans } from '../services/tourPlan.service'
 import type { TourPlanSummary } from '../types/tourPlan'
 
 const searchSchema = z.object({
-  destination: z.string().catch(''),
+  destination: z.string().optional(),
 })
 
 export const Route = createFileRoute('/search')({
@@ -54,7 +54,12 @@ const SkeletonCard = () => (
 );
 
 function SearchComponent() {
-  const { destination } = Route.useSearch()
+  Route.useSearch() // Trigger re-renders on route search changes
+
+  // Extract the destination query operation manually from the URL itself
+  const searchParams = new URLSearchParams(window.location.search);
+  const destination = searchParams.get('destination') || '';
+
   const [plans, setPlans] = useState<TourPlanSummary[]>([])
   const [loading, setLoading] = useState(true)
 

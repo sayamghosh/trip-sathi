@@ -1,59 +1,93 @@
-import { Facebook, Twitter, Instagram } from 'lucide-react';
+import React from 'react';
 
 const Footer = () => {
     return (
-        <footer className="relative pt-32 pb-10 overflow-hidden bg-[#F8FAFC]">
-
-            {/* Simple Top Border or Decoration if needed */}
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-
-
-
-
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
-
-                    <div className="col-span-2 pr-8">
-                        <h2 className="text-3xl font-bold text-brand-primary mb-4">Trip<span className="text-brand-dark">Sathi</span></h2>
-                        <p className="text-gray-500 text-sm mb-6 leading-relaxed">
-                            TripSathi connects you directly with confirmed local guides for the best tour packages at the best prices. No middlemen, no extra cost.
-                        </p>
+        <footer className="w-full bg-[#f8fafc] sm:bg-transparent p-0 sm:p-6 lg:p-8">
+            <div className="max-w-8xl mx-auto bg-[#1351D8] sm:rounded-3xl p-8 md:p-14 lg:p-16 text-white overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
+                    {/* Left Section */}
+                    <div className="lg:col-span-5 flex flex-col justify-between">
+                        <div className="text-xl font-bold mb-8 lg:mb-12">tripvio</div>
+                        <div>
+                            <h2 className="text-3xl md:text-[2.5rem] font-medium mb-4 leading-tight">
+                                Get Fresh Deals & Travel Tips<br className="hidden md:block" /> in Your Inbox
+                            </h2>
+                            <p className="text-white/80 mb-8 max-w-md text-sm md:text-base leading-relaxed">
+                                Be the first to know about flash sales, new packages,<br className="hidden md:block" /> and destination ideas.
+                            </p>
+                            
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <input 
+                                    type="email" 
+                                    placeholder="Enter your email" 
+                                    className="bg-[#306CE6] text-white placeholder-white/80 rounded-full px-6 py-3.5 w-full sm:w-[280px] outline-none focus:ring-2 focus:ring-white/50 text-sm"
+                                />
+                                <button className="bg-white text-gray-900 font-medium rounded-full px-8 py-3.5 hover:bg-gray-100 transition-colors whitespace-nowrap text-sm">
+                                    Subscribe
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div>
-                        <h4 className="font-bold text-lg text-brand-dark mb-6">Company</h4>
-                        <ul className="space-y-4 text-gray-500 text-sm font-medium">
-                            <li><a href="#" className="hover:text-brand-primary transition">About</a></li>
-                            <li><a href="#" className="hover:text-brand-primary transition">Careers</a></li>
-                            <li><a href="#" className="hover:text-brand-primary transition">Mobile</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-lg text-brand-dark mb-6">Contact</h4>
-                        <ul className="space-y-4 text-gray-500 text-sm font-medium">
-                            <li><a href="#" className="hover:text-brand-primary transition">Help/FAQ</a></li>
-                            <li><a href="#" className="hover:text-brand-primary transition">Press</a></li>
-                            <li><a href="#" className="hover:text-brand-primary transition">Affiliates</a></li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h4 className="font-bold text-lg text-brand-dark mb-6">More</h4>
-                        <ul className="space-y-4 text-gray-500 text-sm font-medium">
-                            <li><a href="#" className="hover:text-brand-primary transition">Airlinefees</a></li>
-                            <li><a href="#" className="hover:text-brand-primary transition">Airline</a></li>
-                            <li><a href="#" className="hover:text-brand-primary transition">Low fare tips</a></li>
-                        </ul>
+                    {/* Right Section - Links */}
+                    <div className="lg:col-span-6 lg:col-start-7 pt-2 lg:pt-0">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+                            <div>
+                                <h4 className="font-semibold text-white mb-6">Tripvio</h4>
+                                <ul className="space-y-4 text-white/80 text-sm">
+                                    <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Press & Media</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-white mb-6">Explore</h4>
+                                <ul className="space-y-4 text-white/80 text-sm">
+                                    <li><a href="#" className="hover:text-white transition-colors">Destinations</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Hotels</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Packages</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Experiences</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-white mb-6">Support</h4>
+                                <ul className="space-y-4 text-white/80 text-sm">
+                                    <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Payment & Refunds</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
+                                    <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-200">
-                    <p className="text-gray-400 text-sm font-medium">All rights reserved@TripSathi.co</p>
-                    <div className="flex gap-4 mt-4 md:mt-0">
-                        <a href="#" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-brand-primary hover:text-white transition-all"><Facebook size={18} /></a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-brand-primary hover:text-white transition-all"><Instagram size={18} /></a>
-                        <a href="#" className="w-10 h-10 rounded-full bg-white shadow-sm border border-gray-100 flex items-center justify-center text-gray-500 hover:bg-brand-primary hover:text-white transition-all"><Twitter size={18} /></a>
+                <hr className="my-10 lg:my-12 border-[#306CE6]" />
+
+                <div className="flex flex-col md:flex-row justify-between gap-8 md:items-start">
+                    <div>
+                        <h4 className="font-semibold text-white mb-4">Contact</h4>
+                        <div className="text-white/80 text-sm space-y-2">
+                            <p className="flex flex-wrap items-center gap-2">
+                                Jl. Wanderlust No. 12, Jakarta, Indonesia 
+                                <span className="hidden sm:inline opacity-50">•</span> 
+                                support@tripvio.com
+                            </p>
+                            <p>+62 21 0000 1234</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold text-white mb-4">Social</h4>
+                        <div className="text-white/80 text-sm flex flex-wrap items-center gap-2 sm:gap-3">
+                            <a href="#" className="hover:text-white transition-colors">Facebook</a>
+                            <span className="opacity-50">•</span>
+                            <a href="#" className="hover:text-white transition-colors">Instagram</a>
+                            <span className="opacity-50">•</span>
+                            <a href="#" className="hover:text-white transition-colors">X</a>
+                            <span className="opacity-50">•</span>
+                            <a href="#" className="hover:text-white transition-colors">YouTube</a>
+                        </div>
                     </div>
                 </div>
             </div>

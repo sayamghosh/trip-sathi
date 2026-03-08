@@ -35,7 +35,7 @@ const Navbar = () => {
   return (
     <nav className="fixed w-full z-50 bg-[#F0F9FF]/90 backdrop-blur-md border-b border-sky-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-20 h-20 items-center">
+        <div className="flex justify-between gap-20 h-20 items-center">
 
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-2">

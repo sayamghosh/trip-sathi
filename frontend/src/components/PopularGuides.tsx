@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Navigation } from 'lucide-react';
+import { getOptimizedImageUrl } from '../lib/utils';
 
 const guides = [
     {
@@ -58,8 +59,12 @@ const PopularGuides = () => {
                         >
                             <div className="h-[300px] overflow-hidden m-4 rounded-[24px]">
                                 <img
-                                    src={item.image}
+                                    src={getOptimizedImageUrl(item.image, 600)}
                                     alt={item.name}
+                                    width={600}
+                                    height={300}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
                             </div>

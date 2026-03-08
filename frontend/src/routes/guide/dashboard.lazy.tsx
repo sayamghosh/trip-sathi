@@ -245,6 +245,10 @@ function GuideDashboardPage() {
                   src={user.picture}
                   alt="Profile"
                   className="h-16 w-16 rounded-2xl border border-white object-cover shadow"
+                  width={64}
+                  height={64}
+                  loading="lazy"
+                  decoding="async"
                   referrerPolicy="no-referrer"
                 />
               ) : (

@@ -64,9 +64,13 @@ const PlanVacation = () => {
                             className="bg-white p-6 rounded-[32px] shadow-2xl relative z-[1] w-[370px] border border-gray-100"
                         >
                             <img
-                                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                                src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80&fm=webp"
                                 className="w-full h-[180px] object-cover rounded-[24px] mb-6 shadow-md"
                                 alt="Trip to Greece"
+                                width={600}
+                                height={180}
+                                loading="lazy"
+                                decoding="async"
                             />
                             <h4 className="font-bold text-xl text-brand-dark mb-2">Greece Getaway</h4>
                             <p className="text-gray-400 text-sm mb-4 font-medium">14-29 June | by Robbin joseph</p>
@@ -92,7 +96,7 @@ const PlanVacation = () => {
                                 viewport={{ once: true }}
                                 className="absolute bottom-12 -right-16 bg-white p-4 rounded-2xl shadow-xl flex gap-4 w-[240px] border border-gray-50"
                             >
-                                <img src="https://images.unsplash.com/photo-1566438480900-0609be27a4be?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" alt="Rome" />
+                                <img src="https://images.unsplash.com/photo-1566438480900-0609be27a4be?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80&fm=webp" className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" alt="Rome" width={48} height={48} loading="lazy" decoding="async" />
                                 <div>
                                     <p className="text-gray-400 text-xs font-medium">Ongoing</p>
                                     <h5 className="font-bold text-brand-dark text-sm">Trip to Rome</h5>

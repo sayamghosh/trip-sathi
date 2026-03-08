@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { Plus, Trash2, UploadCloud, MapPin, Clock, Image as ImageIcon, X, Edit2 } from 'lucide-react';
 import tourPlanService from '../../services/tourPlan.service';
+import { getOptimizedImageUrl } from '../../lib/utils';
 import toast from 'react-hot-toast';
 
 const LOCAL_STORAGE_KEY = 'trip_sathi_tour_plan_draft';
@@ -224,7 +225,7 @@ export default function CreateTourPlanForm({ initialData, editId, onSuccess }: {
                                     onDragOver={handleBannerReorderDragOver}
                                     onDrop={() => handleBannerReorderDrop(i)}
                                 >
-                                    <img src={img} alt="Banner" className="w-full h-full object-cover select-none pointer-events-none" />
+                                    <img src={getOptimizedImageUrl(img, 96)} alt="Banner" className="w-full h-full object-cover select-none pointer-events-none" width={96} height={96} loading="lazy" decoding="async" />
                                     <button
                                         type="button"
                                         onClick={(e) => {
@@ -530,7 +531,7 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
                                     {actDetails?.images && actDetails.images.length > 0 && (
                                         <div className="hidden sm:flex -space-x-3 mt-2 shrink-0">
                                             {actDetails.images.slice(0, 3).map((img: string, i: number) => (
-                                                <img key={i} src={img} alt="" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm bg-gray-100" />
+                                                <img key={i} src={getOptimizedImageUrl(img, 40)} alt="" className="w-10 h-10 rounded-full border-2 border-white object-cover shadow-sm bg-gray-100" width={40} height={40} loading="lazy" decoding="async" />
                                             ))}
                                             {actDetails.images.length > 3 && (
                                                 <div className="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 shadow-sm z-10 relative">
@@ -659,7 +660,7 @@ function ActivitiesManager({ control, dayIndex, handleImageUpload, watch }: any)
                                                 onDragOver={handleActivityReorderDragOver}
                                                 onDrop={() => handleActivityReorderDrop(i)}
                                             >
-                                                <img src={img} alt="Activity" className="w-full h-full object-cover select-none pointer-events-none" />
+                                                <img src={getOptimizedImageUrl(img, 96)} alt="Activity" className="w-full h-full object-cover select-none pointer-events-none" width={96} height={96} loading="lazy" decoding="async" />
                                                 <button
                                                     type="button"
                                                     onClick={(e) => {

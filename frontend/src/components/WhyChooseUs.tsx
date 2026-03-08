@@ -42,7 +42,7 @@ const WhyChooseUs = () => {
                             className="bg-white p-8 rounded-[32px] hover:shadow-xl transition-all duration-300 group text-center border border-gray-100 relative overflow-hidden"
                         >
                             <div className="relative mb-6 inline-block">
-                                <img src={feature.icon} alt={feature.title} className="h-16 w-auto mx-auto relative z-[1]" />
+                                <img src={feature.icon} alt={feature.title} className="h-16 w-auto mx-auto relative z-[1]" width={64} height={64} loading="lazy" decoding="async" />
                                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-sky-50 rounded-full -z-0 opacity-0 group-hover:opacity-100 transition-all scale-0 group-hover:scale-100"></div>
                             </div>
 

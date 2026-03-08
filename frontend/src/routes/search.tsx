@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { MapPin, Clock, Star, CheckCircle } from 'lucide-react'
 import { searchTourPlans } from '../services/tourPlan.service'
+import { getOptimizedImageUrl } from '../lib/utils'
 import type { TourPlanSummary } from '../types/tourPlan'
 
 const searchSchema = z.object({
@@ -109,11 +110,15 @@ function SearchComponent() {
                         >
                             <div className="h-[240px] overflow-hidden relative">
                                 <img
-                                    src={getFirstImage(plan)}
+                                    src={getOptimizedImageUrl(getFirstImage(plan), 600)}
                                     alt={plan.title}
+                                    width={600}
+                                    height={240}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80';
+                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80&fm=webp';
                                     }}
                                 />
                                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 text-[12px] font-bold text-gray-800 shadow-sm border border-white/20">
@@ -153,7 +158,7 @@ function SearchComponent() {
                                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         {plan.guideId?.profileImage ? (
-                                            <img src={plan.guideId.profileImage} className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm" alt={plan.guideId.name} />
+                                            <img src={getOptimizedImageUrl(plan.guideId.profileImage, 40)} className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm" alt={plan.guideId.name} width={40} height={40} loading="lazy" decoding="async" />
                                         ) : (
                                             <div className="w-10 h-10 rounded-full border border-gray-200 bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm shadow-sm">
                                                 {plan.guideId?.name?.[0]?.toUpperCase() ?? 'G'}

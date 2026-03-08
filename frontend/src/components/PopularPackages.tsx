@@ -9,6 +9,7 @@ import { requestCallback } from '../services/callback.service';
 import { useAuth } from '../context/AuthContext';
 import { useAuthFlow } from '../context/AuthFlowContext';
 import ContactModal from './guide/ContactModal';
+import { getOptimizedImageUrl } from '../lib/utils';
 import type { TourPlanSummary } from '../types/tourPlan';
 
 
@@ -217,12 +218,16 @@ const PopularPackages = () => {
                                 >
                                     <div className="h-[220px] overflow-hidden relative">
                                         <img
-                                            src={getFirstImage(plan)}
+                                            src={getOptimizedImageUrl(getFirstImage(plan), 600)}
                                             alt={plan.title}
+                                            width={600}
+                                            height={220}
+                                            loading="lazy"
+                                            decoding="async"
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             onError={(e) => {
                                                 (e.target as HTMLImageElement).src =
-                                                    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80';
+                                                    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80&fm=webp';
                                             }}
                                         />
                                         <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold text-gray-800 shadow-sm">
@@ -281,9 +286,13 @@ const PopularPackages = () => {
                                             <div className="flex items-center gap-2">
                                                 {plan.guideId?.profileImage ? (
                                                     <img
-                                                        src={plan.guideId.profileImage}
+                                                        src={getOptimizedImageUrl(plan.guideId.profileImage, 40)}
                                                         className="w-10 h-10 rounded-full border border-gray-200 object-cover"
                                                         alt={plan.guideId.name}
+                                                        width={40}
+                                                        height={40}
+                                                        loading="lazy"
+                                                        decoding="async"
                                                     />
                                                 ) : (
                                                     <div className="w-10 h-10 rounded-full border border-gray-200 bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm">

@@ -1,4 +1,5 @@
 import { MapPin, Clock, Calendar, IndianRupee, Briefcase, Hotel, Utensils, Info } from 'lucide-react';
+import { getOptimizedImageUrl } from '../../lib/utils';
 
 interface Activity {
     type: string;
@@ -49,24 +50,24 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
                 {plan.bannerImages && plan.bannerImages.length > 0 && (
                     <div className="w-full h-[400px] md:h-[500px] relative">
                         {plan.bannerImages.length === 1 && (
-                            <img src={plan.bannerImages[0]} alt={plan.title} className="w-full h-full object-cover" />
+                            <img src={getOptimizedImageUrl(plan.bannerImages[0], 1200)} alt={plan.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                         )}
 
                         {plan.bannerImages.length === 2 && (
                             <div className="flex h-full w-full gap-1">
-                                <img src={plan.bannerImages[0]} alt={plan.title} className="w-1/2 h-full object-cover" />
-                                <img src={plan.bannerImages[1]} alt={plan.title} className="w-1/2 h-full object-cover" />
+                                <img src={getOptimizedImageUrl(plan.bannerImages[0], 600)} alt={plan.title} className="w-1/2 h-full object-cover" loading="lazy" decoding="async" />
+                                <img src={getOptimizedImageUrl(plan.bannerImages[1], 600)} alt={plan.title} className="w-1/2 h-full object-cover" loading="lazy" decoding="async" />
                             </div>
                         )}
 
                         {plan.bannerImages.length === 3 && (
                             <div className="flex h-full w-full gap-1">
                                 <div className="w-2/3 h-full">
-                                    <img src={plan.bannerImages[0]} alt={plan.title} className="w-full h-full object-cover" />
+                                    <img src={getOptimizedImageUrl(plan.bannerImages[0], 800)} alt={plan.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                                 </div>
                                 <div className="w-1/3 h-full flex flex-col gap-1">
-                                    <img src={plan.bannerImages[1]} alt={plan.title} className="w-full h-1/2 object-cover" />
-                                    <img src={plan.bannerImages[2]} alt={plan.title} className="w-full h-1/2 object-cover" />
+                                    <img src={getOptimizedImageUrl(plan.bannerImages[1], 400)} alt={plan.title} className="w-full h-1/2 object-cover" loading="lazy" decoding="async" />
+                                    <img src={getOptimizedImageUrl(plan.bannerImages[2], 400)} alt={plan.title} className="w-full h-1/2 object-cover" loading="lazy" decoding="async" />
                                 </div>
                             </div>
                         )}
@@ -74,14 +75,14 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
                         {plan.bannerImages.length >= 4 && (
                             <div className="flex h-full w-full gap-1">
                                 <div className="w-1/2 lg:w-2/3 h-full">
-                                    <img src={plan.bannerImages[0]} alt={plan.title} className="w-full h-full object-cover" />
+                                    <img src={getOptimizedImageUrl(plan.bannerImages[0], 800)} alt={plan.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                                 </div>
                                 <div className="w-1/2 lg:w-1/3 h-full flex flex-col gap-1">
-                                    <img src={plan.bannerImages[1]} alt={plan.title} className="w-full h-1/2 object-cover" />
+                                    <img src={getOptimizedImageUrl(plan.bannerImages[1], 400)} alt={plan.title} className="w-full h-1/2 object-cover" loading="lazy" decoding="async" />
                                     <div className="flex w-full h-1/2 gap-1">
-                                        <img src={plan.bannerImages[2]} alt={plan.title} className="w-1/2 h-full object-cover" />
+                                        <img src={getOptimizedImageUrl(plan.bannerImages[2], 300)} alt={plan.title} className="w-1/2 h-full object-cover" loading="lazy" decoding="async" />
                                         <div className="w-1/2 h-full relative">
-                                            <img src={plan.bannerImages[3]} alt={plan.title} className="w-full h-full object-cover" />
+                                            <img src={getOptimizedImageUrl(plan.bannerImages[3], 300)} alt={plan.title} className="w-full h-full object-cover" loading="lazy" decoding="async" />
                                             {plan.bannerImages.length > 4 && (
                                                 <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold text-xl md:text-2xl cursor-pointer hover:bg-black/60 transition-colors">
                                                     +{plan.bannerImages.length - 4} More
@@ -101,9 +102,13 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
                         <div className="flex items-center gap-4 mb-6">
                             {plan.guideId.profileImage ? (
                                 <img
-                                    src={plan.guideId.profileImage}
+                                    src={getOptimizedImageUrl(plan.guideId.profileImage, 48)}
                                     alt={plan.guideId.name}
                                     className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                                    width={48}
+                                    height={48}
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                             ) : (
                                 <div className="w-12 h-12 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm">
@@ -195,9 +200,13 @@ export default function DetailedTourPlan({ plan }: { plan: TourPlan }) {
                                                         {activity.images.map((img, i) => (
                                                             <img
                                                                 key={i}
-                                                                src={img}
+                                                                src={getOptimizedImageUrl(img, 400)}
                                                                 alt={activity.title}
                                                                 className="w-48 h-32 object-cover rounded-xl border border-gray-200 shadow-sm flex-none"
+                                                                width={192}
+                                                                height={128}
+                                                                loading="lazy"
+                                                                decoding="async"
                                                             />
                                                         ))}
                                                     </div>

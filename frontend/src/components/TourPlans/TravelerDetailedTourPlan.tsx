@@ -12,6 +12,7 @@ import { requestCallback } from '../../services/callback.service';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthFlow } from '../../context/AuthFlowContext';
 import ContactModal from '../guide/ContactModal';
+import { getOptimizedImageUrl } from '../../lib/utils';
 import type { TourPlanDetailed, TourPlanDay } from '../../types/tourPlan';
 
 type PendingPlanPayload = {
@@ -288,9 +289,11 @@ export default function TravelerDetailedTourPlan() {
                             {/* Main large image */}
                             <div className="md:col-span-5 h-full relative group cursor-pointer overflow-hidden">
                                 <img
-                                    src={plan.bannerImages[0]}
+                                    src={getOptimizedImageUrl(plan.bannerImages[0], 600)}
                                     alt="Banner 1"
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    loading="lazy"
+                                    decoding="async"
                                 />
                                 <button className="absolute bottom-4 left-4 bg-black/60 hover:bg-black/80 text-white text-xs font-bold px-3 py-2 rounded flex items-center gap-2 transition-colors">
                                     <Image size={14} /> VIEW GALLERY →
@@ -311,9 +314,11 @@ export default function TravelerDetailedTourPlan() {
                                         <div key={idx} className="relative overflow-hidden group cursor-pointer">
                                             {img ? (
                                                 <img
-                                                    src={img}
+                                                    src={getOptimizedImageUrl(img, 300)}
                                                     alt={`Banner ${idx + 1}`}
                                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    loading="lazy"
+                                                    decoding="async"
                                                 />
                                             ) : (
                                                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
@@ -506,9 +511,11 @@ export default function TravelerDetailedTourPlan() {
                                                                         {activity.images && activity.images.length > 0 && (
                                                                             <div className="sm:w-[260px] h-[200px] sm:h-auto shrink-0 overflow-hidden">
                                                                                 <img
-                                                                                    src={activity.images[0]}
+                                                                                    src={getOptimizedImageUrl(activity.images[0], 400)}
                                                                                     alt={activity.title}
                                                                                     className="w-full h-full object-cover"
+                                                                                    loading="lazy"
+                                                                                    decoding="async"
                                                                                 />
                                                                             </div>
                                                                         )}
@@ -530,9 +537,13 @@ export default function TravelerDetailedTourPlan() {
                                                                             {activity.images.slice(1, 4).map((img, i) => (
                                                                                 <img
                                                                                     key={i}
-                                                                                    src={img}
+                                                                                    src={getOptimizedImageUrl(img, 100)}
                                                                                     alt={`${activity.title} ${i + 2}`}
                                                                                     className="w-14 h-14 object-cover rounded border border-gray-200"
+                                                                                    width={56}
+                                                                                    height={56}
+                                                                                    loading="lazy"
+                                                                                    decoding="async"
                                                                                 />
                                                                             ))}
                                                                             {activity.images.length > 4 && (
@@ -551,9 +562,11 @@ export default function TravelerDetailedTourPlan() {
                                                                     {activity.images && activity.images.length > 0 && (
                                                                         <div className="w-full sm:w-[200px] h-[140px] shrink-0 rounded-lg overflow-hidden">
                                                                             <img
-                                                                                src={activity.images[0]}
+                                                                                src={getOptimizedImageUrl(activity.images[0], 400)}
                                                                                 alt={activity.title}
                                                                                 className="w-full h-full object-cover"
+                                                                                loading="lazy"
+                                                                                decoding="async"
                                                                             />
                                                                         </div>
                                                                     )}
@@ -580,9 +593,11 @@ export default function TravelerDetailedTourPlan() {
                                                                     {activity.images && activity.images.length > 0 && (
                                                                         <div className="w-full sm:w-[180px] h-[120px] shrink-0 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center">
                                                                             <img
-                                                                                src={activity.images[0]}
+                                                                                src={getOptimizedImageUrl(activity.images[0], 300)}
                                                                                 alt={activity.title}
                                                                                 className="max-w-full max-h-full object-contain"
+                                                                                loading="lazy"
+                                                                                decoding="async"
                                                                             />
                                                                         </div>
                                                                     )}
@@ -606,9 +621,11 @@ export default function TravelerDetailedTourPlan() {
                                                                     {activity.images && activity.images.length > 0 && (
                                                                         <div className="w-full sm:w-[180px] h-[120px] shrink-0 rounded-lg overflow-hidden">
                                                                             <img
-                                                                                src={activity.images[0]}
+                                                                                src={getOptimizedImageUrl(activity.images[0], 300)}
                                                                                 alt={activity.title}
                                                                                 className="w-full h-full object-cover"
+                                                                                loading="lazy"
+                                                                                decoding="async"
                                                                             />
                                                                         </div>
                                                                     )}
@@ -736,9 +753,13 @@ export default function TravelerDetailedTourPlan() {
                                     <div className="flex items-center gap-3">
                                         {plan.guideId?.profileImage ? (
                                             <img
-                                                src={plan.guideId.profileImage}
+                                                src={getOptimizedImageUrl(plan.guideId.profileImage, 40)}
                                                 alt={plan.guideId.name}
                                                 className="w-10 h-10 rounded-full border-2 border-white shadow-sm object-cover"
+                                                width={40}
+                                                height={40}
+                                                loading="lazy"
+                                                decoding="async"
                                             />
                                         ) : (
                                             <div className="w-10 h-10 rounded-full bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold">

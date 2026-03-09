@@ -3,6 +3,7 @@ import WhyChooseUs from '../components/WhyChooseUs';
 import PopularPackages from '../components/PopularPackages';
 import PlanVacation from '../components/PlanVacation';
 import BestSellingDestinations from '../components/BestSellingDestinations';
+import LimitedTimeDeals from '../components/LimitedTimeDeals';
 
 const LandingPage = () => {
     return (
@@ -10,6 +11,7 @@ const LandingPage = () => {
             <Hero />
             <PopularPackages />
             <BestSellingDestinations />
+            <LimitedTimeDeals />
             <WhyChooseUs />
             <PlanVacation />
         </div>

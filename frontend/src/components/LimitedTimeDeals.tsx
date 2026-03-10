@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import OptimizedImage from './ui/OptimizedImage';
 
 const LimitedTimeDeals = () => {
     return (
@@ -20,11 +21,13 @@ const LimitedTimeDeals = () => {
                         className="relative flex-1 rounded-2xl overflow-hidden h-[240px] sm:h-[280px] group cursor-pointer block"
                     >
                         {/* Background — paraglider over tropical island */}
-                        <img
-                            src="https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=1000&h=600&fit=crop"
+                        <OptimizedImage
+                            src="https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg"
                             alt="Stay Longer and Save 15% OFF"
+                            width={600}
+                            height={280}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            loading="lazy"
+                            containerClassName="w-full h-full"
                         />
 
                         {/* Dark overlay */}
@@ -54,11 +57,13 @@ const LimitedTimeDeals = () => {
                         className="relative flex-1 rounded-2xl overflow-hidden h-[240px] sm:h-[280px] group cursor-pointer block"
                     >
                         {/* Background — Manali green valley */}
-                        <img
+                        <OptimizedImage
                             src="https://images.pexels.com/photos/414807/pexels-photo-414807.jpeg"
                             alt="New Year Holiday Getaway Manali 35% OFF"
+                            width={600}
+                            height={280}
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                            loading="lazy"
+                            containerClassName="w-full h-full"
                         />
 
                         {/* Subtle dark overlay */}

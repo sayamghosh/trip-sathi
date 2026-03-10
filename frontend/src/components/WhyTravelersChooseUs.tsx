@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Banknote, Building2, Headset, Copy } from 'lucide-react';
+import OptimizedImage from './ui/OptimizedImage';
 
 const features = [
     {
@@ -71,11 +72,13 @@ const WhyTravelersChooseUs = () => {
                         viewport={{ once: true }}
                         className="relative h-[400px] lg:h-[500px] w-full lg:w-[450px] ml-auto"
                     >
-                        <img 
+                        <OptimizedImage 
                             src="https://images.pexels.com/photos/868097/pexels-photo-868097.jpeg" 
-                            alt="Travelers smiling together on a mountain" 
+                            alt="Travelers smiling together on a mountain"
+                            width={450}
+                            height={500}
                             className="w-full h-full object-cover rounded-[24px]"
-                            loading="lazy"
+                            containerClassName="w-full h-full rounded-[24px]"
                         />
                     </motion.div>
 

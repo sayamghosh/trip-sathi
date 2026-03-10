@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import OptimizedImage from './ui/OptimizedImage';
 
 // Dummy data for Indian destinations using high-quality Unsplash image URLs
 const destinations = [
@@ -107,11 +108,13 @@ const BestSellingDestinations = () => {
                             className="relative group shrink-0 w-[158px] h-[220px] rounded-2xl overflow-hidden snap-start cursor-pointer block"
                         >
                             {/* Background Image */}
-                            <img 
+                            <OptimizedImage 
                                 src={dest.image} 
-                                alt={dest.name} 
+                                alt={dest.name}
+                                width={158}
+                                height={220}
                                 className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                loading="lazy"
+                                containerClassName="w-full h-full"
                             />
                             
                             {/* Gradient Overlay */}

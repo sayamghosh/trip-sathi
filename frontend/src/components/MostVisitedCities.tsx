@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Badge } from './ui/badge';
+import OptimizedImage from './ui/OptimizedImage';
 
 const cities = [
     {
@@ -63,11 +64,13 @@ const MostVisitedCities = () => {
                             className="group block w-full sm:w-[220px] shrink-0"
                         >
                             <div className="rounded-2xl overflow-hidden aspect-[3/4] border border-gray-100 mb-5 relative bg-gray-50">
-                                <img 
+                                <OptimizedImage 
                                     src={city.image} 
-                                    alt={city.name} 
+                                    alt={city.name}
+                                    width={220}
+                                    height={293}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    loading="lazy"
+                                    containerClassName="w-full h-full"
                                 />
                                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                             </div>

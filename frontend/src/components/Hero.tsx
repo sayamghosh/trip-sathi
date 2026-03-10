@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
+import OptimizedImage from './ui/OptimizedImage';
 import bannerImg from '../assets/banner-tripsathi.png';
 
 type SlideDirection = 'down' | 'up';
@@ -27,17 +28,26 @@ const Hero = () => {
     const [destination, setDestination] = useState('');
     const [isSticky, setIsSticky] = useState(false);
     const navigate = useNavigate();
+    const rafRef = useRef<number | null>(null);
+
+    // Throttled scroll handler using requestAnimationFrame
+    const handleScroll = useCallback(() => {
+        if (rafRef.current) return; // Skip if already scheduled
+        
+        rafRef.current = requestAnimationFrame(() => {
+            setIsSticky(window.scrollY > 350);
+            rafRef.current = null;
+        });
+    }, []);
 
     useEffect(() => {
-        const handleScroll = () => {
-            // Trigger stickiness slightly before it leaves screen for smoother interpolation
-            setIsSticky(window.scrollY > 350);
-        };
-
-        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('scroll', handleScroll, { passive: true });
         handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            if (rafRef.current) cancelAnimationFrame(rafRef.current);
+        };
+    }, [handleScroll]);
 
     const handleSearch = () => {
         if (destination.trim()) {
@@ -59,9 +69,17 @@ const Hero = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Image Container with rounded corners */}
                 <div
-                    className="relative w-full mx-auto rounded-[20px] sm:rounded-[32px] overflow-hidden bg-no-repeat bg-center bg-cover h-[450px] sm:h-[500px] lg:h-[550px] flex flex-col items-center justify-center text-center shadow-xl sm:shadow-2xl"
-                    style={{ backgroundImage: `url(${bannerImg})` }}
+                    className="relative w-full mx-auto rounded-[20px] sm:rounded-[32px] overflow-hidden h-[450px] sm:h-[500px] lg:h-[550px] flex flex-col items-center justify-center text-center shadow-xl sm:shadow-2xl"
                 >
+                    {/* Banner Image - Priority loaded for LCP */}
+                    <OptimizedImage
+                        src={bannerImg}
+                        alt="Trip Sathi banner - explore India"
+                        priority
+                        className="absolute inset-0 w-full h-full object-cover"
+                        containerClassName="absolute inset-0 w-full h-full"
+                    />
+                    
                     {/* Dark overlay for better text readability */}
                     <div className="absolute inset-0 bg-black/20 sm:bg-black/10"></div>
 

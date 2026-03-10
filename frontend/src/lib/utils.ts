@@ -6,31 +6,49 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Optimizes image URLs for faster loading:
- * - Cloudinary: injects f_auto,q_auto,w_{width} transforms (serves WebP/AVIF automatically)
- * - Unsplash: appends fm=webp for modern format delivery
- * - Other URLs: pass through unchanged
+ * Optimizes image URLs for faster loading while maintaining quality:
+ * - Requests 2x width for retina displays
+ * - Cloudinary: f_auto,q_80 (higher quality)
+ * - Unsplash: fm=webp&q=85
+ * - Pexels: dpr=2 for high-DPI without aggressive compression
  */
 export function getOptimizedImageUrl(url: string, width?: number): string {
     if (!url) return url;
 
+    // Request 2x for retina displays
+    const retinaWidth = width ? width * 2 : undefined;
+
     // Cloudinary: inject transforms after /upload/
     if (url.includes('res.cloudinary.com') && url.includes('/upload/')) {
         const transforms = [
-            'f_auto',   // auto-format (WebP/AVIF per browser)
-            'q_auto',   // auto quality
-            ...(width ? [`w_${width}`] : []),
+            'f_auto',       // auto-format (WebP/AVIF per browser)
+            'q_80',         // quality 80 (good balance)
+            ...(retinaWidth ? [`w_${retinaWidth}`] : []),
         ].join(',');
         return url.replace('/upload/', `/upload/${transforms}/`);
     }
 
-    // Unsplash: add fm=webp if not already present
+    // Unsplash: add quality and format params
     if (url.includes('images.unsplash.com')) {
+        const params = new URLSearchParams();
+        params.set('fm', 'webp');
+        params.set('q', '85');
+        if (retinaWidth) params.set('w', String(retinaWidth));
+        
         const separator = url.includes('?') ? '&' : '?';
-        if (!url.includes('fm=')) {
-            url = `${url}${separator}fm=webp`;
-        }
-        return url;
+        return `${url}${separator}${params.toString()}`;
+    }
+
+    // Pexels: use dpr=2 for retina without over-compression
+    if (url.includes('images.pexels.com')) {
+        const params = new URLSearchParams();
+        params.set('auto', 'compress');
+        params.set('cs', 'tinysrgb');
+        params.set('dpr', '2');  // Request 2x for retina
+        if (width) params.set('w', String(width)); // Original width, dpr handles retina
+        
+        const separator = url.includes('?') ? '&' : '?';
+        return `${url}${separator}${params.toString()}`;
     }
 
     return url;

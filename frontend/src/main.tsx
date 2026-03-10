@@ -7,6 +7,7 @@ import './index.css';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from './context/AuthContext';
 import { AuthFlowProvider } from './context/AuthFlowContext';
+import SmoothScroll from './components/SmoothScroll';
 
 const router = createRouter({ routeTree });
 
@@ -27,7 +28,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <AuthFlowProvider>
         <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
           <Toaster position="top-center" reverseOrder={false} />
-          <RouterProvider router={router} />
+          <SmoothScroll>
+            <RouterProvider router={router} />
+          </SmoothScroll>
         </GoogleOAuthProvider>
       </AuthFlowProvider>
     </AuthProvider>

@@ -1,10 +1,10 @@
 import Hero from '../components/Hero';
 import PopularPackages from '../components/PopularPackages';
-import PlanVacation from '../components/PlanVacation';
 import BestSellingDestinations from '../components/BestSellingDestinations';
 import LimitedTimeDeals from '../components/LimitedTimeDeals';
 import MostVisitedCities from '../components/MostVisitedCities';
 import WhyTravelersChooseUs from '../components/WhyTravelersChooseUs';
+import FAQ from '../components/FAQ';
 
 const LandingPage = () => {
     return (
@@ -15,7 +15,7 @@ const LandingPage = () => {
             <LimitedTimeDeals />
             <MostVisitedCities />
             <WhyTravelersChooseUs />
-            <PlanVacation />
+            <FAQ />
         </div>
     );
 };

@@ -4,6 +4,7 @@ import PopularPackages from '../components/PopularPackages';
 import PlanVacation from '../components/PlanVacation';
 import BestSellingDestinations from '../components/BestSellingDestinations';
 import LimitedTimeDeals from '../components/LimitedTimeDeals';
+import MostVisitedCities from '../components/MostVisitedCities';
 
 const LandingPage = () => {
     return (
@@ -12,6 +13,7 @@ const LandingPage = () => {
             <PopularPackages />
             <BestSellingDestinations />
             <LimitedTimeDeals />
+            <MostVisitedCities />
             <WhyChooseUs />
             <PlanVacation />
         </div>

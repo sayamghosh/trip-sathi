@@ -167,9 +167,13 @@ function BecomeAGuidePage() {
           <div className="flex-1 hidden md:block">
             <div className="relative">
               <img
-                src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                src="https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=webp"
                 alt="Tour guide showing a group a map"
                 className="rounded-3xl shadow-2xl border-4 border-white/20 transform rotate-2 hover:rotate-0 transition-transform duration-500 object-cover h-[450px] w-full"
+                width={800}
+                height={450}
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute -bottom-6 -left-6 bg-white p-4 rounded-2xl shadow-xl flex items-center gap-4">
                 <div className="bg-green-100 p-3 rounded-full text-green-600">

@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import { MapPin, Clock, Star, CheckCircle } from 'lucide-react'
+import { MapPin, Clock, Star, CheckCircle, Search } from 'lucide-react'
 import { searchTourPlans } from '../services/tourPlan.service'
+import { getOptimizedImageUrl } from '../lib/utils'
 import type { TourPlanSummary } from '../types/tourPlan'
 
 const searchSchema = z.object({
@@ -56,12 +57,19 @@ const SkeletonCard = () => (
 function SearchComponent() {
   Route.useSearch() // Trigger re-renders on route search changes
 
+  const navigate = useNavigate()
+
   // Extract the destination query operation manually from the URL itself
   const searchParams = new URLSearchParams(window.location.search);
   const destination = searchParams.get('destination') || '';
 
+  const [localDestination, setLocalDestination] = useState(destination)
   const [plans, setPlans] = useState<TourPlanSummary[]>([])
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    setLocalDestination(destination)
+  }, [destination])
 
   useEffect(() => {
     setLoading(true);
@@ -71,23 +79,48 @@ function SearchComponent() {
       .finally(() => setLoading(false));
   }, [destination])
 
+  const handleSearch = () => {
+      if (localDestination.trim() || localDestination === '') {
+          navigate({
+              to: '/search',
+              search: { destination: localDestination.trim() || undefined }
+          });
+      }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+          handleSearch();
+      }
+  };
+
   return (
-    <div className="min-h-screen bg-white pt-28 pb-20">
+    <div className="min-h-screen bg-gradient-to-b from-[#f4f7fa] to-white pt-28 pb-20 font-display">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="mb-12">
-          <h1 className="text-4xl lg:text-5xl font-display font-bold text-gray-900 mb-4 tracking-tight">
-            Search Results
-          </h1>
-          {destination ? (
-            <p className="text-gray-500 text-lg md:text-xl">
-              Showing amazing trips and packages for <span className="font-bold text-brand-primary">{destination}</span>
-            </p>
-          ) : (
-            <p className="text-gray-500 text-lg md:text-xl">
-              Showing all available top destinations and packages.
-            </p>
-          )}
+        <div className="mb-16 flex flex-col items-center text-center sticky top-24 z-[5]">
+
+          {/* Search Bar Wrapper */}
+          <div className="w-full max-w-xl sm:max-w-3xl">
+              <div className="bg-white/95 backdrop-blur-xl p-1.5 sm:p-2 rounded-full flex items-center shadow-lg border border-gray-200/50 transition-shadow duration-300 hover:shadow-xl">
+                  <input
+                      type="text"
+                      value={localDestination}
+                      onChange={(e) => setLocalDestination(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Where do you want to go?"
+                      className="flex-1 bg-transparent outline-none text-gray-800 font-medium px-5 sm:px-6 text-base sm:text-lg w-full placeholder-gray-400"
+                  />
+                  <button
+                      onClick={handleSearch}
+                      className="bg-brand-primary hover:bg-blue-700 text-white px-6 sm:px-8 py-3 rounded-full flex items-center gap-2 font-bold transition-transform duration-200 hover:scale-105 active:scale-95 cursor-pointer text-sm shadow-md shadow-brand-primary/20"
+                  >
+                      <Search size={16} className="sm:hidden" />
+                      <Search size={18} className="hidden sm:block" />
+                      <span className="hidden sm:inline">search</span>
+                  </button>
+              </div>
+          </div>
         </div>
           
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -105,17 +138,24 @@ function SearchComponent() {
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: index * 0.1 }}
-                            className="bg-[#F8FAFF] rounded-[24px] border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-full overflow-hidden flex flex-col"
+                            className="bg-white rounded-[24px] border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 group cursor-pointer h-full overflow-hidden flex flex-col"
                         >
                             <div className="h-[240px] overflow-hidden relative">
                                 <img
-                                    src={getFirstImage(plan)}
+                                    src={getOptimizedImageUrl(getFirstImage(plan), 600)}
                                     alt={plan.title}
+                                    width={600}
+                                    height={240}
+                                    loading="lazy"
+                                    decoding="async"
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     onError={(e) => {
-                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80';
+                                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80&fm=webp';
                                     }}
                                 />
+                                {/* Dark gradient overlay to make tags/text pop, although we just have a duration tag right now */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                
                                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-1.5 text-[12px] font-bold text-gray-800 shadow-sm border border-white/20">
                                     <Clock size={14} className="text-brand-primary" />
                                     {formatDuration(plan.durationDays, plan.durationNights)}
@@ -130,14 +170,14 @@ function SearchComponent() {
                                         </h3>
                                         <div className="flex flex-wrap gap-1.5 mt-3 text-[12px] text-gray-500 font-semibold">
                                             {(plan.locations ?? []).slice(0, 3).map((loc) => (
-                                                <span key={loc} className="inline-flex items-center gap-1 bg-white border border-gray-200 shadow-sm rounded-full px-2.5 py-1">
+                                                <span key={loc} className="inline-flex items-center gap-1 bg-gray-50 text-gray-600 border border-gray-100 shadow-sm rounded-full px-2.5 py-1">
                                                     <MapPin size={12} className="text-brand-primary" /> {loc}
                                                 </span>
                                             ))}
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-1 text-xs font-bold bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-lg">
-                                        <Star size={12} fill="currentColor" /> 5.0
+                                    <div className="flex items-center gap-1 text-sm font-bold text-gray-800">
+                                        <Star size={14} className="text-amber-400" fill="currentColor" /> 5.0
                                     </div>
                                 </div>
 
@@ -153,7 +193,7 @@ function SearchComponent() {
                                 <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
                                     <div className="flex items-center gap-3">
                                         {plan.guideId?.profileImage ? (
-                                            <img src={plan.guideId.profileImage} className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm" alt={plan.guideId.name} />
+                                            <img src={getOptimizedImageUrl(plan.guideId.profileImage, 40)} className="w-10 h-10 rounded-full border border-gray-200 object-cover shadow-sm" alt={plan.guideId.name} width={40} height={40} loading="lazy" decoding="async" />
                                         ) : (
                                             <div className="w-10 h-10 rounded-full border border-gray-200 bg-brand-primary/10 flex items-center justify-center text-brand-primary font-bold text-sm shadow-sm">
                                                 {plan.guideId?.name?.[0]?.toUpperCase() ?? 'G'}

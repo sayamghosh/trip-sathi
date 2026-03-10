@@ -72,6 +72,10 @@ const Navbar = () => {
                     src={user.picture}
                     alt="Profile"
                     className="w-10 h-10 rounded-full object-cover"
+                    width={40}
+                    height={40}
+                    loading="lazy"
+                    decoding="async"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
@@ -159,6 +163,10 @@ const Navbar = () => {
                           src={user.picture}
                           alt="Profile"
                           className="w-12 h-12 rounded-full object-cover shadow-sm"
+                          width={48}
+                          height={48}
+                          loading="lazy"
+                          decoding="async"
                           referrerPolicy="no-referrer"
                         />
                       ) : (

@@ -97,9 +97,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     {/* ── LEFT PANEL: Scenic photo ── */}
                     <div className="hidden md:block relative w-[42%] flex-shrink-0 overflow-hidden">
                         <img
-                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80&fm=webp"
                             alt="Beautiful mountain landscape"
                             className="absolute inset-0 w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                         />
                         <div
                             className="absolute inset-0"

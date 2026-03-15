@@ -53,45 +53,45 @@ const MostVisitedCities = () => {
                         Plan your itinerary around iconic landmarks, must-see spots, and unforgettable local experiences.
                     </p>
                 </div>
-                
-                {/* Grid Area - 3 cards, width 374px */}
-                <div className="flex flex-col md:flex-row flex-wrap justify-center gap-6 lg:gap-8 gap-y-12">
-                    {cities.map((city) => (
-                        <Link 
-                            key={city.name} 
-                            to="/search" 
-                            search={{ destination: city.query }} 
-                            className="group block w-full sm:w-[220px] shrink-0"
-                        >
-                            <div className="rounded-2xl overflow-hidden aspect-[3/4] border border-gray-100 mb-5 relative bg-gray-50">
-                                <OptimizedImage 
-                                    src={city.image} 
-                                    alt={city.name}
-                                    width={220}
-                                    height={293}
-                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    containerClassName="w-full h-full"
-                                />
-                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                            </div>
-                            
-                            <div className="flex flex-row items-center justify-between gap-4 mb-2">
-                                <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight">
-                                    {city.name}
-                                </h3>
-                                <Badge 
-                                    variant="secondary" 
-                                    className="px-2.5 py-1 text-[11px] font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 border-none shrink-0"
-                                >
-                                    {city.hotels} Hotels
-                                </Badge>
-                            </div>
-                            
-                            <p className="text-sm text-gray-500 leading-relaxed max-w-[95%]">
-                                {city.description}
-                            </p>
-                        </Link>
-                    ))}
+
+                {/* Grid Area – horizontal scroll on mobile, wrap on md+ */}
+                <div className="-mx-4 sm:mx-0">
+                    <div className="flex flex-row md:flex-wrap md:justify-center gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory pl-5 pr-4 sm:px-0 scroll-pl-5 md:scroll-pl-0 pb-4 md:pb-0 scrollbar-hide">
+                        {cities.map((city) => (
+                            <Link
+                                key={city.name}
+                                to="/search"
+                                search={{ destination: city.query }}
+                                className="group block w-[200px] sm:w-[220px] shrink-0 snap-start"
+                            >
+                                <div className="rounded-2xl overflow-hidden aspect-[3/4] border border-gray-100 mb-5 relative bg-gray-50">
+                                    <OptimizedImage
+                                        src={city.image}
+                                        alt={city.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        containerClassName="w-full h-full"
+                                    />
+                                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                                </div>
+
+                                <div className="flex flex-row items-center justify-between gap-4 mb-2">
+                                    <h3 className="text-lg md:text-xl font-bold text-gray-900 tracking-tight">
+                                        {city.name}
+                                    </h3>
+                                    <Badge
+                                        variant="secondary"
+                                        className="px-2.5 py-1 text-[11px] font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 border-none shrink-0"
+                                    >
+                                        {city.hotels} Hotels
+                                    </Badge>
+                                </div>
+
+                                <p className="text-sm text-gray-500 leading-relaxed max-w-[95%]">
+                                    {city.description}
+                                </p>
+                            </Link>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>

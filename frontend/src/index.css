@@ -23,6 +23,7 @@
         transform: translate(-50%, -150%);
         opacity: 0;
     }
+
     to {
         transform: translate(-50%, 0);
         opacity: 1;
@@ -34,8 +35,13 @@
 }
 
 @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
 }
 
 .animate-shimmer {
@@ -58,4 +64,17 @@ html.lenis body {
 
 .lenis.lenis-stopped {
     overflow: hidden;
+}
+
+/* Hide scrollbar but keep scroll functionality */
+.scrollbar-hide {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE/Edge */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome/Safari */
 }

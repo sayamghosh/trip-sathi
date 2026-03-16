@@ -172,7 +172,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                     <GoogleLogin
                                         onSuccess={handleSuccess}
                                         onError={() => setError('Sign-in failed. Please try again.')}
-                                        useOneTap
                                         theme="outline"
                                         shape="pill"
                                         size="large"

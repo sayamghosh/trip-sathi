@@ -57,7 +57,6 @@ const LoginPage: React.FC = () => {
                         <GoogleLogin
                             onSuccess={handleSuccess}
                             onError={handleError}
-                            useOneTap
                             theme="filled_blue"
                             shape="rectangular"
                             size="large"

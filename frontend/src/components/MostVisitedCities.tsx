@@ -8,35 +8,35 @@ const cities = [
         query: 'delhi',
         hotels: '1,450+',
         description: 'Delhi, India’s capital territory, is a massive metropolitan area in the country’s north.',
-        image: 'https://images.pexels.com/photos/31709020/pexels-photo-31709020.jpeg',
+        image: 'https://images.unsplash.com/photo-1678966432189-d58296e45ad2?auto=format&fit=crop&q=80&w=800&h=1200',
     },
     {
         name: 'Goa, India',
         query: 'goa',
         hotels: '4,320+',
         description: 'Cliffside temples with ocean views and stunning golden hours.',
-        image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1000&q=80',
+        image: 'https://plus.unsplash.com/premium_photo-1697729701846-e34563b06d47?auto=format&fit=crop&q=80&w=800&h=1200',
     },
     {
         name: 'Jaipur, India',
         query: 'jaipur',
         hotels: '7,850+',
         description: 'Panoramic skyline views with a luxe ambience and iconic backdrop.',
-        image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=1000&q=80',
+        image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&q=80&w=800&h=1200',
     },
     {
-        name: 'Kolkata, India',
+        name: 'Kolkata',
         query: 'kolkata',
         hotels: '7,850+',
         description: 'The capital and largest city of the Indian state of West Bengal.',
-        image: 'https://images.pexels.com/photos/29263819/pexels-photo-29263819.jpeg',
+        image: 'https://images.unsplash.com/photo-1682582036641-91dfe7b66ba6?auto=format&fit=crop&q=80&w=800&h=1200',
     },
     {
-        name: 'Mumbai, India',
+        name: 'Mumbai',
         query: 'Mumbai',
         hotels: '7,850+',
-        description: 'Mumbai (formerly called Bombay) is a densely populated city on India’s west coast.',
-        image: 'https://images.pexels.com/photos/15528027/pexels-photo-15528027.jpeg',
+        description: 'Mumbai is a densely populated city on India’s west coast.',
+        image: 'https://images.unsplash.com/photo-1598434192043-71111c1b3f41?auto=format&fit=crop&q=80&w=800&h=1200',
     }
 ];
 

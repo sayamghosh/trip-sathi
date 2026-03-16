@@ -1,4 +1,5 @@
-import { Sidebar } from "@/components/dashboard/Sidebar"
+import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 import { TopBar } from "@/components/dashboard/TopBar"
 import { MetricCards } from "@/components/dashboard/MetricCards"
 import { RevenueChart } from "@/components/dashboard/RevenueChart"
@@ -11,22 +12,19 @@ import { CalendarWidget } from "@/components/dashboard/CalendarWidget"
 import { UpcomingTrips } from "@/components/dashboard/UpcomingTrips"
 import { RecentActivity } from "@/components/dashboard/RecentActivity"
 import { Footer } from "@/components/dashboard/Footer"
-
 export function App() {
   return (
-    <div className="flex min-h-screen bg-[#F5F7FA]">
-      {/* Left Sidebar - fixed 175px */}
-      <Sidebar />
+    <SidebarProvider>
+      <AppSidebar />
 
-      {/* Everything right of sidebar */}
-      <div className="flex min-h-screen flex-1 flex-col" style={{ marginLeft: 175 }}>
-
-
-        {/* Header row - full width */}
-        <div className="flex items-center justify-between px-5 pt-4 pb-0">
-          <h1 className="text-[20px] font-bold text-[#1A2B3D]">Dashboard</h1>
-          <TopBar />
-        </div>
+      <SidebarInset>          {/* Header row - full width */}
+          <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4">
+            <div className="flex items-center gap-4">
+              <SidebarTrigger className="-ml-1" />
+              <h1 className="text-xl font-bold">Dashboard</h1>
+            </div>
+            <TopBar />
+          </header>
 
         {/* Middle: center content + right panel */}
         <div className="flex flex-1">
@@ -66,10 +64,9 @@ export function App() {
           </aside>
         </div>
 
-        {/* Footer - full width spanning center + right panel */}
         <Footer />
-      </div>
-    </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 

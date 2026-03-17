@@ -48,8 +48,8 @@ export function AppSidebar() {
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <Compass className="size-4" />
           </div>
-          <span className="text-sm font-semibold truncate">
-            Travelie
+          <span className="font-semibold truncate">
+            Trip Sathi
           </span>
         </div>
       </SidebarHeader>
@@ -57,13 +57,17 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
+            <SidebarMenu className="space-y-1.5">
               {items.map((item) => (
                 <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton asChild isActive={item.active}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={item.active}
+                    className="[&_svg]:!size-5"
+                  >
                     <a href={item.url}>
                       <item.icon />
-                      <span>{item.label}</span>
+                      <span className="text-[15px]">{item.label}</span>
                     </a>
                   </SidebarMenuButton>
                   {item.badge && (

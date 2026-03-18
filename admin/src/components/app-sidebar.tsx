@@ -48,9 +48,7 @@ export function AppSidebar() {
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <Compass className="size-4" />
           </div>
-          <span className="font-semibold truncate">
-            Trip Sathi
-          </span>
+          <span className="truncate font-semibold">Trip Sathi</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
@@ -71,9 +69,7 @@ export function AppSidebar() {
                     </a>
                   </SidebarMenuButton>
                   {item.badge && (
-                    <SidebarMenuBadge>
-                      {item.badge}
-                    </SidebarMenuBadge>
+                    <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
               ))}
@@ -84,7 +80,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="text-destructive hover:text-destructive hover:bg-destructive/10">
+            <SidebarMenuButton className="text-destructive hover:bg-destructive/10 hover:text-destructive">
               <LogOut />
               <span>Logout</span>
             </SidebarMenuButton>

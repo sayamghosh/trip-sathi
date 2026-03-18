@@ -28,7 +28,8 @@ export function CalendarWidget() {
     <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-3">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[13px] font-semibold text-[#1A2B3D]">
-          {monthStr} {y} <ChevronRight className="inline h-3 w-3 text-[#8896A6]" />
+          {monthStr} {y}{" "}
+          <ChevronRight className="inline h-3 w-3 text-[#8896A6]" />
         </span>
         <div className="flex gap-0.5">
           <button className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-[#F0F4F8]">
@@ -41,7 +42,10 @@ export function CalendarWidget() {
       </div>
       <div className="grid grid-cols-7">
         {DOW.map((d) => (
-          <div key={d} className="py-[3px] text-center text-[10px] font-medium text-[#8896A6]">
+          <div
+            key={d}
+            className="py-[3px] text-center text-[10px] font-medium text-[#8896A6]"
+          >
             {d}
           </div>
         ))}

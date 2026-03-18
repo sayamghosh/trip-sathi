@@ -10,7 +10,16 @@ const metrics = [
     iconBg: "bg-[#D4E8FC]",
     iconColor: "#2E7CF6",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E7CF6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#2E7CF6"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
       </svg>
     ),
@@ -24,8 +33,20 @@ const metrics = [
     iconBg: "bg-[#C9EFDA]",
     iconColor: "#22B357",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22B357" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><line x1="19" x2="19" y1="8" y2="14" /><line x1="22" x2="16" y1="11" y2="11" />
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#22B357"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+        <circle cx="9" cy="7" r="4" />
+        <line x1="19" x2="19" y1="8" y2="14" />
+        <line x1="22" x2="16" y1="11" y2="11" />
       </svg>
     ),
   },
@@ -38,8 +59,18 @@ const metrics = [
     iconBg: "bg-[#DDD4FC]",
     iconColor: "#7C5CE7",
     icon: (
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C5CE7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" x2="12" y1="2" y2="22" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#7C5CE7"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="12" x2="12" y1="2" y2="22" />
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
       </svg>
     ),
   },
@@ -58,7 +89,7 @@ export function MetricCards() {
               <p className="text-[11px] font-medium text-[#5A6E82]">
                 {m.label}
               </p>
-              <p className="mt-[2px] text-[26px] font-bold leading-tight text-[#1A2B3D]">
+              <p className="mt-[2px] text-[26px] leading-tight font-bold text-[#1A2B3D]">
                 {m.value}
               </p>
             </div>

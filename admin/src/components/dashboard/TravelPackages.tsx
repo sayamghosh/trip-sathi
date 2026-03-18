@@ -67,7 +67,7 @@ export function TravelPackages() {
             >
               <span className="text-[32px]">{p.emoji}</span>
               <span
-                className="absolute left-2 top-2 rounded-[6px] px-2 py-[2px] text-[9px] font-semibold"
+                className="absolute top-2 left-2 rounded-[6px] px-2 py-[2px] text-[9px] font-semibold"
                 style={{ backgroundColor: p.catBg, color: p.catColor }}
               >
                 {p.category}

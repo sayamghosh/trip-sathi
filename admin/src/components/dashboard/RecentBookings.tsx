@@ -1,11 +1,46 @@
 import { Search, ArrowUpDown } from "lucide-react"
 
 const bookings = [
-  { name: "Camellia Swan", pkg: "Venice Dreams", dur: "6D5N", date: "Jun 25 - Jun 30", price: "$1,500", status: "Confirmed" },
-  { name: "Raphael Goodman", pkg: "Safari Adventure", dur: "8D7N", date: "Jun 25 - Jul 2", price: "$3,200", status: "Pending" },
-  { name: "Ludwig Contessa", pkg: "Alpine Escape", dur: "7D6N", date: "Jun 26 - Jul 2", price: "$2,100", status: "Confirmed" },
-  { name: "Armina Raul Meyes", pkg: "Caribbean Cruise", dur: "10D9N", date: "Jun 25 - Jul 5", price: "$2,800", status: "Cancelled" },
-  { name: "James Dunn", pkg: "Parisian Romance", dur: "5D4N", date: "Jun 28 - Jun 30", price: "$1,200", status: "Confirmed" },
+  {
+    name: "Camellia Swan",
+    pkg: "Venice Dreams",
+    dur: "6D5N",
+    date: "Jun 25 - Jun 30",
+    price: "$1,500",
+    status: "Confirmed",
+  },
+  {
+    name: "Raphael Goodman",
+    pkg: "Safari Adventure",
+    dur: "8D7N",
+    date: "Jun 25 - Jul 2",
+    price: "$3,200",
+    status: "Pending",
+  },
+  {
+    name: "Ludwig Contessa",
+    pkg: "Alpine Escape",
+    dur: "7D6N",
+    date: "Jun 26 - Jul 2",
+    price: "$2,100",
+    status: "Confirmed",
+  },
+  {
+    name: "Armina Raul Meyes",
+    pkg: "Caribbean Cruise",
+    dur: "10D9N",
+    date: "Jun 25 - Jul 5",
+    price: "$2,800",
+    status: "Cancelled",
+  },
+  {
+    name: "James Dunn",
+    pkg: "Parisian Romance",
+    dur: "5D4N",
+    date: "Jun 28 - Jun 30",
+    price: "$1,200",
+    status: "Confirmed",
+  },
 ]
 
 const statusCls: Record<string, string> = {
@@ -57,7 +92,7 @@ export function RecentBookings() {
           {bookings.map((b, i) => (
             <tr
               key={i}
-              className="border-b border-[#F0F4F8] last:border-0 transition hover:bg-[#F5F7FA]"
+              className="border-b border-[#F0F4F8] transition last:border-0 hover:bg-[#F5F7FA]"
             >
               <td className="px-2.5 py-2.5 text-[11.5px] font-medium text-[#1A2B3D]">
                 {b.name}

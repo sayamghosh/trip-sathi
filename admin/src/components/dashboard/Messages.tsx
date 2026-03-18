@@ -1,13 +1,62 @@
 import { MoreHorizontal } from "lucide-react"
 
 const messages = [
-  { name: "Europia Hotel", msg: "We are pleased to announc...", time: "11:00 AM", color: "#2E7CF6", init: "E", online: true },
-  { name: "Global Travel Co", msg: "We have updated our com...", time: "2:15 PM", color: "#22B357", init: "G", online: false },
-  { name: "Kalendra Umbora", msg: "Hi, I need assistance with c...", time: "9:45 AM", color: "#818CF8", init: "K", online: true },
-  { name: "Osman Farooq", msg: "Hello, I had an amazing tim...", time: "10:15 AM", color: "#F472B6", init: "O", online: false },
-  { name: "Mellinda Jenkins", msg: "Can you provide more deta...", time: "1:20 PM", color: "#FB923C", init: "M", online: true },
-  { name: "David Hernandez", msg: "I would like to upgrade my...", time: "10:00 AM", color: "#EF4444", init: "D", online: false },
-  { name: "Alexandra Green", msg: "Our company is interested i...", time: "9:10 PM", color: "#0EA5E9", init: "A", online: true },
+  {
+    name: "Europia Hotel",
+    msg: "We are pleased to announc...",
+    time: "11:00 AM",
+    color: "#2E7CF6",
+    init: "E",
+    online: true,
+  },
+  {
+    name: "Global Travel Co",
+    msg: "We have updated our com...",
+    time: "2:15 PM",
+    color: "#22B357",
+    init: "G",
+    online: false,
+  },
+  {
+    name: "Kalendra Umbora",
+    msg: "Hi, I need assistance with c...",
+    time: "9:45 AM",
+    color: "#818CF8",
+    init: "K",
+    online: true,
+  },
+  {
+    name: "Osman Farooq",
+    msg: "Hello, I had an amazing tim...",
+    time: "10:15 AM",
+    color: "#F472B6",
+    init: "O",
+    online: false,
+  },
+  {
+    name: "Mellinda Jenkins",
+    msg: "Can you provide more deta...",
+    time: "1:20 PM",
+    color: "#FB923C",
+    init: "M",
+    online: true,
+  },
+  {
+    name: "David Hernandez",
+    msg: "I would like to upgrade my...",
+    time: "10:00 AM",
+    color: "#EF4444",
+    init: "D",
+    online: false,
+  },
+  {
+    name: "Alexandra Green",
+    msg: "Our company is interested i...",
+    time: "9:10 PM",
+    color: "#0EA5E9",
+    init: "A",
+    online: true,
+  },
 ]
 
 export function Messages() {
@@ -34,7 +83,7 @@ export function Messages() {
                 {m.init}
               </div>
               {m.online && (
-                <div className="absolute -bottom-[1px] -right-[1px] h-[10px] w-[10px] rounded-full border-2 border-white bg-[#22B357]" />
+                <div className="absolute -right-[1px] -bottom-[1px] h-[10px] w-[10px] rounded-full border-2 border-white bg-[#22B357]" />
               )}
             </div>
 

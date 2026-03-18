@@ -2,7 +2,12 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 
 const data = [
   { name: "Tokyo, Japan", pct: 35, color: "#2E7CF6", participants: "2,458" },
-  { name: "Sydney, Australia", pct: 28, color: "#5BC5F0", participants: "2,458" },
+  {
+    name: "Sydney, Australia",
+    pct: 28,
+    color: "#5BC5F0",
+    participants: "2,458",
+  },
   { name: "Paris, France", pct: 22, color: "#818CF8", participants: "2,458" },
   { name: "Venice, Italy", pct: 15, color: "#F472B6", participants: "2,458" },
 ]
@@ -51,7 +56,7 @@ export function TopDestinations() {
                 style={{ backgroundColor: d.color }}
               />
               <div>
-                <p className="text-[12px] font-medium leading-tight text-[#1A2B3D]">
+                <p className="text-[12px] leading-tight font-medium text-[#1A2B3D]">
                   {d.name} ({d.pct}%)
                 </p>
                 <p className="text-[10px] text-[#8896A6]">

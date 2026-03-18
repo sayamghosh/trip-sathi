@@ -1,4 +1,8 @@
-import { SidebarProvider, SidebarTrigger, SidebarInset } from "@/components/ui/sidebar"
+import {
+  SidebarProvider,
+  SidebarTrigger,
+  SidebarInset,
+} from "@/components/ui/sidebar"
 import { AppSidebar } from "@/components/app-sidebar"
 import { TopBar } from "@/components/dashboard/TopBar"
 import { MetricCards } from "@/components/dashboard/MetricCards"
@@ -17,15 +21,16 @@ export function App() {
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset>          {/* Header row - full width */}
-          <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="-ml-1" />
-              <h1 className="text-xl font-bold">Dashboard</h1>
-            </div>
-            <TopBar />
-          </header>
-
+      <SidebarInset>
+        {" "}
+        {/* Header row - full width */}
+        <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger className="-ml-1" />
+            <h1 className="text-xl font-bold">Dashboard</h1>
+          </div>
+          <TopBar />
+        </header>
         {/* Middle: center content + right panel */}
         <div className="flex flex-1">
           {/* Center scrollable content */}
@@ -63,7 +68,6 @@ export function App() {
             </div>
           </aside>
         </div>
-
         <Footer />
       </SidebarInset>
     </SidebarProvider>

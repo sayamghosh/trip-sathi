@@ -16,7 +16,7 @@ export function TopBar() {
       {/* Notification */}
       <button className="relative flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-[#E4EAF1] bg-white transition hover:bg-[#F0F4F8]">
         <Bell className="h-[15px] w-[15px] text-[#6B7F95]" strokeWidth={1.8} />
-        <span className="absolute -right-[2px] -top-[2px] h-[8px] w-[8px] rounded-full bg-[#2E7CF6] ring-2 ring-white" />
+        <span className="absolute -top-[2px] -right-[2px] h-[8px] w-[8px] rounded-full bg-[#2E7CF6] ring-2 ring-white" />
       </button>
 
       {/* User */}

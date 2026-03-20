@@ -11,6 +11,7 @@ import {
   MessageSquareText,
   LogOut,
 } from "lucide-react"
+import { useRouter } from "@tanstack/react-router"
 
 import {
   Sidebar,
@@ -41,6 +42,14 @@ const items = [
 ]
 
 export function AppSidebar() {
+  const router = useRouter()
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
+    router.navigate({ to: "/login" })
+  }
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -80,7 +89,10 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton className="text-destructive hover:bg-destructive/10 hover:text-destructive">
+            <SidebarMenuButton 
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              onClick={handleLogout}
+            >
               <LogOut />
               <span>Logout</span>
             </SidebarMenuButton>

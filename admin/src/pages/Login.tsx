@@ -31,6 +31,7 @@ export function Login() {
 
       // Success
       localStorage.setItem("token", response.data.token)
+      localStorage.setItem("user", JSON.stringify(response.data.user))
       router.navigate({ to: "/" })
     } catch (err) {
       if (
@@ -75,6 +76,7 @@ export function Login() {
       })
 
       localStorage.setItem("token", response.data.token)
+      localStorage.setItem("user", JSON.stringify(response.data.user))
       router.navigate({ to: "/" })
     } catch (err) {
       if (axios.isAxiosError(err)) {

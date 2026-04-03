@@ -1,4 +1,4 @@
-﻿import React, { useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import {
   CalendarDays,
   MapPin,
@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
+import api from "@/lib/axios"
 
 interface ItineraryItem {
   day: number
@@ -50,21 +51,62 @@ const tagOptions = [
   "City Break",
 ]
 
+import { useParams, useNavigate } from "@tanstack/react-router"
+
 export function CreatePlanPage() {
-  const [planName, setPlanName] = useState("Bali Discovery Escape")
-  const [destination, setDestination] = useState("Bali, Indonesia")
+  const { packageId } = useParams({ strict: false }) as any
+  const navigate = useNavigate()
+  const isEdit = !!packageId
+
+  const [planName, setPlanName] = useState("")
+  const [description, setDescription] = useState("")
+  const [destination, setDestination] = useState("")
   const [category, setCategory] = useState("Adventure")
-  const [startDate, setStartDate] = useState("2026-05-10")
-  const [endDate, setEndDate] = useState("2026-05-16")
-  const [price, setPrice] = useState(1299)
-  const [capacity, setCapacity] = useState(18)
-  const [duration, setDuration] = useState(7)
+  const [startDate, setStartDate] = useState(new Date().toISOString().split('T')[0])
+  const [endDate, setEndDate] = useState(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0])
+  const [price, setPrice] = useState(0)
+  const [capacity, setCapacity] = useState(10)
+  const [duration, setDuration] = useState(1)
   const [includeFlights, setIncludeFlights] = useState(false)
   const [includeStay, setIncludeStay] = useState(true)
-  const [isFeatured, setIsFeatured] = useState(true)
+  const [isFeatured, setIsFeatured] = useState(false)
   const [isPublished, setIsPublished] = useState(false)
-  const [tags, setTags] = useState<string[]>(["Adventure", "Nature"])
-  const [itinerary, setItinerary] = useState<ItineraryItem[]>(defaultItinerary)
+  const [tags, setTags] = useState<string[]>([])
+  const [itinerary, setItinerary] = useState<ItineraryItem[]>([
+    { day: 1, title: "Arrival", detail: "Arrival and hotel check-in." }
+  ])
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(isEdit)
+
+  React.useEffect(() => {
+    if (isEdit) {
+      const fetchPlan = async () => {
+        try {
+          const res = await api.get(`/api/tour-plans/${packageId}`)
+          const data = res.data
+          setPlanName(data.title)
+          setDescription(data.description)
+          setPrice(data.basePrice)
+          setDuration(data.durationDays)
+          setDestination(data.locations?.[0] || "")
+          setItinerary(data.days.map((d: any) => ({
+            day: d.dayNumber,
+            title: d.title,
+            detail: d.activities[0]?.description || ""
+          })))
+          if (data.createdAt) {
+             setStartDate(new Date(data.createdAt).toISOString().split('T')[0])
+          }
+        } catch (error) {
+          console.error("Error fetching plan:", error)
+          alert("Failed to load plan data")
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      fetchPlan()
+    }
+  }, [isEdit, packageId])
 
   const nights = useMemo(() => Math.max(duration - 1, 1), [duration])
   const selectedTags = useMemo(() => tags.join(", "), [tags])
@@ -96,8 +138,64 @@ export function CreatePlanPage() {
     setItinerary((prev) => prev.filter((_, i) => i !== index).map((item, i) => ({ ...item, day: i + 1 })))
   }
 
-  const handlePublish = () => {
-    setIsPublished(true)
+  const handlePublish = async () => {
+    setIsSubmitting(true)
+    try {
+      const payload = {
+        title: planName,
+        description,
+        basePrice: price,
+        durationDays: duration,
+        durationNights: nights,
+        locations: [destination],
+        bannerImages: [
+          "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800",
+        ],
+        days: itinerary.map((item) => ({
+          dayNumber: item.day,
+          title: item.title,
+          activities: [
+            {
+              type: "other",
+              title: item.title,
+              description: item.detail,
+              images: [],
+            },
+          ],
+        })),
+      }
+
+      if (isEdit) {
+        await api.put(`/api/tour-plans/${packageId}`, payload)
+        alert("Plan updated successfully!")
+      } else {
+        await api.post("/api/tour-plans", payload)
+        alert("Plan published successfully!")
+      }
+      setIsPublished(true)
+      navigate({ to: "/packages" })
+    } catch (error: any) {
+      console.error("Error saving plan:", error)
+      alert(error.response?.data?.message || "Failed to save plan")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this package?")) return
+    try {
+      await api.delete(`/api/tour-plans/${packageId}`)
+      alert("Package deleted successfully!")
+      navigate({ to: "/packages" })
+    } catch (error) {
+      console.error("Error deleting package:", error)
+      alert("Failed to delete package")
+    }
+  }
+
+  if (isLoading) {
+    return <div className="flex h-[70vh] items-center justify-center">Loading plan details...</div>
   }
 
   return (
@@ -106,14 +204,27 @@ export function CreatePlanPage() {
       <div className="rounded-[14px] border border-[#E4EAF1] bg-white px-5 py-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-wide text-[#2E7CF6]">Create travel plan</p>
-            <h1 className="text-2xl font-bold text-[#1A2B3D] mt-1">{planName || "New travel plan"}</h1>
-            <p className="text-[12px] text-[#5A6E82] mt-1">Publish curated packages with dates, pricing, and a day-by-day itinerary.</p>
+            <p className="text-[12px] font-semibold uppercase tracking-wide text-[#2E7CF6]">{isEdit ? "Edit travel plan" : "Create travel plan"}</p>
+            <h1 className="text-2xl font-bold text-[#1A2B3D] mt-1">{planName || (isEdit ? "Loading..." : "New travel plan")}</h1>
+            <p className="text-[12px] text-[#5A6E82] mt-1">{isEdit ? "Update this package's details, pricing and itinerary." : "Publish curated packages with dates, pricing, and a day-by-day itinerary."}</p>
           </div>
           <div className="flex items-center gap-2">
+            {isEdit && (
+              <Button onClick={handleDelete} variant="outline" size="sm" className="h-9 border-red-100 text-red-600 hover:bg-red-50 hover:text-red-700">
+                <Trash2 className="mr-2 h-4 w-4" />
+                Delete Package
+              </Button>
+            )}
             <Button variant="outline" size="sm" className="h-9 border-[#E4EAF1]">Save draft</Button>
             <Button variant="secondary" size="sm" className="h-9">Preview</Button>
-            <Button onClick={handlePublish} size="sm" className="h-9">Publish plan</Button>
+            <Button 
+              onClick={handlePublish} 
+              disabled={isSubmitting}
+              size="sm" 
+              className="h-9"
+            >
+              {isSubmitting ? "Saving..." : (isEdit ? "Update plan" : "Publish plan")}
+            </Button>
           </div>
         </div>
       </div>
@@ -139,6 +250,15 @@ export function CreatePlanPage() {
               <div className="space-y-2">
                 <label className="text-[12px] font-semibold text-[#1A2B3D]">Destination</label>
                 <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="City / Country" className="h-10" />
+              </div>
+              <div className="col-span-2 space-y-2">
+                <label className="text-[12px] font-semibold text-[#1A2B3D]">Rich Description</label>
+                <textarea 
+                  value={description} 
+                  onChange={(e) => setDescription(e.target.value)} 
+                  placeholder="Describe the overall experience..." 
+                  className="min-h-[100px] w-full rounded-lg border border-[#E4EAF1] bg-white px-3 py-2 text-[13px] text-[#1A2B3D] focus:border-[#2E7CF6] focus:outline-none focus:ring-2 focus:ring-[#2E7CF6]/20"
+                />
               </div>
               <div className="space-y-2">
                 <label className="text-[12px] font-semibold text-[#1A2B3D]">Category</label>

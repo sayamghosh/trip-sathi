@@ -1,14 +1,14 @@
 import {
   LayoutDashboard,
   Package,
-  BookOpen,
+  BookCheck,
   CalendarDays,
   Users,
   Compass,
   ImageIcon,
   MessageCircle,
-  Tag,
-  MessageSquareText,
+  Percent,
+  ThumbsUp,
   LogOut,
 } from "lucide-react"
 
@@ -18,26 +18,27 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuBadge,
 } from "@/components/ui/sidebar"
+import { Link } from "@tanstack/react-router"
+import { Button } from "@/components/ui/button"
 
-// Menu items.
+// Menu items according to the UI image
 const items = [
-  { icon: Package, label: "Create Plan", url: "#", active: true },
-  { icon: LayoutDashboard, label: "Dashboard", url: "#" },
-  { icon: BookOpen, label: "Bookings", url: "#" },
-  { icon: CalendarDays, label: "Calendar", url: "#" },
-  { icon: Users, label: "Travelers", url: "#" },
-  { icon: Compass, label: "Guides", url: "#" },
-  { icon: ImageIcon, label: "Gallery", url: "#" },
-  { icon: MessageCircle, label: "Messages", url: "#", badge: 7 },
-  { icon: Tag, label: "Deals", url: "#" },
-  { icon: MessageSquareText, label: "Feedback", url: "#" },
+  { icon: LayoutDashboard, label: "Dashboard", to: "/" },
+  { icon: Package, label: "Packages", to: "/packages" },
+  { icon: BookCheck, label: "Bookings", to: "/bookings" },
+  { icon: CalendarDays, label: "Calendar", to: "/calendar" },
+  { icon: Users, label: "Travelers", to: "/travelers" },
+  { icon: Compass, label: "Guides", to: "/guides" },
+  { icon: ImageIcon, label: "Gallery", to: "/gallery" },
+  { icon: MessageCircle, label: "Messages", to: "/messages", badge: 7 },
+  { icon: Percent, label: "Deals", to: "/deals" },
+  { icon: ThumbsUp, label: "Feedback", to: "/feedback" },
 ]
 
 export function AppSidebar() {
@@ -48,34 +49,43 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-2 py-4">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-            <Compass className="size-4" />
+    <Sidebar className="border-r-0">
+      <SidebarHeader className="bg-white px-6 py-8">
+        <Link to="/" className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#3B82F6] text-white shadow-lg shadow-blue-200">
+            <Compass className="h-5 w-5" />
           </div>
-          <span className="truncate font-semibold">Trip Sathi</span>
-        </div>
+          <span className="text-xl font-bold tracking-tight text-[#1A2B3D]">Travelie</span>
+        </Link>
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="bg-white px-4">
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1.5">
+            <SidebarMenu className="gap-1">
               {items.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     asChild
-                    isActive={item.active}
-                    className="[&_svg]:!size-5"
+                    className="h-11 px-4 transition-all duration-200 hover:bg-slate-50 group"
                   >
-                    <a href={item.url}>
-                      <item.icon />
-                      <span className="text-[15px]">{item.label}</span>
-                    </a>
+                    <Link
+                      to={item.to as any}
+                      activeProps={{
+                        className: "bg-[#3B82F6] text-white hover:bg-[#3B82F6] shadow-md shadow-blue-100",
+                      }}
+                      inactiveProps={{
+                         className: "text-[#8896A6] hover:text-[#1A2B3D]",
+                      }}
+                    >
+                      <item.icon className="h-5 w-5 shrink-0" />
+                      <span className="text-[15px] font-medium">{item.label}</span>
+                    </Link>
                   </SidebarMenuButton>
                   {item.badge && (
-                    <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                    <SidebarMenuBadge className="right-4 bg-[#3B82F6] text-white">
+                      {item.badge}
+                    </SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
               ))}
@@ -83,15 +93,26 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+
+      <SidebarFooter className="bg-white p-6 pt-0">
+        <div className="mb-8 overflow-hidden rounded-2xl bg-[#D0EBFF] p-6 text-center space-y-4">
+          <div className="space-y-1">
+            <p className="text-[13px] font-medium text-[#1A2B3D]/70">Enhance Your</p>
+            <p className="text-[15px] font-bold text-[#1A2B3D]">Travelie Experience!</p>
+          </div>
+          <Button variant="secondary" className="w-full bg-white text-[#1A2B3D] hover:bg-slate-50 font-semibold shadow-sm text-[13px] h-10 rounded-xl">
+            Upgrade Now
+          </Button>
+        </div>
+
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton 
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            <SidebarMenuButton
+              className="h-10 text-[#8896A6] hover:bg-red-50 hover:text-red-500 transition-colors px-4 group"
               onClick={handleLogout}
             >
-              <LogOut />
-              <span>Logout</span>
+              <LogOut className="h-5 w-5 mr-3 transition-colors group-hover:text-red-500" />
+              <span className="text-[15px] font-medium">Logout</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

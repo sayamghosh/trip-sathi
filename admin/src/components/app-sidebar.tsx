@@ -11,7 +11,6 @@ import {
   MessageSquareText,
   LogOut,
 } from "lucide-react"
-import { useRouter } from "@tanstack/react-router"
 
 import {
   Sidebar,
@@ -29,8 +28,8 @@ import {
 
 // Menu items.
 const items = [
-  { icon: LayoutDashboard, label: "Dashboard", url: "#", active: true },
-  { icon: Package, label: "Packages", url: "#" },
+  { icon: Package, label: "Create Plan", url: "#", active: true },
+  { icon: LayoutDashboard, label: "Dashboard", url: "#" },
   { icon: BookOpen, label: "Bookings", url: "#" },
   { icon: CalendarDays, label: "Calendar", url: "#" },
   { icon: Users, label: "Travelers", url: "#" },
@@ -42,12 +41,10 @@ const items = [
 ]
 
 export function AppSidebar() {
-  const router = useRouter()
-
   const handleLogout = () => {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
-    router.navigate({ to: "/login" })
+    window.location.href = "/login"
   }
 
   return (

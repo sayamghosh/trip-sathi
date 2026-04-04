@@ -21,24 +21,22 @@ import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import api from "@/lib/axios"
 
+interface ActivityItem {
+  id: string
+  type: "transfer" | "sightseeing" | "hotel" | "other"
+  metaInfo?: string
+  title: string
+  description?: string
+  images?: string[]
+}
+
 interface ItineraryItem {
   day: number
   title: string
-  detail: string
+  activities: ActivityItem[]
 }
 
-const defaultItinerary: ItineraryItem[] = [
-  {
-    day: 1,
-    title: "Arrival & City Stroll",
-    detail: "Airport pickup, hotel check-in, evening guided walk through old town with welcome dinner.",
-  },
-  {
-    day: 2,
-    title: "Signature Experience",
-    detail: "Morning hike to sunrise viewpoint, brunch with locals, afternoon museum pass, night market crawl.",
-  },
-]
+
 
 const tagOptions = [
   "Beach",
@@ -73,8 +71,14 @@ export function CreatePlanPage() {
   const [isPublished, setIsPublished] = useState(false)
   const [tags, setTags] = useState<string[]>([])
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([
-    { day: 1, title: "Arrival", detail: "Arrival and hotel check-in." }
+    { day: 1, title: "Arrival", activities: [] }
   ])
+  const [activeDayIndex, setActiveDayIndex] = useState(0)
+
+  const [activityModalOpen, setActivityModalOpen] = useState(false)
+  const [activityModalDay, setActivityModalDay] = useState(0)
+  const [initialActivityType, setInitialActivityType] = useState<ActivityItem["type"]>("other")
+  const [currentActivity, setCurrentActivity] = useState<ActivityItem | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(isEdit)
 
@@ -89,11 +93,20 @@ export function CreatePlanPage() {
           setPrice(data.basePrice)
           setDuration(data.durationDays)
           setDestination(data.locations?.[0] || "")
-          setItinerary(data.days.map((d: any) => ({
+          const fetchedDays = data.days?.length > 0 ? data.days : [{ dayNumber: 1, title: "Arrival", activities: [] }]
+          setItinerary(fetchedDays.map((d: any) => ({
             day: d.dayNumber,
             title: d.title,
-            detail: d.activities[0]?.description || ""
+            activities: d.activities?.map((a: any) => ({
+              id: Math.random().toString(36).substr(2, 9),
+              type: a.type || "other",
+              title: a.title,
+              metaInfo: a.duration || "",
+              description: a.description || "",
+              images: a.images || [],
+            })) || []
           })))
+          setActiveDayIndex(0)
           if (data.createdAt) {
              setStartDate(new Date(data.createdAt).toISOString().split('T')[0])
           }
@@ -128,14 +141,61 @@ export function CreatePlanPage() {
       ...prev,
       {
         day: prev.length + 1,
-        title: "New experience",
-        detail: "Describe the activity, inclusions, meeting point, and timing.",
+        title: "New Day",
+        activities: [],
       },
     ])
+    setActiveDayIndex(itinerary.length)
   }
 
   const removeDay = (index: number) => {
     setItinerary((prev) => prev.filter((_, i) => i !== index).map((item, i) => ({ ...item, day: i + 1 })))
+    if (activeDayIndex >= index && activeDayIndex > 0) {
+      setActiveDayIndex(activeDayIndex - 1)
+    }
+  }
+
+  const openActivityModal = (dayIndex: number, type: ActivityItem["type"], existingActivity?: ActivityItem) => {
+    setActivityModalDay(dayIndex)
+    if (existingActivity) {
+      setCurrentActivity(existingActivity)
+      setInitialActivityType(existingActivity.type)
+    } else {
+      setCurrentActivity({
+        id: Math.random().toString(36).substr(2, 9),
+        type,
+        title: "",
+        metaInfo: "",
+        description: "",
+        images: []
+      })
+      setInitialActivityType(type)
+    }
+    setActivityModalOpen(true)
+  }
+
+  const saveActivity = () => {
+    if (!currentActivity) return
+    setItinerary(prev => {
+      const next = [...prev]
+      const day = next[activityModalDay]
+      const exists = day.activities.findIndex(a => a.id === currentActivity.id)
+      if (exists !== -1) {
+        day.activities[exists] = currentActivity
+      } else {
+        day.activities.push(currentActivity)
+      }
+      return next
+    })
+    setActivityModalOpen(false)
+  }
+
+  const removeActivity = (dayIndex: number, activityId: string) => {
+    setItinerary(prev => {
+      const next = [...prev]
+      next[dayIndex].activities = next[dayIndex].activities.filter(a => a.id !== activityId)
+      return next
+    })
   }
 
   const handlePublish = async () => {
@@ -154,14 +214,13 @@ export function CreatePlanPage() {
         days: itinerary.map((item) => ({
           dayNumber: item.day,
           title: item.title,
-          activities: [
-            {
-              type: "other",
-              title: item.title,
-              description: item.detail,
-              images: [],
-            },
-          ],
+          activities: item.activities.map(a => ({
+            type: a.type,
+            title: a.title,
+            duration: a.metaInfo || "",
+            description: a.description || "",
+            images: a.images || [],
+          })),
         })),
       }
 
@@ -363,32 +422,118 @@ export function CreatePlanPage() {
           </section>
 
           {/* Itinerary */}
-          <section className="rounded-[14px] border border-[#E4EAF1] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)]">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="text-[15px] font-semibold text-[#1A2B3D]">Itinerary builder</h3>
-                <p className="text-[12px] text-[#5A6E82]">Add day-by-day highlights and logistics.</p>
-              </div>
-              <Button size="sm" variant="outline" onClick={addDay} className="border-[#E4EAF1]">
-                <Plus className="h-4 w-4" /> Add day
-              </Button>
+          <section className="rounded-[14px] border border-[#E4EAF1] bg-white shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)] flex flex-col">
+            <div className="p-5 border-b border-[#E4EAF1]">
+              <h3 className="text-[17px] font-semibold text-[#1A2B3D]">Day-wise Itinerary</h3>
+              <p className="text-[13px] text-[#5A6E82]">Manage activities for each day of the tour.</p>
             </div>
-
-            <div className="space-y-3">
-              {itinerary.map((item, index) => (
-                <div key={item.day} className="rounded-[12px] border border-[#E4EAF1] bg-[#F8FAFC] p-4">
-                  <div className="mb-3 flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="rounded-lg bg-white px-2.5 py-1 text-[12px] font-semibold text-[#2E7CF6]">Day {item.day}</span>
-                      <Input value={item.title} onChange={(e) => updateItinerary(index, { title: e.target.value })} className="h-9 min-w-[220px]" />
-                    </div>
-                    <button type="button" onClick={() => removeDay(index)} className="text-[#EF4444] transition hover:text-[#c13232]">
-                      <Trash2 className="h-4 w-4" />
+            
+            <div className="flex bg-[#FAFCFF] flex-1 rounded-b-[14px] min-h-[400px]">
+              {/* Sidebar */}
+              <div className="w-[220px] shrink-0 border-r border-[#E4EAF1] p-4 flex flex-col gap-3">
+                {itinerary.map((day, idx) => {
+                  const isActive = idx === activeDayIndex
+                  return (
+                    <button
+                      key={day.day}
+                      onClick={() => setActiveDayIndex(idx)}
+                      className={cn(
+                        "text-left p-3 rounded-lg border transition text-[13px]",
+                        isActive 
+                          ? "bg-[#2E7CF6] border-[#2E7CF6] text-white shadow-sm"
+                          : "bg-white border-[#E4EAF1] text-[#1A2B3D] hover:border-[#C8D2DE]"
+                      )}
+                    >
+                      <div className="font-semibold">Day {day.day}</div>
+                      <div className={cn("text-[11px] truncate", isActive ? "text-blue-100" : "text-[#5A6E82]")}>
+                        {day.title || "Untitled"}
+                      </div>
                     </button>
+                  )
+                })}
+                <button
+                  type="button"
+                  onClick={addDay}
+                  className="flex items-center justify-center gap-1 mt-1 p-3 rounded-lg border border-dashed border-[#C8D2DE] bg-white text-[#5A6E82] text-[13px] hover:border-[#2E7CF6] hover:text-[#2E7CF6] transition"
+                >
+                  <Plus className="h-4 w-4" /> Add Day
+                </button>
+              </div>
+
+              {/* Main Day Content */}
+              <div className="flex-1 p-6 bg-white rounded-br-[14px]">
+                {itinerary[activeDayIndex] && (
+                  <div className="space-y-6">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1 flex-1 max-w-[400px]">
+                        <label className="text-[12px] font-semibold text-[#5A6E82]">Day {itinerary[activeDayIndex].day} Title</label>
+                        <Input 
+                          value={itinerary[activeDayIndex].title} 
+                          onChange={(e) => updateItinerary(activeDayIndex, { title: e.target.value })} 
+                          placeholder="e.g. Arrival in Ganganagar"
+                          className="h-10 font-medium text-[#1A2B3D] text-[14px]"
+                        />
+                      </div>
+                      {itinerary.length > 1 && (
+                        <Button variant="ghost" size="sm" onClick={() => removeDay(activeDayIndex)} className="text-[#EF4444] hover:bg-red-50 hover:text-red-600 mt-5">
+                          <Trash2 className="h-4 w-4 mr-1" /> Remove
+                        </Button>
+                      )}
+                    </div>
+
+                    <div className="space-y-4">
+                      <div className="border-b border-[#E4EAF1] pb-2">
+                        <h4 className="text-[11px] font-bold tracking-wider text-[#5A6E82] uppercase">Activities & Plan</h4>
+                      </div>
+
+                      {itinerary[activeDayIndex].activities.length === 0 ? (
+                        <div className="rounded-[10px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] py-10 text-center flex flex-col items-center justify-center">
+                          <p className="text-[13px] text-[#5A6E82]">No activities added for this day yet.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {itinerary[activeDayIndex].activities.map((activity) => (
+                            <div key={activity.id} className="relative group rounded-[10px] border border-[#E4EAF1] p-3 flex gap-3 bg-white shadow-sm hover:shadow-md transition">
+                                <div className="mt-1">
+                                  {activity.type === "transfer" && <Clock3 className="h-4 w-4 text-[#2E7CF6]" />}
+                                  {activity.type === "sightseeing" && <MapPin className="h-4 w-4 text-[#10B981]" />}
+                                  {activity.type === "hotel" && <ImagePlus className="h-4 w-4 text-[#8B5CF6]" />}
+                                  {activity.type === "other" && <Sparkles className="h-4 w-4 text-[#F59E0B]" />}
+                                </div>
+                                <div className="flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <h5 className="text-[13px] font-semibold text-[#1A2B3D]">{activity.title || "Untitled Activity"}</h5>
+                                    <div className="opacity-0 group-hover:opacity-100 flex gap-1 transition">
+                                      <button onClick={() => openActivityModal(activeDayIndex, activity.type, activity)} className="p-1 text-[#5A6E82] hover:text-[#2E7CF6]">Edit</button>
+                                      <button onClick={() => removeActivity(activeDayIndex, activity.id)} className="p-1 text-[#5A6E82] hover:text-[#EF4444]"><Trash2 className="h-3.5 w-3.5" /></button>
+                                    </div>
+                                  </div>
+                                  {activity.metaInfo && <p className="text-[11px] text-[#8896A6] mt-0.5">{activity.metaInfo}</p>}
+                                  {activity.description && <p className="text-[12px] text-[#5A6E82] mt-1.5">{activity.description}</p>}
+                                </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex gap-2 flex-wrap pt-2">
+                        <button onClick={() => openActivityModal(activeDayIndex, "transfer")} type="button" className="flex items-center gap-1.5 rounded-md border border-blue-100 bg-blue-50/50 px-3 py-1.5 text-[12px] font-medium text-blue-600 transition hover:bg-blue-100/50">
+                          <Clock3 className="h-3.5 w-3.5" /> Add Transfer
+                        </button>
+                        <button onClick={() => openActivityModal(activeDayIndex, "sightseeing")} type="button" className="flex items-center gap-1.5 rounded-md border border-emerald-100 bg-emerald-50/50 px-3 py-1.5 text-[12px] font-medium text-emerald-600 transition hover:bg-emerald-100/50">
+                          <MapPin className="h-3.5 w-3.5" /> Add Sightseeing
+                        </button>
+                        <button onClick={() => openActivityModal(activeDayIndex, "hotel")} type="button" className="flex items-center gap-1.5 rounded-md border border-purple-100 bg-purple-50/50 px-3 py-1.5 text-[12px] font-medium text-purple-600 transition hover:bg-purple-100/50">
+                          <ImagePlus className="h-3.5 w-3.5" /> Add Hotel
+                        </button>
+                        <button onClick={() => openActivityModal(activeDayIndex, "other")} type="button" className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-[12px] font-medium text-slate-600 transition hover:bg-slate-100">
+                          <Plus className="h-3.5 w-3.5" /> Other
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <textarea value={item.detail} onChange={(e) => updateItinerary(index, { detail: e.target.value })} className="w-full rounded-lg border border-[#E4EAF1] bg-white px-3 py-2 text-[13px] text-[#1A2B3D] placeholder:text-[#8896A6] focus:border-[#2E7CF6] focus:outline-none focus:ring-2 focus:ring-[#2E7CF6]/20" rows={3} />
-                </div>
-              ))}
+                )}
+              </div>
             </div>
           </section>
 
@@ -493,6 +638,95 @@ export function CreatePlanPage() {
           </section>
         </div>
       </div>
+
+      {activityModalOpen && currentActivity && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#1A2B3D]/40 backdrop-blur-sm px-4">
+          <div className="w-full max-w-[500px] bg-white rounded-[16px] shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between p-5 border-b border-[#E4EAF1]">
+              <div className="flex items-center gap-2">
+                {currentActivity.type === "transfer" && <Clock3 className="h-4 w-4 text-[#2E7CF6]" />}
+                {currentActivity.type === "sightseeing" && <MapPin className="h-4 w-4 text-[#10B981]" />}
+                {currentActivity.type === "hotel" && <ImagePlus className="h-4 w-4 text-[#8B5CF6]" />}
+                {currentActivity.type === "other" && <Sparkles className="h-4 w-4 text-[#F59E0B]" />}
+                <h3 className="text-[16px] font-bold text-[#1A2B3D]">
+                  {currentActivity.title ? "Edit Activity" : `Add ${initialActivityType === "other" ? "Activity" : initialActivityType.charAt(0).toUpperCase() + initialActivityType.slice(1)}`}
+                </h3>
+              </div>
+              <button 
+                onClick={() => setActivityModalOpen(false)}
+                className="text-[#5A6E82] hover:bg-[#F8FAFC] p-1 rounded-full transition"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="p-5 overflow-y-auto flex-1 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#1A2B3D]">Activity Type</label>
+                  <select 
+                    value={currentActivity.type} 
+                    onChange={(e) => setCurrentActivity({...currentActivity, type: e.target.value as any})}
+                    className="w-full h-10 rounded-lg border border-[#E4EAF1] px-3 text-[13px] bg-white"
+                  >
+                    <option value="transfer">Transfer</option>
+                    <option value="sightseeing">Sightseeing</option>
+                    <option value="hotel">Hotel</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[12px] font-semibold text-[#1A2B3D]">Duration / Meta Info</label>
+                  <div className="relative">
+                    <Clock3 className="absolute left-3 top-2.5 h-4 w-4 text-[#8896A6]" />
+                    <Input 
+                      placeholder="e.g. 2 hrs, 1 Night" 
+                      value={currentActivity.metaInfo || ""} 
+                      onChange={(e) => setCurrentActivity({...currentActivity, metaInfo: e.target.value})}
+                      className="pl-9 h-10 text-[13px]"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[12px] font-semibold text-[#1A2B3D]">Title <span className="text-red-500">*</span></label>
+                <Input 
+                  placeholder={currentActivity.type === 'transfer' ? "Private Transfer Airport to Hotel" : currentActivity.type === 'hotel' ? "Hotel Check-in" : "Activity Name"} 
+                  value={currentActivity.title} 
+                  onChange={(e) => setCurrentActivity({...currentActivity, title: e.target.value})}
+                  className={cn("h-10 font-medium text-[13px]", !currentActivity.title ? "border-red-200 focus:ring-red-500/20" : "")}
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[12px] font-semibold text-[#1A2B3D]">Description / Inclusions</label>
+                <textarea 
+                  placeholder="Add details about what is included or what to expect..." 
+                  value={currentActivity.description || ""} 
+                  onChange={(e) => setCurrentActivity({...currentActivity, description: e.target.value})}
+                  className="w-full min-h-[90px] rounded-lg border border-[#E4EAF1] bg-white px-3 py-2 text-[13px] text-[#1A2B3D] placeholder:text-[#8896A6] focus:border-[#2E7CF6] focus:outline-none focus:ring-2 focus:ring-[#2E7CF6]/20"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[12px] font-semibold text-[#1A2B3D]">Activity Images</label>
+                <div className="flex gap-3">
+                  <button className="w-[80px] h-[80px] rounded-[10px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] flex flex-col items-center justify-center hover:bg-[#EBF3FE] hover:border-[#2E7CF6] transition text-[#5A6E82] hover:text-[#2E7CF6]">
+                    <ImagePlus className="h-5 w-5 mb-1" />
+                    <span className="text-[10px] font-medium">Upload</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-4 border-t border-[#E4EAF1] bg-[#F8FAFC] rounded-b-[16px] flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setActivityModalOpen(false)} className="bg-white border-[#E4EAF1] text-[#5A6E82]">Cancel</Button>
+              <Button onClick={saveActivity} disabled={!currentActivity.title} className="bg-[#2E7CF6] hover:bg-[#2569d9] text-white shadow-sm">Save Activity</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

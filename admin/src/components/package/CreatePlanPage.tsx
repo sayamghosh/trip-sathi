@@ -14,6 +14,7 @@ import {
   Plus,
   Trash2,
   Check,
+  Utensils,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -23,7 +24,7 @@ import api from "@/lib/axios"
 
 interface ActivityItem {
   id: string
-  type: "transfer" | "sightseeing" | "hotel" | "other"
+  type: "transfer" | "sightseeing" | "hotel" | "meal" | "other"
   metaInfo?: string
   title: string
   description?: string
@@ -68,8 +69,10 @@ export function CreatePlanPage() {
   const [includeFlights, setIncludeFlights] = useState(false)
   const [includeStay, setIncludeStay] = useState(true)
   const [isFeatured, setIsFeatured] = useState(false)
+  const [isRecommended, setIsRecommended] = useState(false)
   const [isPublished, setIsPublished] = useState(false)
   const [tags, setTags] = useState<string[]>([])
+  const [bannerImages, setBannerImages] = useState<string[]>([])
   const [itinerary, setItinerary] = useState<ItineraryItem[]>([
     { day: 1, title: "Arrival", activities: [] }
   ])
@@ -77,7 +80,6 @@ export function CreatePlanPage() {
 
   const [activityModalOpen, setActivityModalOpen] = useState(false)
   const [activityModalDay, setActivityModalDay] = useState(0)
-  const [initialActivityType, setInitialActivityType] = useState<ActivityItem["type"]>("other")
   const [currentActivity, setCurrentActivity] = useState<ActivityItem | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(isEdit)
@@ -93,6 +95,9 @@ export function CreatePlanPage() {
           setPrice(data.basePrice)
           setDuration(data.durationDays)
           setDestination(data.locations?.[0] || "")
+          setBannerImages(data.bannerImages || [])
+          setIsRecommended(data.isRecommended || false)
+          
           const fetchedDays = data.days?.length > 0 ? data.days : [{ dayNumber: 1, title: "Arrival", activities: [] }]
           setItinerary(fetchedDays.map((d: any) => ({
             day: d.dayNumber,
@@ -159,7 +164,6 @@ export function CreatePlanPage() {
     setActivityModalDay(dayIndex)
     if (existingActivity) {
       setCurrentActivity(existingActivity)
-      setInitialActivityType(existingActivity.type)
     } else {
       setCurrentActivity({
         id: Math.random().toString(36).substr(2, 9),
@@ -169,7 +173,6 @@ export function CreatePlanPage() {
         description: "",
         images: []
       })
-      setInitialActivityType(type)
     }
     setActivityModalOpen(true)
   }
@@ -208,9 +211,10 @@ export function CreatePlanPage() {
         durationDays: duration,
         durationNights: nights,
         locations: [destination],
-        bannerImages: [
+        bannerImages: bannerImages.length > 0 ? bannerImages : [
           "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800",
         ],
+        isRecommended,
         days: itinerary.map((item) => ({
           dayNumber: item.day,
           title: item.title,
@@ -498,6 +502,7 @@ export function CreatePlanPage() {
                                   {activity.type === "transfer" && <Clock3 className="h-4 w-4 text-[#2E7CF6]" />}
                                   {activity.type === "sightseeing" && <MapPin className="h-4 w-4 text-[#10B981]" />}
                                   {activity.type === "hotel" && <ImagePlus className="h-4 w-4 text-[#8B5CF6]" />}
+                                  {activity.type === "meal" && <Utensils className="h-4 w-4 text-[#F43F5E]" />}
                                   {activity.type === "other" && <Sparkles className="h-4 w-4 text-[#F59E0B]" />}
                                 </div>
                                 <div className="flex-1">
@@ -510,6 +515,13 @@ export function CreatePlanPage() {
                                   </div>
                                   {activity.metaInfo && <p className="text-[11px] text-[#8896A6] mt-0.5">{activity.metaInfo}</p>}
                                   {activity.description && <p className="text-[12px] text-[#5A6E82] mt-1.5">{activity.description}</p>}
+                                  {activity.images && activity.images.length > 0 && (
+                                    <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                                      {activity.images.map((img, i) => (
+                                        <img key={i} src={img} alt="Activity" className="h-[60px] w-[60px] rounded-lg object-cover shrink-0 border border-[#E4EAF1]" />
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                             </div>
                           ))}
@@ -525,6 +537,9 @@ export function CreatePlanPage() {
                         </button>
                         <button onClick={() => openActivityModal(activeDayIndex, "hotel")} type="button" className="flex items-center gap-1.5 rounded-md border border-purple-100 bg-purple-50/50 px-3 py-1.5 text-[12px] font-medium text-purple-600 transition hover:bg-purple-100/50">
                           <ImagePlus className="h-3.5 w-3.5" /> Add Hotel
+                        </button>
+                        <button onClick={() => openActivityModal(activeDayIndex, "meal")} type="button" className="flex items-center gap-1.5 rounded-md border border-rose-100 bg-rose-50/50 px-3 py-1.5 text-[12px] font-medium text-rose-600 transition hover:bg-rose-100/50">
+                          <Utensils className="h-3.5 w-3.5" /> Add Meal
                         </button>
                         <button onClick={() => openActivityModal(activeDayIndex, "other")} type="button" className="flex items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-3 py-1.5 text-[12px] font-medium text-slate-600 transition hover:bg-slate-100">
                           <Plus className="h-3.5 w-3.5" /> Other
@@ -547,19 +562,29 @@ export function CreatePlanPage() {
               <Button variant="outline" size="sm" className="border-[#E4EAF1]">Manage gallery</Button>
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <div className="col-span-2 flex items-center justify-center rounded-[12px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] p-6 text-center">
-                <div className="space-y-2">
-                  <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#EBF3FE] text-[#2E7CF6]"><ImagePlus className="h-5 w-5" /></div>
-                  <p className="text-[13px] font-semibold text-[#1A2B3D]">Drop cover photo</p>
-                  <p className="text-[12px] text-[#5A6E82]">JPG, PNG up to 5MB - 1920x1080 recommended</p>
-                  <Button size="sm">Upload cover</Button>
-                </div>
+              <div className="col-span-2 flex items-center justify-center rounded-[12px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] p-6 text-center overflow-hidden relative">
+                {bannerImages.length > 0 ? (
+                  <img src={bannerImages[0]} alt="Cover" className="absolute inset-0 w-full h-full object-cover" />
+                ) : (
+                  <div className="space-y-2 relative z-10">
+                    <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#EBF3FE] text-[#2E7CF6]"><ImagePlus className="h-5 w-5" /></div>
+                    <p className="text-[13px] font-semibold text-[#1A2B3D]">Drop cover photo</p>
+                    <p className="text-[12px] text-[#5A6E82]">JPG, PNG up to 5MB - 1920x1080 recommended</p>
+                    <Button size="sm">Upload cover</Button>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col gap-2">
-                {[1, 2, 3].map((slot) => (
-                  <div key={slot} className="flex flex-1 items-center justify-between rounded-[10px] border border-[#E4EAF1] bg-white px-3 py-2 text-[12px] text-[#5A6E82]">
-                    <span>Gallery slot {slot}</span>
-                    <Button size="xs" variant="ghost" className="h-7 px-2 text-[11px] text-[#2E7CF6]">Upload</Button>
+                {[1, 2, 3].map((slot, idx) => (
+                  <div key={slot} className="flex flex-1 items-center justify-between rounded-[10px] border border-[#E4EAF1] bg-white px-3 py-2 text-[12px] text-[#5A6E82] relative overflow-hidden">
+                    {bannerImages[idx + 1] ? (
+                      <img src={bannerImages[idx + 1]} alt={`Gallery slot ${slot}`} className="absolute inset-0 w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <span>Gallery slot {slot}</span>
+                        <Button size="xs" variant="ghost" className="h-7 px-2 text-[11px] text-[#2E7CF6]">Upload</Button>
+                      </>
+                    )}
                   </div>
                 ))}
               </div>
@@ -578,6 +603,7 @@ export function CreatePlanPage() {
             <div className="mt-3 space-y-3">
               <SwitchRow label="Visible to travelers" sub="Listed on search, booking open" checked={isPublished} onChange={setIsPublished} />
               <SwitchRow label="Mark as featured" sub="Show on homepage hero" checked={isFeatured} onChange={setIsFeatured} />
+              <SwitchRow label="Recommended Packages" sub="Show in the Recommended section" checked={isRecommended} onChange={setIsRecommended} />
               <SwitchRow label="Accept waitlist" sub="Collect leads when seats fill" checked={capacity <= 0} onChange={() => setCapacity((c) => (c === 0 ? 18 : 0))} />
             </div>
 
@@ -647,9 +673,11 @@ export function CreatePlanPage() {
                 {currentActivity.type === "transfer" && <Clock3 className="h-4 w-4 text-[#2E7CF6]" />}
                 {currentActivity.type === "sightseeing" && <MapPin className="h-4 w-4 text-[#10B981]" />}
                 {currentActivity.type === "hotel" && <ImagePlus className="h-4 w-4 text-[#8B5CF6]" />}
+                {currentActivity.type === "meal" && <Utensils className="h-4 w-4 text-[#F43F5E]" />}
                 {currentActivity.type === "other" && <Sparkles className="h-4 w-4 text-[#F59E0B]" />}
                 <h3 className="text-[16px] font-bold text-[#1A2B3D]">
-                  {currentActivity.title ? "Edit Activity" : `Add ${initialActivityType === "other" ? "Activity" : initialActivityType.charAt(0).toUpperCase() + initialActivityType.slice(1)}`}
+                  {!currentActivity.id ? `Add ${currentActivity.type === "other" ? "Activity" : currentActivity.type.charAt(0).toUpperCase() + currentActivity.type.slice(1)}` : 
+                   (currentActivity.title ? "Edit Activity" : `Add ${currentActivity.type === "other" ? "Activity" : currentActivity.type.charAt(0).toUpperCase() + currentActivity.type.slice(1)}`)}
                 </h3>
               </div>
               <button 
@@ -672,6 +700,7 @@ export function CreatePlanPage() {
                     <option value="transfer">Transfer</option>
                     <option value="sightseeing">Sightseeing</option>
                     <option value="hotel">Hotel</option>
+                    <option value="meal">Meal</option>
                     <option value="other">Other</option>
                   </select>
                 </div>
@@ -692,7 +721,7 @@ export function CreatePlanPage() {
               <div className="space-y-1.5">
                 <label className="text-[12px] font-semibold text-[#1A2B3D]">Title <span className="text-red-500">*</span></label>
                 <Input 
-                  placeholder={currentActivity.type === 'transfer' ? "Private Transfer Airport to Hotel" : currentActivity.type === 'hotel' ? "Hotel Check-in" : "Activity Name"} 
+                  placeholder={currentActivity.type === 'transfer' ? "Private Transfer Airport to Hotel" : currentActivity.type === 'hotel' ? "Hotel Check-in" : currentActivity.type === 'meal' ? "Lunch Buffet at Resort" : currentActivity.type === 'sightseeing' ? "Guided City Tour" : "Activity Name"} 
                   value={currentActivity.title} 
                   onChange={(e) => setCurrentActivity({...currentActivity, title: e.target.value})}
                   className={cn("h-10 font-medium text-[13px]", !currentActivity.title ? "border-red-200 focus:ring-red-500/20" : "")}
@@ -711,11 +740,16 @@ export function CreatePlanPage() {
 
               <div className="space-y-1.5">
                 <label className="text-[12px] font-semibold text-[#1A2B3D]">Activity Images</label>
-                <div className="flex gap-3">
-                  <button className="w-[80px] h-[80px] rounded-[10px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] flex flex-col items-center justify-center hover:bg-[#EBF3FE] hover:border-[#2E7CF6] transition text-[#5A6E82] hover:text-[#2E7CF6]">
+                <div className="flex gap-3 overflow-x-auto pb-2">
+                  <button className="w-[80px] h-[80px] shrink-0 rounded-[10px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] flex flex-col items-center justify-center hover:bg-[#EBF3FE] hover:border-[#2E7CF6] transition text-[#5A6E82] hover:text-[#2E7CF6]">
                     <ImagePlus className="h-5 w-5 mb-1" />
                     <span className="text-[10px] font-medium">Upload</span>
                   </button>
+                  {currentActivity.images && currentActivity.images.map((img, i) => (
+                    <div key={i} className="relative h-[80px] w-[80px] shrink-0 rounded-[10px] overflow-hidden border border-[#E4EAF1]">
+                      <img src={img} alt="" className="h-full w-full object-cover" />
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

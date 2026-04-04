@@ -4,7 +4,6 @@ import {
   MapPin,
   Star,
   MoreHorizontal,
-  Sparkles,
   PlaneTakeoff,
   Loader2,
 } from "lucide-react"
@@ -63,7 +62,10 @@ export function PackagePage() {
 
   const heroPackage = packages[0]
   const featuredPackages = packages.slice(1, 3)
-  const recommendedPackages = packages.slice(3, 7)
+  let recommendedPackages = packages.filter((p: any) => p.isRecommended).slice(0, 4)
+  if (recommendedPackages.length === 0) {
+    recommendedPackages = packages.slice(3, 7)
+  }
 
   return (
     <div className="space-y-4">
@@ -88,136 +90,111 @@ export function PackagePage() {
         <>
           {/* Hero + side column */}
           <div className="grid gap-4 lg:grid-cols-3">
-            <div className="lg:col-span-2 space-y-4">
-              <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)]">
-                <div className="grid gap-4 md:grid-cols-[1.2fr_1fr]">
-                  <div className="space-y-4">
-                    <div 
-                      className="h-48 rounded-xl bg-cover bg-center" 
-                      style={{ backgroundImage: `url(${packages[0]?.bannerImages?.[0] || 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=800'})` }}
-                    />
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2 text-[#5A6E82]">
-                        <MapPin className="h-4 w-4 text-[#2E7CF6]" />
-                        <span className="text-sm">{packages[0]?.locations?.join(", ") || "Mainland"}</span>
-                      </div>
-                      <h3 className="mt-1 text-xl font-semibold text-[#1A2B3D]">{packages[0]?.title || "Select a package"}</h3>
-                      <p className="mt-1 text-sm text-[#5A6E82] line-clamp-3">
-                        {packages[0]?.description || "Choose a curated travel package to view its full itinerary and details."}
-                      </p>
+            <div className="lg:col-span-2 space-y-3">
+              <h3 className="text-[15px] font-semibold text-[#1A2B3D]">New Package</h3>
+              <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-5 shadow-sm">
+                <div className="grid grid-cols-1 md:grid-cols-[200px_1.2fr_1fr] lg:grid-cols-[240px_1.2fr_1fr] gap-6">
+                  {/* Left Column - Image */}
+                  <div className="h-full min-h-[260px] rounded-[10px] bg-[#EBF3FE] relative flex flex-col justify-end p-3 bg-cover bg-center" style={{ backgroundImage: `url(${packages[0]?.bannerImages?.[0] || ''})` }}>
+                     {!packages[0]?.bannerImages?.[0] && <div className="absolute inset-0 flex items-center justify-center"><PlaneTakeoff className="h-8 w-8 text-[#2E7CF6]/20" /></div>}
+                     <div className="flex items-center gap-2 relative z-10 w-full h-[50px]">
+                       <div className="h-full flex-1 rounded bg-white shadow-sm" />
+                       <div className="h-full flex-1 rounded bg-white shadow-sm" />
+                       <div className="h-full flex-1 rounded bg-white shadow-sm" />
+                     </div>
+                  </div>
+
+                  {/* Middle Column - Details */}
+                  <div className="flex flex-col">
+                    <h3 className="text-[22px] font-bold text-[#1A2B3D] leading-tight mb-2">
+                       {packages[0]?.title || "Tropical Paradise Retreat"}
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#5A6E82] mb-4">
+                       <MapPin className="h-3.5 w-3.5" />
+                       <span>{packages[0]?.locations?.join(", ") || "Maldives"}</span>
+                    </div>
+                    <p className="text-[11px] text-[#8896A6] leading-relaxed mb-6 flex-1 pr-4 line-clamp-5">
+                       {packages[0]?.description || "Escape to a tropical haven where pristine beaches, lush greenery, and luxurious accommodations await. Perfect for those looking to unwind and experience the ultimate relaxation"}
+                    </p>
+                    
+                    <div className="flex items-end justify-between mb-4">
+                       <div>
+                         <p className="text-[10px] text-[#A0ABB8] mb-0.5">Price:</p>
+                         <p className="text-[22px] font-bold text-[#2E7CF6] font-inter leading-none">
+                           ₹{packages[0]?.basePrice?.toLocaleString() || "2,100"}
+                         </p>
+                         <p className="text-[10px] text-[#5A6E82] mt-0.5">per person</p>
+                       </div>
+                       <div className="text-right">
+                         <p className="text-[10px] text-[#A0ABB8] mb-1">Duration:</p>
+                         <p className="text-[11px] font-semibold text-[#1A2B3D]">
+                           {heroPackage?.durationDays || "7"} Days / {Math.max((heroPackage?.durationDays || 7) - 1, 0)} Nights
+                         </p>
+                       </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div className="rounded-lg bg-[#F7FAFD] px-3 py-2">
-                        <p className="text-[#5A6E82]">Price</p>
-                        <p className="text-[20px] font-bold text-[#2E7CF6] font-inter">
-                          ₹{packages[0]?.basePrice?.toLocaleString() || "0"}
-                        </p>
-                        <p className="text-xs text-[#5A6E82]">per person</p>
-                      </div>
-                      <div className="rounded-lg bg-[#F7FAFD] px-3 py-2">
-                        <p className="text-[#5A6E82]">Duration</p>
-                        <p className="text-[20px] font-bold text-[#1A2B3D]">
-                          {heroPackage?.durationDays || "0"} Days / {Math.max((heroPackage?.durationDays || 1) - 1, 0)} Nights
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="h-12 w-12 rounded-xl bg-[#E6F1FF]" />
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-2">
+                    <div className="space-y-2 mt-auto">
                       {packages[0]?._id ? (
-                        <>
-                          <Link to="/packages/$packageId" params={{ packageId: packages[0]._id }}>
-                            <Button className="h-10 px-6 rounded-lg bg-[#2E7CF6] text-white shadow-sm hover:bg-[#2569d9]">
-                              View details
-                            </Button>
-                          </Link>
-                          <Link to="/plans/edit/$packageId" params={{ packageId: packages[0]._id }}>
-                            <Button variant="outline" className="h-10 px-4 border-[#E4EAF1] text-[#1A2B3D]">
-                              Edit Detail
-                            </Button>
-                          </Link>
-                          <Button 
-                            onClick={async () => {
-                              if (window.confirm("Are you sure you want to delete this package?")) {
-                                try {
-                                  await api.delete(`/api/tour-plans/${packages[0]._id}`)
-                                  alert("Package deleted")
-                                  window.location.reload()
-                                } catch (e) {
-                                  alert("Delete failed")
-                                }
-                              }
-                            }}
-                            variant="ghost" 
-                            className="h-10 px-3 text-red-500 hover:text-red-600 hover:bg-red-50"
-                          >
-                            Delete
+                        <Link to="/plans/edit/$packageId" params={{ packageId: packages[0]._id }}>
+                          <Button className="w-full bg-[#3FB1F5] hover:bg-[#2CA1E6] text-white rounded-lg h-[42px] shadow-none font-semibold">
+                            Edit Detail
                           </Button>
-                        </>
+                        </Link>
                       ) : (
-                        <Button disabled className="h-10 rounded-lg bg-[#2E7CF6]/60 text-white">
-                          View details
+                        <Button disabled className="w-full bg-[#3FB1F5]/50 text-white rounded-lg h-[42px]">
+                          Edit Detail
                         </Button>
                       )}
                     </div>
                   </div>
 
-                  <div className="space-y-3">
-                    <h4 className="text-[15px] font-semibold text-[#1A2B3D]">Inclusions</h4>
-                    <div className="space-y-2">
-                      {featureList.map((item) => (
-                        <div
-                          key={item.title}
-                          className="flex gap-3 rounded-lg border border-[#E4EAF1] bg-[#F9FBFD] px-3 py-2"
-                        >
-                          <CheckCircle2 className="mt-[2px] h-4 w-4 text-[#2E7CF6]" />
-                          <div>
-                            <p className="text-sm font-semibold text-[#1A2B3D]">{item.title}</p>
-                            <p className="text-xs text-[#5A6E82]">{item.desc}</p>
-                          </div>
+                  {/* Right Column - Inclusions */}
+                  <div className="flex flex-col gap-5 py-1">
+                    {featureList.map((item) => (
+                      <div key={item.title} className="flex gap-2.5">
+                        <CheckCircle2 className="h-3.5 w-3.5 text-[#5A6E82] shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-[11px] font-semibold text-[#1A2B3D] leading-none mb-1.5">{item.title}</p>
+                          <p className="text-[10px] text-[#A0ABB8] leading-snug">{item.desc}</p>
                         </div>
-                      ))}
-                    </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.12)]">
-                <div className="mb-3 flex items-center justify-between">
-                  <h4 className="text-[15px] font-semibold text-[#1A2B3D]">Popular Packages</h4>
-                  <MoreHorizontal className="h-5 w-5 text-[#5A6E82]" />
-                </div>
-                <div className="space-y-3">
-                  {popularPackages.map((pkg) => (
-                    <div key={pkg.title} className="flex items-start justify-between rounded-lg bg-[#F9FBFD] px-3 py-2">
-                      <div>
-                        <p className="text-sm font-semibold text-[#1A2B3D]">{pkg.title}</p>
-                        <p className="text-xs text-[#5A6E82]">{pkg.location}</p>
-                      </div>
-                      <div className="flex items-center gap-1 text-[#F7B500]">
-                        <Star className="h-4 w-4 fill-[#F7B500]" />
-                        <span className="text-sm font-semibold text-[#1A2B3D]">{pkg.rating.toFixed(1)}</span>
+              <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-[15px] font-semibold text-[#1A2B3D]">Popular Packages</h3>
+                <MoreHorizontal className="h-4 w-4 text-[#8896A6]" />
+              </div>
+              <div className="space-y-3">
+                {popularPackages.map((pkg) => (
+                  <div key={pkg.title} className="flex items-center gap-3 rounded-xl bg-white p-2.5 shadow-sm border border-[#E4EAF1]">
+                    <div className="h-[46px] w-[50px] shrink-0 rounded-lg bg-[#EBF3FE] flex items-center justify-center text-[#2E7CF6]/20">
+                      <PlaneTakeoff className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 overflow-hidden">
+                      <p className="text-[13px] font-bold text-[#1A2B3D] truncate">{pkg.title}</p>
+                      <div className="flex items-center gap-1 text-[10px] text-[#8896A6] mt-0.5">
+                        <MapPin className="h-2.5 w-2.5" />
+                        <span className="truncate">{pkg.location}</span>
                       </div>
                     </div>
-                  ))}
-                </div>
+                    <div className="flex items-center text-[#F7B500] shrink-0 pr-1">
+                      <Star className="h-2.5 w-2.5 fill-[#F7B500]" />
+                      <Star className="h-2.5 w-2.5 fill-[#F7B500]" />
+                      <Star className="h-2.5 w-2.5 fill-[#F7B500]" />
+                      <Star className="h-2.5 w-2.5 fill-[#F7B500]" />
+                      <Star className="h-2.5 w-2.5 fill-[#E4EAF1] text-[#E4EAF1]" />
+                      <span className="text-[9px] font-bold text-[#8896A6] ml-1.5">{pkg.rating.toFixed(1)}/5</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-
-              <div className="rounded-[14px] border border-dashed border-[#C8D2DE] bg-[#F4F7FB] p-4 text-center">
-                <p className="text-sm font-semibold text-[#1A2B3D]">Enhance your packages</p>
-                <p className="mt-1 text-xs text-[#5A6E82]">Add upsells and loyalty perks for returning travelers.</p>
-                <Button variant="secondary" className="mt-3 bg-white text-[#2E7CF6] shadow-none" asChild>
-                  <Link to="/plans/create">Upgrade now</Link>
-                </Button>
-              </div>
+            </div>
             </div>
           </div>
 
@@ -228,57 +205,112 @@ export function PackagePage() {
               <div className="space-y-3">
                 {featuredPackages.map((pkg) => {
                   const card = (
-                    <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-24px_rgba(26,43,61,0.2)]">
-                      <div className="mb-2 flex items-start justify-between gap-3">
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2 text-[#5A6E82]">
-                            <Star className="h-4 w-4 fill-[#F7B500] text-[#F7B500]" />
-                            <span className="text-sm font-semibold text-[#1A2B3D]">4.5</span>
-                            <span className="text-xs">  {pkg.durationDays} Days / {Math.max(pkg.durationDays - 1, 0)} Nights</span>
-                            <span className="text-xs">  {pkg.locations?.join(", ")}</span>
-                          </div>
-                          <h4 className="text-[18px] font-semibold text-[#1A2B3D]">{pkg.title}</h4>
-                        </div>
-                          <div className="text-right flex flex-col items-end gap-1">
-                            <p className="text-[12px] uppercase text-[#5A6E82]">from</p>
-                            <p className="text-xl font-bold text-[#2E7CF6]">₹{pkg.basePrice?.toLocaleString()}</p>
-                            <p className="text-xs text-[#5A6E82]">per person</p>
-                          <div className="mt-2 flex items-center gap-2">
-                             <Link to="/plans/edit/$packageId" params={{ packageId: pkg._id }}>
-                               <Button variant="ghost" size="sm" className="h-7 px-2 text-[#2E7CF6] text-xs">Edit</Button>
-                             </Link>
-                             <Button 
-                               onClick={async (e) => {
-                                 e.preventDefault();
-                                 if (window.confirm("Delete this package?")) {
-                                   try {
-                                     await api.delete(`/api/tour-plans/${pkg._id}`)
-                                     window.location.reload()
-                                   } catch (e) {
-                                     alert("Delete failed")
-                                   }
-                                 }
-                               }}
-                               variant="ghost" 
-                               size="sm" 
-                               className="h-7 px-2 text-red-500 text-xs"
-                             >
-                               Delete
-                             </Button>
-                          </div>
+                    <div className="flex flex-col sm:flex-row rounded-[14px] border border-[#E4EAF1] bg-white shadow-sm transition hover:shadow-md overflow-hidden min-h-[220px]">
+                      {/* Left Image Section */}
+                      <div 
+                        className="w-full sm:w-[220px] shrink-0 bg-[#EBF3FE] bg-cover bg-center relative"
+                        style={{ backgroundImage: `url(${pkg.bannerImages?.[0] || 'https://images.unsplash.com/photo-1542314831-c6a4d14cd44b?auto=format&fit=crop&w=400&q=80'})` }}
+                      >
+                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur rounded-[8px] px-2 py-0.5 flex items-center gap-1 shadow-sm">
+                          <Star className="h-3 w-3 fill-[#F7B500] text-[#F7B500]" />
+                          <span className="text-[11px] font-bold text-[#1A2B3D]">4.5</span>
                         </div>
                       </div>
 
-                      <div className="mt-3 rounded-lg border border-dashed border-[#E4EAF1] bg-[#FBFDFF] p-3 text-xs text-slate-500 line-clamp-2 italic">
-                        {pkg.description}
+                      {/* Right Details Section */}
+                      <div className="flex-1 p-5 flex flex-col">
+                        {/* Header Row */}
+                        <div className="flex items-start justify-between mb-2">
+                          <div>
+                            <h4 className="text-[17px] font-bold text-[#1A2B3D]">{pkg.title}</h4>
+                            <div className="flex items-center gap-4 mt-1">
+                              <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#5A6E82]">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                                <span>{pkg.durationDays} Days / {Math.max(pkg.durationDays - 1, 0)} Nights</span>
+                              </div>
+                              <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#5A6E82]">
+                                <MapPin className="h-3 w-3" />
+                                <span>{pkg.locations?.join(", ")}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-[18px] font-bold text-[#2E7CF6]">₹{pkg.basePrice?.toLocaleString()}</p>
+                            <p className="text-[10px] text-[#8896A6]">per person</p>
+                          </div>
+                        </div>
+
+                        {/* Content Grid */}
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-4 mt-2 flex-1">
+                          <div className="space-y-3">
+                            <div>
+                              <p className="text-[10px] font-medium text-[#A0ABB8] mb-0.5">Accommodation</p>
+                              <p className="text-[11px] text-[#1A2B3D] leading-snug">Stay in premium handpicked properties.</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-medium text-[#A0ABB8] mb-0.5">Included Meals</p>
+                              <p className="text-[11px] text-[#1A2B3D] leading-snug">Daily breakfast and selected complementary dinners.</p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] font-medium text-[#A0ABB8] mb-0.5">Extras</p>
+                              <p className="text-[11px] text-[#1A2B3D] leading-snug">Free airport transfers and 24/7 assistance.</p>
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-medium text-[#A0ABB8] mb-1.5">Activities</p>
+                            <ul className="list-disc pl-3 text-[11px] text-[#1A2B3D] space-y-1.5 leading-snug">
+                              {pkg.days && pkg.days.length > 0 ? (
+                                pkg.days.slice(0, 4).map((d: any) => (
+                                  <li key={d._id || Math.random()}>{d.title}</li>
+                                ))
+                              ) : (
+                                <>
+                                  <li>Curated sightseeing tours</li>
+                                  <li>Local immersive experiences</li>
+                                  <li>Leisure time for self-exploration</li>
+                                </>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* Actions Row (Spacing only) */}
+                        <div className="mt-4 pt-4 border-t border-[#E4EAF1] h-[45px]"></div>
                       </div>
                     </div>
                   )
 
                   return pkg._id ? (
-                    <Link key={pkg._id} to="/packages/$packageId" params={{ packageId: pkg._id }} className="block">
+                    <div key={pkg._id} className="relative group">
                       {card}
-                    </Link>
+                      {/* Full card link overlay */}
+                      <Link to="/packages/$packageId" params={{ packageId: pkg._id }} className="absolute inset-0 z-0"></Link>
+                      
+                      {/* Action Buttons overlay */}
+                      <div className="absolute bottom-[21px] right-5 z-20 flex gap-2">
+                          <Link to="/plans/edit/$packageId" params={{ packageId: pkg._id }} className="relative z-20">
+                            <Button variant="outline" size="sm" className="h-7 text-[11px] px-3 font-medium text-[#2E7CF6] border-[#E4EAF1] bg-white">Edit</Button>
+                          </Link>
+                          <Button 
+                            onClick={async (e) => {
+                              e.preventDefault();
+                              if (window.confirm("Delete this package?")) {
+                                try {
+                                  await api.delete(`/api/tour-plans/${pkg._id}`)
+                                  window.location.reload()
+                                } catch (err) {
+                                  alert("Delete failed")
+                                }
+                              }
+                            }}
+                            variant="outline" 
+                            size="sm" 
+                            className="h-7 text-[11px] px-3 font-medium text-[#EF4444] border-red-100 hover:bg-red-50 hover:border-red-200 bg-white relative z-20"
+                          >
+                            Delete
+                          </Button>
+                      </div>
+                    </div>
                   ) : (
                     <div key={pkg.title}>{card}</div>
                   )
@@ -289,32 +321,39 @@ export function PackagePage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-[15px] font-semibold text-[#1A2B3D]">Recommended Packages</h3>
-                <MoreHorizontal className="h-5 w-5 text-[#5A6E82]" />
+                <MoreHorizontal className="h-4 w-4 text-[#8896A6]" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 {recommendedPackages.map((pkg) => {
                   const card = (
-                    <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-3 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.12)] transition hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-24px_rgba(26,43,61,0.18)]">
+                    <div className="rounded-[14px] border border-[#E4EAF1] bg-white overflow-hidden shadow-sm transition hover:shadow-md h-full flex flex-col">
                       <div 
-                        className="flex h-20 items-center justify-center rounded-lg bg-cover bg-center text-[#2E7CF6]"
+                        className="h-[140px] w-full bg-[#EBF3FE] bg-cover bg-center flex items-center justify-center text-[#2E7CF6]/20"
                         style={{ backgroundImage: `url(${pkg.bannerImages?.[0] || 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&q=80&w=200'})` }}
                       >
-                        {!pkg.bannerImages?.[0] && <PlaneTakeoff className="h-5 w-5" />}
+                        {!pkg.bannerImages?.[0] && <PlaneTakeoff className="h-8 w-8" />}
                       </div>
-                      <p className="mt-2 text-sm font-semibold text-[#1A2B3D] truncate">{pkg.title}</p>
-                      <p className="text-xs text-[#5A6E82] truncate">{pkg.locations?.join(", ") || "Various"}</p>
-                      <p className="mt-1 text-sm font-bold text-[#2E7CF6]">
-                        ₹{pkg.basePrice?.toLocaleString()} <span className="text-xs font-normal text-[#5A6E82]">/person</span>
-                      </p>
+                      <div className="p-3.5 flex flex-col flex-1">
+                        <h4 className="text-[13px] font-bold text-[#1A2B3D] truncate">{pkg.title}</h4>
+                        <div className="flex items-center gap-1 text-[11px] text-[#A0ABB8] mt-1 mb-2">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          <span className="truncate">{pkg.locations?.join(", ") || "Various"}</span>
+                        </div>
+                        <div className="mt-auto pt-1">
+                          <p className="text-[15px] font-bold text-[#2E7CF6]">
+                            ₹{pkg.basePrice?.toLocaleString()} <span className="text-[10px] font-medium text-[#8896A6]">/person</span>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )
 
                   return pkg._id ? (
-                    <Link key={pkg._id} to="/packages/$packageId" params={{ packageId: pkg._id }} className="block">
+                    <Link key={pkg._id} to="/packages/$packageId" params={{ packageId: pkg._id }} className="block h-full">
                       {card}
                     </Link>
                   ) : (
-                    <div key={pkg.title}>{card}</div>
+                    <div key={pkg.title} className="h-full">{card}</div>
                   )
                 })}
               </div>

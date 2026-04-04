@@ -306,12 +306,21 @@ export default function PackageDetailPage() {
                       <div className="space-y-1 text-[13px] text-[#5A6E82]">
                         {day.activities && day.activities.length ? (
                           day.activities.map((activity, idx) => (
-                            <div key={idx} className="flex gap-2">
-                              <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[#2E7CF6]" />
-                              <span className="leading-snug">
-                                {activity.title}
-                                {activity.description ? ` — ${activity.description}` : ""}
-                              </span>
+                            <div key={idx} className="flex flex-col gap-2">
+                              <div className="flex gap-2">
+                                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2E7CF6]" />
+                                <span className="leading-snug">
+                                  {activity.title}
+                                  {activity.description ? ` — ${activity.description}` : ""}
+                                </span>
+                              </div>
+                              {activity.images && activity.images.length > 0 && (
+                                <div className="ml-3.5 flex gap-2 overflow-x-auto pb-1 mt-1">
+                                  {activity.images.map((img, i) => (
+                                    <img key={i} src={img} alt="Activity" className="h-[60px] w-[60px] rounded-lg object-cover shrink-0 border border-[#E4EAF1]" />
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           ))
                         ) : (

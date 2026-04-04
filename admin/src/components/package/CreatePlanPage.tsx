@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useRef } from "react"
 import {
   CalendarDays,
   MapPin,
@@ -83,6 +83,67 @@ export function CreatePlanPage() {
   const [currentActivity, setCurrentActivity] = useState<ActivityItem | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(isEdit)
+  const [isUploading, setIsUploading] = useState(false)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadType, setUploadType] = useState<{ type: 'banner' | 'gallery' | 'activity', index?: number }>({ type: 'banner' })
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const formData = new FormData()
+    formData.append('image', file)
+
+    if (isUploading) {
+       alert("Please wait for images to finish uploading.")
+       return
+    }
+    
+    setIsUploading(true)
+    try {
+      const res = await api.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+      const imageUrl = res.data.url
+
+      if (uploadType.type === 'banner') {
+        setBannerImages(prev => {
+          const next = [...prev]
+          next[0] = imageUrl
+          return next
+        })
+      } else if (uploadType.type === 'gallery') {
+        setBannerImages(prev => {
+          const next = [...prev]
+          const idx = (uploadType.index || 0) + 1
+          next[idx] = imageUrl
+          return next
+        })
+      } else if (uploadType.type === 'activity') {
+        setCurrentActivity(prev => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            images: [...(prev.images || []), imageUrl]
+          }
+        })
+      }
+    } catch (error) {
+      console.error("Upload failed:", error)
+      alert("Failed to upload image")
+    } finally {
+      setIsUploading(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
+  const triggerUpload = (type: 'banner' | 'gallery' | 'activity', index?: number) => {
+    setUploadType({ type, index })
+    fileInputRef.current?.click()
+  }
 
   React.useEffect(() => {
     if (isEdit) {
@@ -126,7 +187,7 @@ export function CreatePlanPage() {
     }
   }, [isEdit, packageId])
 
-  const nights = useMemo(() => Math.max(duration - 1, 1), [duration])
+  const nights = useMemo(() => Math.max(duration - 1, 0), [duration])
   const selectedTags = useMemo(() => tags.join(", "), [tags])
 
   const toggleTag = (tag: string) => {
@@ -202,6 +263,10 @@ export function CreatePlanPage() {
   }
 
   const handlePublish = async () => {
+    if (isUploading) {
+      alert("Please wait for images to finish uploading.")
+      return
+    }
     setIsSubmitting(true)
     try {
       const payload = {
@@ -263,6 +328,13 @@ export function CreatePlanPage() {
 
   return (
     <div className="space-y-4">
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        className="hidden" 
+        accept="image/*"
+        onChange={handleFileUpload}
+      />
       {/* Hero header */}
       <div className="rounded-[14px] border border-[#E4EAF1] bg-white px-5 py-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -282,7 +354,7 @@ export function CreatePlanPage() {
             <Button variant="secondary" size="sm" className="h-9">Preview</Button>
             <Button 
               onClick={handlePublish} 
-              disabled={isSubmitting}
+              disabled={isSubmitting || isUploading} 
               size="sm" 
               className="h-9"
             >
@@ -518,7 +590,23 @@ export function CreatePlanPage() {
                                   {activity.images && activity.images.length > 0 && (
                                     <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
                                       {activity.images.map((img, i) => (
-                                        <img key={i} src={img} alt="Activity" className="h-[60px] w-[60px] rounded-lg object-cover shrink-0 border border-[#E4EAF1]" />
+                                        <div key={i} className="relative group/img h-[60px] w-[60px] shrink-0">
+                                          <img src={img} alt="Activity" className="h-full w-full rounded-lg object-cover border border-[#E4EAF1]" />
+                                          <button 
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              setItinerary(prev => {
+                                                const next = [...prev];
+                                                const act = next[activeDayIndex].activities.find(a => a.id === activity.id);
+                                                if (act) act.images = act.images?.filter((_, idx) => idx !== i);
+                                                return next;
+                                              });
+                                            }}
+                                            className="absolute -top-1 -right-1 hidden group-hover/img:flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-white text-[10px]"
+                                          >
+                                            <Trash2 className="h-2.5 w-2.5" />
+                                          </button>
+                                        </div>
                                       ))}
                                     </div>
                                   )}
@@ -570,19 +658,45 @@ export function CreatePlanPage() {
                     <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#EBF3FE] text-[#2E7CF6]"><ImagePlus className="h-5 w-5" /></div>
                     <p className="text-[13px] font-semibold text-[#1A2B3D]">Drop cover photo</p>
                     <p className="text-[12px] text-[#5A6E82]">JPG, PNG up to 5MB - 1920x1080 recommended</p>
-                    <Button size="sm">Upload cover</Button>
+                    <Button size="sm" disabled={isUploading} onClick={() => triggerUpload('banner')}>
+                      {isUploading && uploadType.type === 'banner' ? "Uploading..." : "Upload cover"}
+                    </Button>
                   </div>
+                )}
+                {bannerImages.length > 0 && (
+                   <button 
+                    onClick={() => setBannerImages(prev => prev.filter((_, i) => i !== 0))}
+                    className="absolute top-2 right-2 z-20 h-7 w-7 flex items-center justify-center rounded-full bg-red-500 text-white shadow-md hover:bg-red-600 transition"
+                   >
+                     <Trash2 className="h-4 w-4" />
+                   </button>
                 )}
               </div>
               <div className="flex flex-col gap-2">
                 {[1, 2, 3].map((slot, idx) => (
                   <div key={slot} className="flex flex-1 items-center justify-between rounded-[10px] border border-[#E4EAF1] bg-white px-3 py-2 text-[12px] text-[#5A6E82] relative overflow-hidden">
                     {bannerImages[idx + 1] ? (
-                      <img src={bannerImages[idx + 1]} alt={`Gallery slot ${slot}`} className="absolute inset-0 w-full h-full object-cover" />
+                      <>
+                        <img src={bannerImages[idx + 1]} alt={`Gallery slot ${slot}`} className="absolute inset-0 w-full h-full object-cover" />
+                        <button 
+                          onClick={() => setBannerImages(prev => prev.filter((_, i) => i !== idx + 1))}
+                          className="absolute top-1 right-1 z-20 h-5 w-5 flex items-center justify-center rounded-full bg-red-500 text-white shadow-sm hover:bg-red-600 transition"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      </>
                     ) : (
                       <>
                         <span>Gallery slot {slot}</span>
-                        <Button size="xs" variant="ghost" className="h-7 px-2 text-[11px] text-[#2E7CF6]">Upload</Button>
+                        <Button 
+                          size="xs" 
+                          variant="ghost" 
+                          disabled={isUploading}
+                          onClick={() => triggerUpload('gallery', idx)}
+                          className="h-7 px-2 text-[11px] text-[#2E7CF6]"
+                        >
+                          {isUploading && uploadType.type === 'gallery' && uploadType.index === idx ? "..." : "Upload"}
+                        </Button>
                       </>
                     )}
                   </div>
@@ -612,7 +726,7 @@ export function CreatePlanPage() {
                 <p className="font-semibold text-[#1A2B3D]">Ready to publish?</p>
                 <p>{selectedTags || "Add at least one tag"}</p>
               </div>
-              <Button size="sm" onClick={handlePublish}>Publish</Button>
+              <Button size="sm" disabled={isSubmitting || isUploading} onClick={handlePublish}>Publish</Button>
             </div>
           </section>
 
@@ -741,13 +855,24 @@ export function CreatePlanPage() {
               <div className="space-y-1.5">
                 <label className="text-[12px] font-semibold text-[#1A2B3D]">Activity Images</label>
                 <div className="flex gap-3 overflow-x-auto pb-2">
-                  <button className="w-[80px] h-[80px] shrink-0 rounded-[10px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] flex flex-col items-center justify-center hover:bg-[#EBF3FE] hover:border-[#2E7CF6] transition text-[#5A6E82] hover:text-[#2E7CF6]">
+                  <button 
+                    type="button"
+                    disabled={isUploading}
+                    onClick={() => triggerUpload('activity')}
+                    className="w-[80px] h-[80px] shrink-0 rounded-[10px] border border-dashed border-[#C8D2DE] bg-[#F8FAFC] flex flex-col items-center justify-center hover:bg-[#EBF3FE] hover:border-[#2E7CF6] transition text-[#5A6E82] hover:text-[#2E7CF6] disabled:opacity-50"
+                  >
                     <ImagePlus className="h-5 w-5 mb-1" />
-                    <span className="text-[10px] font-medium">Upload</span>
+                    <span className="text-[10px] font-medium">{isUploading && uploadType.type === 'activity' ? '...' : 'Upload'}</span>
                   </button>
                   {currentActivity.images && currentActivity.images.map((img, i) => (
-                    <div key={i} className="relative h-[80px] w-[80px] shrink-0 rounded-[10px] overflow-hidden border border-[#E4EAF1]">
+                    <div key={i} className="relative h-[80px] w-[80px] shrink-0 rounded-[10px] overflow-hidden border border-[#E4EAF1] group">
                       <img src={img} alt="" className="h-full w-full object-cover" />
+                      <button 
+                        onClick={() => setCurrentActivity({...currentActivity, images: currentActivity.images?.filter((_, idx) => idx !== i)})}
+                        className="absolute top-1 right-1 hidden group-hover:flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
                     </div>
                   ))}
                 </div>

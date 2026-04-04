@@ -8,15 +8,26 @@ export function MetricCards() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await api.get("/api/tour-plans")
-        setTotalPlans(response.data.length)
+        const [plansRes, callbacksRes] = await Promise.all([
+           api.get("/api/tour-plans"),
+           api.get("/api/callbacks/mine")
+        ])
+        setTotalPlans(plansRes.data.length)
+        setTotalGuests(callbacksRes.data.length || 0)
+        
+        const totalVolume = plansRes.data.reduce((acc: number, p: any) => acc + (p.basePrice || 0), 0)
+        setGrossVolume(`₹${totalVolume.toLocaleString('en-IN')}`)
       } catch (error) {
         console.error("Error fetching stats:", error)
         setTotalPlans("ERR")
+        setTotalGuests("ERR")
       }
     }
     fetchStats()
   }, [])
+
+  const [totalGuests, setTotalGuests] = useState<number | string>("...")
+  const [grossVolume, setGrossVolume] = useState<string>("...")
 
   const metrics = [
     {
@@ -44,7 +55,7 @@ export function MetricCards() {
     },
     {
       label: "Total Guests",
-      value: "2,845",
+      value: totalGuests,
       change: "-1.45%",
       positive: false,
       bg: "bg-[#E3F7EC]",
@@ -70,7 +81,7 @@ export function MetricCards() {
     },
     {
       label: "Gross Volume",
-      value: "$12,890",
+      value: grossVolume,
       change: "+3.75%",
       positive: true,
       bg: "bg-[#EDE8FE]",

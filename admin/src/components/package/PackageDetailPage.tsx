@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react"
 import {
   ArrowLeft,
   CalendarDays,
-  CheckCircle2,
   ImageIcon,
   Loader2,
   MapPin,
   Users,
-  XCircle,
+  ChevronLeft,
+  ChevronRight,
+  X,
 } from "lucide-react"
 import { Link, useParams } from "@tanstack/react-router"
 
@@ -37,6 +38,8 @@ type TourPlan = {
   locations: string[]
   bannerImages?: string[]
   days: DayPlan[]
+  includes?: string[]
+  excludes?: string[]
   createdAt?: string
 }
 
@@ -68,12 +71,12 @@ const defaultExcludes = [
   "Travel Insurance",
 ]
 
-const formatDate = (date: Date) =>
-  new Intl.DateTimeFormat("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date)
+const formatDate = (date: Date) => {
+  const day = date.getDate()
+  const month = date.toLocaleString("en-US", { month: "short" })
+  const year = date.getFullYear().toString().slice(-2)
+  return `${day} ${month} ${year}`
+}
 
 const addDays = (date: Date, days: number) => {
   const d = new Date(date)
@@ -85,6 +88,16 @@ export default function PackageDetailPage() {
   const { packageId } = useParams({ strict: false }) as any
   const [plan, setPlan] = useState<TourPlan | null>(null)
   const [loading, setLoading] = useState(true)
+
+  const [lightbox, setLightbox] = useState<{
+    open: boolean
+    index: number
+    images: string[]
+  }>({
+    open: false,
+    index: 0,
+    images: [],
+  })
 
   useEffect(() => {
     const fetchPlan = async () => {
@@ -114,18 +127,44 @@ export default function PackageDetailPage() {
     [plan?.days],
   )
 
-  const startDate = plan?.createdAt ? new Date(plan.createdAt) : null
+  const startDate = plan?.createdAt ? new Date(plan.createdAt) : new Date()
   const durationDays = plan?.durationDays ?? 0
-  
-  // Rule: Nights is always 1 less than Days in this app's context
   const durationNights = Math.max(durationDays - 1, 0)
   
-  const endDate =
-    startDate && durationDays
-      ? addDays(startDate, Math.max(durationDays - 1, 0))
-      : null
-
   const formattedPrice = plan?.basePrice?.toLocaleString?.() || "—"
+
+  const openLightbox = (images: string[], index: number) => {
+    setLightbox({ open: true, index, images })
+  }
+
+  const closeLightbox = () => setLightbox(prev => ({ ...prev, open: false }))
+  
+  const nextImg = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    setLightbox(prev => ({ 
+      ...prev, 
+      index: (prev.index + 1) % prev.images.length 
+    }))
+  }
+
+  const prevImg = (e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    setLightbox(prev => ({ 
+      ...prev, 
+      index: (prev.index - 1 + prev.images.length) % prev.images.length 
+    }))
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightbox.open) return
+      if (e.key === "ArrowRight") nextImg()
+      if (e.key === "ArrowLeft") prevImg()
+      if (e.key === "Escape") closeLightbox()
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
+  }, [lightbox.open, lightbox.images.length])
 
   if (loading) {
     return (
@@ -147,14 +186,16 @@ export default function PackageDetailPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-6 pb-12 relative">
+      {/* Top Breadcrumb & Actions */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
         <div className="flex items-center gap-3">
-          <Link to="/packages" className="flex items-center gap-2 text-sm font-semibold text-[#1A2B3D] hover:text-[#2E7CF6]">
+          <Link to="/packages" className="flex items-center gap-2 text-[14px] font-semibold text-[#1A2B3D] hover:text-[#2E7CF6] transition">
             <ArrowLeft className="h-4 w-4" />
             Back to Packages List
           </Link>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-[12px] font-semibold text-slate-700">
+          <div className="h-4 w-px bg-[#E4EAF1]" />
+          <span className="text-[13px] font-bold text-[#8896A6]">
             Package Details
           </span>
         </div>
@@ -164,7 +205,6 @@ export default function PackageDetailPage() {
               if (window.confirm("Are you sure you want to delete this package?")) {
                 try {
                   await api.delete(`/api/tour-plans/${plan._id}`)
-                  alert("Package deleted successfully")
                   window.location.href = "/packages"
                 } catch (e) {
                   alert("Failed to delete package")
@@ -172,177 +212,239 @@ export default function PackageDetailPage() {
               }
             }}
             variant="outline" 
-            className="border-red-100 text-red-600 hover:bg-red-50 hover:text-red-700 h-9"
+            className="border-red-100 text-red-600 hover:bg-red-50 hover:text-red-700 h-9 rounded-lg text-[13px] font-bold"
           >
             Delete
           </Button>
-          <Button variant="outline" className="border-[#E4EAF1] text-[#1A2B3D] h-9">Duplicate</Button>
+          <Button variant="outline" className="border-[#E4EAF1] text-[#5A6E82] h-9 rounded-lg text-[13px] font-bold">Duplicate</Button>
           <Link to="/plans/edit/$packageId" params={{ packageId: plan._id }}>
-            <Button className="bg-[#2E7CF6] text-white shadow-sm hover:bg-[#2569d9] h-9">Edit Data</Button>
+            <Button className="bg-[#2E7CF6] text-white shadow-sm hover:bg-[#2569d9] h-9 rounded-lg text-[13px] font-bold px-6">Edit Data</Button>
           </Link>
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[2fr_1fr]">
-        <div className="space-y-4">
-          <div className="rounded-[16px] border border-[#E4EAF1] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)]">
-            <div className="grid gap-3 md:grid-cols-3">
-              <div
-                className="md:col-span-2 h-56 rounded-[14px] bg-cover bg-center"
-                style={{ backgroundImage: `url(${photos[0]})` }}
-              />
-              <div className="grid grid-cols-2 gap-3">
-                {photos.slice(1, 5).map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="h-24 rounded-[12px] bg-cover bg-center"
-                    style={{ backgroundImage: `url(${img})` }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-4 flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-2">
-                <div className="flex flex-wrap items-center gap-3 text-sm text-[#5A6E82]">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-4 w-4 text-[#2E7CF6]" />
-                    {plan.locations?.[0] || "Destination"}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <CalendarDays className="h-4 w-4 text-[#2E7CF6]" />
-                    {durationDays} Days / {durationNights} Nights
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Users className="h-4 w-4 text-[#2E7CF6]" />
-                    {sortedDays.length} planned days
-                  </span>
-                </div>
-                <h2 className="text-2xl font-bold text-[#1A2B3D]">{plan.title || "Package"}</h2>
-                <p className="max-w-4xl text-sm leading-relaxed text-[#5A6E82]">
-                  {plan.description ||
-                    "Discover a thoughtfully crafted itinerary designed to balance signature experiences, relaxation, and authentic cultural immersion."}
-                </p>
-              </div>
-
-              <div className="text-right">
-                <p className="text-xs uppercase text-[#5A6E82]">From</p>
-                <p className="text-3xl font-bold text-[#2E7CF6]">₹{formattedPrice}</p>
-                <p className="text-xs text-[#5A6E82]">per person</p>
-              </div>
-            </div>
+      <div className="grid gap-8 lg:grid-cols-[1fr_380px]">
+        {/* Main Content */}
+        <div className="space-y-8">
+          {/* Gallery Grid */}
+          <div className="grid grid-cols-12 grid-rows-2 gap-4 h-[440px]">
+            <div 
+              className="col-span-8 row-span-2 rounded-[20px] bg-cover bg-center shadow-sm cursor-pointer transform transition hover:brightness-110 active:scale-[0.99]"
+              style={{ backgroundImage: `url(${photos[0]})` }}
+              onClick={() => openLightbox(photos, 0)}
+            />
+            <div 
+              className="col-span-4 row-span-1 rounded-[20px] bg-cover bg-center shadow-sm cursor-pointer transform transition hover:brightness-110 active:scale-[0.99]"
+              style={{ backgroundImage: `url(${photos[1]})` }}
+              onClick={() => openLightbox(photos, 1)}
+            />
+            <div 
+              className="col-span-2 row-span-1 rounded-[20px] bg-cover bg-center shadow-sm cursor-pointer transform transition hover:brightness-110 active:scale-[0.99]"
+              style={{ backgroundImage: `url(${photos[2]})` }}
+              onClick={() => openLightbox(photos, 2)}
+            />
+            <div 
+              className="col-span-2 row-span-1 rounded-[20px] bg-cover bg-center shadow-sm cursor-pointer transform transition hover:brightness-110 active:scale-[0.99]"
+              style={{ backgroundImage: `url(${photos[3]})` }}
+              onClick={() => openLightbox(photos, 3)}
+            />
           </div>
 
-            <div className="rounded-[16px] border border-[#E4EAF1] bg-white p-5 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)] space-y-4">
-              <div>
-                <h3 className="text-[15px] font-semibold text-[#1A2B3D]">Trip Schedule</h3>
-                <div className="mt-2 flex items-center gap-2 text-sm text-[#5A6E82]">
-                  <CalendarDays className="h-4 w-4 text-[#2E7CF6]" />
-                  {startDate && endDate ? (
-                    <span>
-                      {formatDate(startDate)} — {formatDate(endDate)}
-                    </span>
-                  ) : (
-                    <span>Dates will be confirmed after publishing</span>
-                  )}
+          <div className="space-y-8 px-1">
+            {/* Header: Title & Price */}
+            <div className="flex items-start justify-between">
+              <div className="space-y-3">
+                <h1 className="text-[32px] font-extrabold text-[#1A2B3D] tracking-tight">{plan.title || "Safari Adventure"}</h1>
+                <div className="flex flex-wrap items-center gap-6">
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-[#5A6E82]">
+                    <MapPin className="h-4 w-4 text-[#8896A6]" />
+                    <span>{plan.locations?.[0] || "Serengeti, Tanzania"}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-[#5A6E82]">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#8896A6]"><path d="M12 2v10l4.2 4.2"/><circle cx="12" cy="12" r="10"/></svg>
+                    <span>{durationDays} Days / {durationNights} Nights</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-[#5A6E82]">
+                    <Users className="h-4 w-4 text-[#8896A6]" />
+                    <span>15 participants</span>
+                  </div>
                 </div>
               </div>
+              <div className="text-right">
+                <div className="text-[32px] font-extrabold text-[#2E7CF6]">₹{formattedPrice}</div>
+                <div className="text-[14px] font-medium text-[#8896A6]">per person</div>
+              </div>
+            </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-[12px] border border-[#E4EAF1] bg-[#F7FAFD] p-4">
-                <h4 className="mb-3 text-sm font-semibold text-[#1A2B3D]">Includes</h4>
-                <div className="space-y-2 text-sm text-[#1A2B3D]">
-                  {defaultIncludes.map((item) => (
-                    <div key={item} className="flex items-start gap-2">
-                      <CheckCircle2 className="mt-[2px] h-4 w-4 text-[#2E7CF6]" />
-                      <span>{item}</span>
+            {/* About Section */}
+            <div className="space-y-3">
+              <h3 className="text-[13px] font-bold text-[#8896A6] uppercase tracking-wider">About</h3>
+              <p className="text-[15px] leading-[1.7] text-[#5A6E82]">
+                {plan.description || "Experience the thrill of a lifetime with our Safari Adventure package. Traverse the Serengeti and witness the majestic wildlife in their natural habitat. This all-inclusive safari offers luxurious accommodations, expert-guided tours, and unforgettable experiences."}
+              </p>
+            </div>
+
+            {/* Trip Schedule */}
+            <div className="space-y-3">
+              <h3 className="text-[13px] font-bold text-[#8896A6] uppercase tracking-wider">Trip Schedule</h3>
+              <div className="flex items-center gap-3 text-[14px] font-bold text-[#5A6E82]">
+                <CalendarDays className="h-4 w-4 text-[#8896A6]" />
+                <span>{formatDate(startDate)} — {formatDate(addDays(startDate, durationDays - 1))}</span>
+              </div>
+            </div>
+
+            <div className="h-px bg-[#E4EAF1] w-full" />
+
+            {/* Includes / Excludes Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+              {/* Includes */}
+              <div className="space-y-6">
+                <h3 className="text-[12px] font-bold text-[#8896A6] uppercase tracking-widest">Includes</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                  {plan.includes?.length ? plan.includes.map((item: string, idx: number) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="h-5 w-5 rounded-full bg-[#EBF3FE] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2E7CF6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                    </div>
+                  )) : defaultIncludes.map((item, idx) => (
+                    <div key={idx} className="flex items-start gap-3">
+                      <div className="h-5 w-5 rounded-full bg-[#EBF3FE] flex items-center justify-center shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2E7CF6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </div>
+                      <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="rounded-[12px] border border-[#E4EAF1] bg-[#FFF8F6] p-4">
-                <h4 className="mb-3 text-sm font-semibold text-[#1A2B3D]">Excludes</h4>
-                <div className="space-y-2 text-sm text-[#1A2B3D]">
-                  {defaultExcludes.map((item) => (
-                    <div key={item} className="flex items-start gap-2">
-                      <XCircle className="mt-[2px] h-4 w-4 text-[#F15B2A]" />
-                      <span>{item}</span>
-                    </div>
-                  ))}
+              {/* Excludes */}
+              <div className="space-y-6 flex flex-col">
+                <div className="h-full border-l border-[#E4EAF1] pl-12">
+                  <h3 className="text-[12px] font-bold text-[#8896A6] uppercase tracking-widest mb-6">Excludes</h3>
+                  <div className="space-y-4">
+                    {plan.excludes?.length ? plan.excludes.map((item: string, idx: number) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="h-5 w-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8896A6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </div>
+                        <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                      </div>
+                    )) : defaultExcludes.map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="h-5 w-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8896A6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </div>
+                        <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <aside className="space-y-4">
-          <div className="rounded-[16px] border border-[#E4EAF1] bg-white p-4 shadow-[0_12px_30px_-24px_rgba(26,43,61,0.15)]">
-            <div className="mb-3 flex items-center justify-between">
-              <h4 className="text-[15px] font-semibold text-[#1A2B3D]">Travel Plans</h4>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-[12px] font-semibold text-slate-700">
-                {sortedDays.length} days
-              </span>
-            </div>
+        {/* Sidebar: Travel Plans */}
+        <aside className="lg:block">
+          <div className="rounded-[24px] border border-[#E4EAF1] bg-[#F7FAFD] p-6 sticky top-6 shadow-sm">
+            <h2 className="text-[20px] font-extrabold text-[#1A2B3D] mb-8">Travel Plans</h2>
+            
+            <div className="space-y-0 relative">
+              {/* Vertical line connecting circles */}
+              <div className="absolute left-[39px] top-6 bottom-6 w-px bg-[#E4EAF1] z-0" />
+              
+              {sortedDays.length ? sortedDays.map((day: DayPlan) => (
+                <div key={day.dayNumber} className="relative flex gap-6 pb-10 last:pb-0">
+                  {/* Left Column: Day & Date */}
+                  <div className="w-[80px] shrink-0 pt-1">
+                    <p className="text-[14px] font-extrabold text-[#1A2B3D]">Day {day.dayNumber}</p>
+                    <p className="text-[11px] font-bold text-[#8896A6] mt-1 uppercase">
+                      {formatDate(addDays(startDate, day.dayNumber - 1))}
+                    </p>
+                  </div>
 
-            <div className="space-y-3">
-              {sortedDays.length ? (
-                sortedDays.map((day) => (
-                  <div key={day.dayNumber} className="flex gap-3 rounded-[12px] border border-[#E4EAF1] bg-[#F9FBFD] p-3">
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-sm font-semibold text-[#1A2B3D] shadow-sm">
-                        {day.dayNumber}
-                      </span>
-                      {startDate && (
-                        <span className="text-[11px] font-medium text-[#5A6E82]">
-                          {formatDate(addDays(startDate, day.dayNumber - 1))}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex-1 space-y-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-semibold text-[#1A2B3D]">{day.title}</p>
-                      </div>
-                      <div className="space-y-1 text-[13px] text-[#5A6E82]">
-                        {day.activities && day.activities.length ? (
-                          day.activities.map((activity, idx) => (
-                            <div key={idx} className="flex flex-col gap-2">
-                              <div className="flex gap-2">
-                                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2E7CF6]" />
-                                <span className="leading-snug">
-                                  {activity.title}
-                                  {activity.description ? ` — ${activity.description}` : ""}
-                                </span>
-                              </div>
-                              {activity.images && activity.images.length > 0 && (
-                                <div className="ml-3.5 flex gap-2 overflow-x-auto pb-1 mt-1">
-                                  {activity.images.map((img, i) => (
-                                    <img key={i} src={img} alt="Activity" className="h-[60px] w-[60px] rounded-lg object-cover shrink-0 border border-[#E4EAF1]" />
-                                  ))}
-                                </div>
-                              )}
+                  {/* Middle Column: Circle */}
+                  <div className="relative z-10 flex flex-col items-center pt-2">
+                    <div className="h-4 w-4 rounded-full bg-[#E4EAF1] border-2 border-white shadow-sm" />
+                  </div>
+
+                  {/* Right Column: Info */}
+                  <div className="flex-1 space-y-3">
+                    <h4 className="text-[15px] font-extrabold text-[#1A2B3D] leading-tight pt-1">{day.title}</h4>
+                    <div className="space-y-3">
+                      {day.activities?.map((act: Activity, i: number) => (
+                        <div key={i} className="space-y-2">
+                          <p className="text-[12px] font-medium text-[#5A6E82] leading-relaxed">
+                            {act.title}: {act.description || "Activity details..."}
+                          </p>
+                          {act.images && act.images.length > 0 && (
+                            <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                              {act.images.map((img: string, imgIdx: number) => (
+                                <img 
+                                  key={imgIdx} src={img} alt="Activity" 
+                                  className="h-16 w-16 rounded-xl object-cover border border-[#E4EAF1] shadow-sm cursor-pointer transform transition hover:scale-105" 
+                                  onClick={() => openLightbox(act.images || [], imgIdx)}
+                                />
+                              ))}
                             </div>
-                          ))
-                        ) : (
-                          <div className="flex items-center gap-2 text-[13px] text-slate-500">
-                            <ImageIcon className="h-4 w-4" />
-                            No activities added for this day yet.
-                          </div>
-                        )}
-                      </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="flex items-center gap-2 rounded-lg border border-dashed border-[#E4EAF1] bg-slate-50 px-3 py-4 text-[13px] text-slate-600">
-                  <ImageIcon className="h-4 w-4 text-[#2E7CF6]" />
-                  Add an itinerary to show day-by-day highlights.
+                </div>
+              )) : (
+                <div className="text-center py-12 px-4 bg-white rounded-2xl border border-dashed border-[#E4EAF1]">
+                  <ImageIcon className="h-8 w-8 text-[#2E7CF6]/20 mx-auto mb-3" />
+                  <p className="text-[13px] font-medium text-slate-500">Add an itinerary to show travel plans.</p>
                 </div>
               )}
             </div>
           </div>
         </aside>
       </div>
+
+      {/* Lightbox Modal */}
+      {lightbox.open && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm transition-all duration-300"
+          onClick={closeLightbox}
+        >
+          <button 
+            className="absolute top-6 right-8 text-white/70 hover:text-white transition p-2 bg-white/10 rounded-full"
+            onClick={closeLightbox}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          
+          <button 
+            className="absolute left-8 h-12 w-12 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-full transition"
+            onClick={prevImg}
+          >
+            <ChevronLeft className="h-8 w-8" />
+          </button>
+
+          <div className="relative max-w-[90vw] max-h-[85vh] flex flex-col items-center gap-4" onClick={(e) => e.stopPropagation()}>
+            <img 
+              src={lightbox.images[lightbox.index]} 
+              alt="Lightbox" 
+              className="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-opacity duration-300"
+            />
+            <div className="text-white/60 text-[14px] font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-md">
+              {lightbox.index + 1} / {lightbox.images.length}
+            </div>
+          </div>
+
+          <button 
+            className="absolute right-8 h-12 w-12 flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 rounded-full transition"
+            onClick={nextImg}
+          >
+            <ChevronRight className="h-8 w-8" />
+          </button>
+        </div>
+      )}
     </div>
   )
 }

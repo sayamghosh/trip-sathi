@@ -28,9 +28,9 @@ interface CustomTooltipProps {
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-[8px] border border-[#E4EAF1] bg-white px-3 py-1.5 shadow-lg">
-        <p className="text-[10px] text-[#8896A6]">{label}</p>
-        <p className="text-[13px] font-bold text-[#1A2B3D]">
+      <div className="rounded-[8px] border border-border bg-card px-3 py-1.5 shadow-lg">
+        <p className="text-[10px] text-muted-foreground">{label}</p>
+        <p className="text-[13px] font-bold text-foreground">
           ${payload[0].value}
         </p>
       </div>
@@ -41,12 +41,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 
 export function RevenueChart() {
   return (
-    <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-4">
+    <div className="rounded-[14px] border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-[14px] font-semibold text-[#1A2B3D]">
+        <h3 className="text-[14px] font-semibold text-foreground">
           Revenue Overview
         </h3>
-        <button className="flex items-center gap-1 rounded-[8px] bg-[#2E7CF6] px-3 py-[5px] text-[11px] font-medium text-white transition hover:bg-[#1B5FCC]">
+        <button className="flex items-center gap-1 rounded-[8px] bg-primary px-3 py-[5px] text-[11px] font-medium text-white transition hover:bg-primary/90">
           Weekly
           <ChevronDown className="h-3 w-3" />
         </button>
@@ -66,19 +66,19 @@ export function RevenueChart() {
             </defs>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#F0F4F8"
+              stroke="var(--border)"
               vertical={false}
             />
             <XAxis
               dataKey="day"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 10, fill: "#8896A6" }}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 10, fill: "#8896A6" }}
+              tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
               tickFormatter={(v: number) => `$${v}`}
             />
             <Tooltip content={<CustomTooltip />} />
@@ -92,7 +92,7 @@ export function RevenueChart() {
               activeDot={{
                 r: 4,
                 fill: "#2E7CF6",
-                stroke: "#fff",
+                stroke: "var(--card)",
                 strokeWidth: 2,
               }}
             />

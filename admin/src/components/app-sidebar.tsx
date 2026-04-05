@@ -49,17 +49,17 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className="border-r-0">
-      <SidebarHeader className="bg-white px-6 py-8">
+    <Sidebar className="border-r-0 border-sidebar-border">
+      <SidebarHeader className="bg-sidebar px-6 py-8">
         <Link to="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#3B82F6] text-white shadow-lg shadow-blue-200">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-blue-200">
             <Compass className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-[#1A2B3D]">Travelie</span>
+          <span className="text-xl font-bold tracking-tight text-sidebar-foreground">Travelie</span>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="bg-white px-4">
+      <SidebarContent className="bg-sidebar px-4">
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu className="gap-1">
@@ -67,15 +67,15 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     asChild
-                    className="h-11 px-4 transition-all duration-200 hover:bg-slate-50 group"
+                    className="h-11 px-4 transition-all duration-200 hover:bg-sidebar-accent group"
                   >
                     <Link
                       to={item.to as any}
                       activeProps={{
-                        className: "bg-[#3B82F6] text-white hover:bg-[#3B82F6] shadow-md shadow-blue-100",
+                        className: "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary shadow-md shadow-blue-100",
                       }}
                       inactiveProps={{
-                         className: "text-[#8896A6] hover:text-[#1A2B3D]",
+                         className: "text-sidebar-foreground/60 hover:text-sidebar-foreground",
                       }}
                     >
                       <item.icon className="h-5 w-5 shrink-0" />
@@ -83,7 +83,7 @@ export function AppSidebar() {
                     </Link>
                   </SidebarMenuButton>
                   {item.badge && (
-                    <SidebarMenuBadge className="right-4 bg-[#3B82F6] text-white">
+                    <SidebarMenuBadge className="right-4 bg-sidebar-primary text-sidebar-primary-foreground">
                       {item.badge}
                     </SidebarMenuBadge>
                   )}
@@ -94,13 +94,11 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="bg-white p-6 pt-0">
-
-
+      <SidebarFooter className="bg-sidebar p-6 pt-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="h-10 text-[#8896A6] hover:bg-red-50 hover:text-red-500 transition-colors px-4 group"
+              className="h-10 text-sidebar-foreground/60 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group"
               onClick={handleLogout}
             >
               <LogOut className="h-5 w-5 mr-3 transition-colors group-hover:text-red-500" />

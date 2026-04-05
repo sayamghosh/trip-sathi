@@ -25,18 +25,18 @@ export function CalendarWidget() {
     cells.push({ d: i, cur: false, today: false, hl: false })
 
   return (
-    <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-3">
+    <div className="rounded-[14px] border border-border bg-card p-3">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-[13px] font-semibold text-[#1A2B3D]">
+        <span className="text-[13px] font-semibold text-foreground">
           {monthStr} {y}{" "}
-          <ChevronRight className="inline h-3 w-3 text-[#8896A6]" />
+          <ChevronRight className="inline h-3 w-3 text-muted-foreground" />
         </span>
         <div className="flex gap-0.5">
-          <button className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-[#F0F4F8]">
-            <ChevronLeft className="h-3 w-3 text-[#8896A6]" />
+          <button className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-accent">
+            <ChevronLeft className="h-3 w-3 text-muted-foreground" />
           </button>
-          <button className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-[#F0F4F8]">
-            <ChevronRight className="h-3 w-3 text-[#8896A6]" />
+          <button className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-accent">
+            <ChevronRight className="h-3 w-3 text-muted-foreground" />
           </button>
         </div>
       </div>
@@ -44,7 +44,7 @@ export function CalendarWidget() {
         {DOW.map((d) => (
           <div
             key={d}
-            className="py-[3px] text-center text-[10px] font-medium text-[#8896A6]"
+            className="py-[3px] text-center text-[10px] font-medium text-muted-foreground/70"
           >
             {d}
           </div>
@@ -56,12 +56,12 @@ export function CalendarWidget() {
             key={i}
             className={`flex h-[28px] items-center justify-center rounded-[6px] text-[11px] font-medium transition ${
               !c.cur
-                ? "text-[#C8D2DE]"
+                ? "text-muted-foreground/30"
                 : c.today
-                  ? "bg-[#2E7CF6] font-bold text-white"
+                  ? "bg-primary font-bold text-white shadow-lg shadow-primary/20"
                   : c.hl
-                    ? "font-semibold text-[#2E7CF6]"
-                    : "text-[#3D4F63] hover:bg-[#F0F4F8]"
+                    ? "font-semibold text-primary"
+                    : "text-foreground/80 hover:bg-accent hover:text-foreground"
             }`}
           >
             {c.d}

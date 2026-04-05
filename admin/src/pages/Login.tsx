@@ -93,20 +93,20 @@ export function Login() {
   }
 
   return (
-    <div className="flex h-screen w-full bg-white font-sans">
+    <div className="flex h-screen w-full bg-background font-sans">
       {/* Left Column - Forms */}
       <div className="relative flex flex-1 flex-col items-center justify-center px-8 lg:px-20">
         <div className="w-full max-w-md">
           {step === 1 ? (
             <div className="animate-in space-y-8 duration-500 fade-in slide-in-from-bottom-4">
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+                <h1 className="text-4xl font-bold tracking-tight text-foreground">
                   Welcome Back{" "}
                   <span role="img" aria-label="wave">
                     👋
                   </span>
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   Today is a new day. It's your day. You shape it.
                   <br />
                   Sign in to start managing your projects.
@@ -114,16 +114,16 @@ export function Login() {
               </div>
 
               {error && (
-                <div className="rounded-md bg-red-50 p-3 text-sm text-red-500">
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                   {error}
                 </div>
               )}
 
               <div className="mt-8 flex w-full flex-col items-center justify-center">
                 {isLoading ? (
-                  <p className="text-sm text-gray-500">Signing in...</p>
+                  <p className="text-sm text-muted-foreground">Signing in...</p>
                 ) : (
-                  <div className="flex w-full justify-center [&>div]:w-full [&>div>div]:!w-full">
+                  <div className="flex w-full justify-center [&>div]:w-full [&>div>div]:w-full!">
                     <GoogleLogin
                       onSuccess={handleGoogleSuccess}
                       onError={handleGoogleError}
@@ -137,24 +137,24 @@ export function Login() {
                 )}
               </div>
 
-              <div className="absolute right-0 bottom-6 left-0 text-center text-xs text-gray-400">
-                © 2023 ALL RIGHTS RESERVED
+              <div className="absolute right-0 bottom-6 left-0 text-center text-xs text-muted-foreground/50">
+                © 2026 ALL RIGHTS RESERVED
               </div>
             </div>
           ) : (
             <div className="animate-in space-y-8 duration-500 fade-in slide-in-from-bottom-4">
               <div className="space-y-2">
-                <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+                <h1 className="text-4xl font-bold tracking-tight text-foreground">
                   Almost there!
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   We need a few more details to create your travel agent
                   account.
                 </p>
               </div>
 
               {error && (
-                <div className="rounded-md bg-red-50 p-3 text-sm text-red-500">
+                <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
                   {error}
                 </div>
               )}
@@ -164,7 +164,7 @@ export function Login() {
                   <div className="space-y-2">
                     <label
                       htmlFor="phone"
-                      className="text-sm leading-none font-medium text-slate-800"
+                      className="text-sm leading-none font-medium text-foreground"
                     >
                       Phone Number
                     </label>
@@ -180,7 +180,7 @@ export function Login() {
                   <div className="space-y-2">
                     <label
                       htmlFor="address"
-                      className="text-sm leading-none font-medium text-slate-800"
+                      className="text-sm leading-none font-medium text-foreground"
                     >
                       Business Address
                     </label>
@@ -209,7 +209,7 @@ export function Login() {
                   </Button>
                   <Button
                     type="submit"
-                    className="h-11 flex-1 bg-slate-900 text-white hover:bg-slate-800"
+                    className="h-11 flex-1 bg-primary text-primary-foreground hover:bg-primary/90"
                     disabled={isLoading}
                   >
                     {isLoading ? "Completing..." : "Complete Registration"}

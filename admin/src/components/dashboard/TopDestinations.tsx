@@ -14,12 +14,12 @@ const data = [
 
 export function TopDestinations() {
   return (
-    <div className="rounded-[14px] border border-[#E4EAF1] bg-white p-4">
+    <div className="rounded-[14px] border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-[14px] font-semibold text-[#1A2B3D]">
+        <h3 className="text-[14px] font-semibold text-foreground">
           Top Destinations
         </h3>
-        <button className="rounded-[8px] bg-[#2E7CF6] px-3 py-[5px] text-[11px] font-medium text-white transition hover:bg-[#1B5FCC]">
+        <button className="rounded-[8px] bg-primary px-3 py-[5px] text-[11px] font-medium text-white transition hover:bg-primary/90">
           This Month
         </button>
       </div>
@@ -56,10 +56,10 @@ export function TopDestinations() {
                 style={{ backgroundColor: d.color }}
               />
               <div>
-                <p className="text-[12px] leading-tight font-medium text-[#1A2B3D]">
+                <p className="text-[12px] leading-tight font-medium text-foreground">
                   {d.name} ({d.pct}%)
                 </p>
-                <p className="text-[10px] text-[#8896A6]">
+                <p className="text-[10px] text-muted-foreground">
                   {d.participants} Participants
                 </p>
               </div>

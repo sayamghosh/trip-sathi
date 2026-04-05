@@ -110,14 +110,14 @@ export function MetricCards() {
       {metrics.map((m) => (
         <div
           key={m.label}
-          className={`relative rounded-[14px] ${m.bg} px-5 py-4 transition-transform duration-200 hover:scale-[1.015]`}
+          className={`relative rounded-[14px] bg-card border border-border px-5 py-4 transition-transform duration-200 hover:scale-[1.015]`}
         >
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-[11px] font-medium text-[#5A6E82]">
+              <p className="text-[11px] font-medium text-muted-foreground">
                 {m.label}
               </p>
-              <p className="mt-[2px] text-[26px] leading-tight font-bold text-[#1A2B3D]">
+              <p className="mt-[2px] text-[26px] leading-tight font-bold text-foreground">
                 {m.value}
               </p>
             </div>
@@ -136,8 +136,8 @@ export function MetricCards() {
             <span
               className={`rounded-full px-[8px] py-[2px] text-[10px] font-semibold ${
                 m.positive
-                  ? "bg-[#C9EFDA] text-[#22B357]"
-                  : "bg-[#FDD] text-[#EF4444]"
+                  ? "bg-[#C9EFDA]/20 text-[#22B357]"
+                  : "bg-[#FDD]/20 text-[#EF4444]"
               }`}
             >
               {m.change}

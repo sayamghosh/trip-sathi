@@ -168,9 +168,9 @@ export default function PackageDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex h-[70vh] items-center justify-center rounded-2xl border border-dashed bg-white/60">
-        <div className="flex items-center gap-3 text-slate-600">
-          <Loader2 className="h-6 w-6 animate-spin text-[#2E7CF6]" />
+      <div className="flex h-[70vh] items-center justify-center rounded-2xl border border-dashed border-border bg-card/60 backdrop-blur-sm">
+        <div className="flex items-center gap-3 text-secondary-foreground">
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
           <span>Loading package details…</span>
         </div>
       </div>
@@ -190,12 +190,12 @@ export default function PackageDetailPage() {
       {/* Top Breadcrumb & Actions */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-1">
         <div className="flex items-center gap-3">
-          <Link to="/packages" className="flex items-center gap-2 text-[14px] font-semibold text-[#1A2B3D] hover:text-[#2E7CF6] transition">
+          <Link to="/packages" className="flex items-center gap-2 text-[14px] font-semibold text-foreground hover:text-primary transition">
             <ArrowLeft className="h-4 w-4" />
             Back to Packages List
           </Link>
-          <div className="h-4 w-px bg-[#E4EAF1]" />
-          <span className="text-[13px] font-bold text-[#8896A6]">
+          <div className="h-4 w-px bg-border" />
+          <span className="text-[13px] font-bold text-muted-foreground">
             Package Details
           </span>
         </div>
@@ -212,13 +212,13 @@ export default function PackageDetailPage() {
               }
             }}
             variant="outline" 
-            className="border-red-100 text-red-600 hover:bg-red-50 hover:text-red-700 h-9 rounded-lg text-[13px] font-bold"
+            className="border-destructive/20 text-destructive hover:bg-destructive/10 h-9 rounded-lg text-[13px] font-bold"
           >
             Delete
           </Button>
-          <Button variant="outline" className="border-[#E4EAF1] text-[#5A6E82] h-9 rounded-lg text-[13px] font-bold">Duplicate</Button>
+          <Button variant="outline" className="border-border text-secondary-foreground h-9 rounded-lg text-[13px] font-bold">Duplicate</Button>
           <Link to="/plans/edit/$packageId" params={{ packageId: plan._id }}>
-            <Button className="bg-[#2E7CF6] text-white shadow-sm hover:bg-[#2569d9] h-9 rounded-lg text-[13px] font-bold px-6">Edit Data</Button>
+            <Button className="bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 h-9 rounded-lg text-[13px] font-bold px-6">Edit Data</Button>
           </Link>
         </div>
       </div>
@@ -254,66 +254,66 @@ export default function PackageDetailPage() {
             {/* Header: Title & Price */}
             <div className="flex items-start justify-between">
               <div className="space-y-3">
-                <h1 className="text-[32px] font-extrabold text-[#1A2B3D] tracking-tight">{plan.title || "Safari Adventure"}</h1>
+                <h1 className="text-[32px] font-extrabold text-foreground tracking-tight">{plan.title || "Safari Adventure"}</h1>
                 <div className="flex flex-wrap items-center gap-6">
-                  <div className="flex items-center gap-2 text-[14px] font-medium text-[#5A6E82]">
-                    <MapPin className="h-4 w-4 text-[#8896A6]" />
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-secondary-foreground">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span>{plan.locations?.[0] || "Serengeti, Tanzania"}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[14px] font-medium text-[#5A6E82]">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#8896A6]"><path d="M12 2v10l4.2 4.2"/><circle cx="12" cy="12" r="10"/></svg>
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-secondary-foreground">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><path d="M12 2v10l4.2 4.2"/><circle cx="12" cy="12" r="10"/></svg>
                     <span>{durationDays} Days / {durationNights} Nights</span>
                   </div>
-                  <div className="flex items-center gap-2 text-[14px] font-medium text-[#5A6E82]">
-                    <Users className="h-4 w-4 text-[#8896A6]" />
+                  <div className="flex items-center gap-2 text-[14px] font-medium text-secondary-foreground">
+                    <Users className="h-4 w-4 text-muted-foreground" />
                     <span>15 participants</span>
                   </div>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-[32px] font-extrabold text-[#2E7CF6]">₹{formattedPrice}</div>
-                <div className="text-[14px] font-medium text-[#8896A6]">per person</div>
+                <div className="text-[32px] font-extrabold text-primary">₹{formattedPrice}</div>
+                <div className="text-[14px] font-medium text-muted-foreground">per person</div>
               </div>
             </div>
 
             {/* About Section */}
             <div className="space-y-3">
-              <h3 className="text-[13px] font-bold text-[#8896A6] uppercase tracking-wider">About</h3>
-              <p className="text-[15px] leading-[1.7] text-[#5A6E82]">
+              <h3 className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider">About</h3>
+              <p className="text-[15px] leading-[1.7] text-secondary-foreground">
                 {plan.description || "Experience the thrill of a lifetime with our Safari Adventure package. Traverse the Serengeti and witness the majestic wildlife in their natural habitat. This all-inclusive safari offers luxurious accommodations, expert-guided tours, and unforgettable experiences."}
               </p>
             </div>
 
             {/* Trip Schedule */}
             <div className="space-y-3">
-              <h3 className="text-[13px] font-bold text-[#8896A6] uppercase tracking-wider">Trip Schedule</h3>
-              <div className="flex items-center gap-3 text-[14px] font-bold text-[#5A6E82]">
-                <CalendarDays className="h-4 w-4 text-[#8896A6]" />
+              <h3 className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider">Trip Schedule</h3>
+              <div className="flex items-center gap-3 text-[14px] font-bold text-secondary-foreground">
+                <CalendarDays className="h-4 w-4 text-muted-foreground" />
                 <span>{formatDate(startDate)} — {formatDate(addDays(startDate, durationDays - 1))}</span>
               </div>
             </div>
 
-            <div className="h-px bg-[#E4EAF1] w-full" />
+            <div className="h-px bg-border w-full" />
 
             {/* Includes / Excludes Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
               {/* Includes */}
               <div className="space-y-6">
-                <h3 className="text-[12px] font-bold text-[#8896A6] uppercase tracking-widest">Includes</h3>
+                <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest">Includes</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                   {plan.includes?.length ? plan.includes.map((item: string, idx: number) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <div className="h-5 w-5 rounded-full bg-[#EBF3FE] flex items-center justify-center shrink-0 mt-0.5">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2E7CF6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <div className="h-5 w-5 rounded-full bg-accent flex items-center justify-center shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><polyline points="20 6 9 17 4 12"/></svg>
                       </div>
-                      <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                      <span className="text-[14px] font-medium text-foreground leading-tight">{item}</span>
                     </div>
                   )) : defaultIncludes.map((item, idx) => (
                     <div key={idx} className="flex items-start gap-3">
-                      <div className="h-5 w-5 rounded-full bg-[#EBF3FE] flex items-center justify-center shrink-0 mt-0.5">
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#2E7CF6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      <div className="h-5 w-5 rounded-full bg-accent flex items-center justify-center shrink-0 mt-0.5">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><polyline points="20 6 9 17 4 12"/></svg>
                       </div>
-                      <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                      <span className="text-[14px] font-medium text-foreground leading-tight">{item}</span>
                     </div>
                   ))}
                 </div>
@@ -321,22 +321,22 @@ export default function PackageDetailPage() {
 
               {/* Excludes */}
               <div className="space-y-6 flex flex-col">
-                <div className="h-full border-l border-[#E4EAF1] pl-12">
-                  <h3 className="text-[12px] font-bold text-[#8896A6] uppercase tracking-widest mb-6">Excludes</h3>
+                <div className="h-full border-l border-border pl-12">
+                  <h3 className="text-[12px] font-bold text-muted-foreground uppercase tracking-widest mb-6">Excludes</h3>
                   <div className="space-y-4">
                     {plan.excludes?.length ? plan.excludes.map((item: string, idx: number) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <div className="h-5 w-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8896A6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </div>
-                        <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                        <span className="text-[14px] font-medium text-foreground leading-tight">{item}</span>
                       </div>
                     )) : defaultExcludes.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-3">
-                        <div className="h-5 w-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8896A6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center shrink-0 mt-0.5">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </div>
-                        <span className="text-[14px] font-medium text-[#1A2B3D] leading-tight">{item}</span>
+                        <span className="text-[14px] font-medium text-foreground leading-tight">{item}</span>
                       </div>
                     ))}
                   </div>
@@ -348,35 +348,35 @@ export default function PackageDetailPage() {
 
         {/* Sidebar: Travel Plans */}
         <aside className="lg:block">
-          <div className="rounded-[24px] border border-[#E4EAF1] bg-[#F7FAFD] p-6 sticky top-6 shadow-sm">
-            <h2 className="text-[20px] font-extrabold text-[#1A2B3D] mb-8">Travel Plans</h2>
+          <div className="rounded-[24px] border border-border bg-secondary/30 p-6 sticky top-6 shadow-sm">
+            <h2 className="text-[20px] font-extrabold text-foreground mb-8">Travel Plans</h2>
             
             <div className="space-y-0 relative">
               {/* Vertical line connecting circles */}
-              <div className="absolute left-[39px] top-6 bottom-6 w-px bg-[#E4EAF1] z-0" />
+              <div className="absolute left-[39px] top-6 bottom-6 w-px bg-border z-0" />
               
               {sortedDays.length ? sortedDays.map((day: DayPlan) => (
                 <div key={day.dayNumber} className="relative flex gap-6 pb-10 last:pb-0">
                   {/* Left Column: Day & Date */}
                   <div className="w-[80px] shrink-0 pt-1">
-                    <p className="text-[14px] font-extrabold text-[#1A2B3D]">Day {day.dayNumber}</p>
-                    <p className="text-[11px] font-bold text-[#8896A6] mt-1 uppercase">
+                    <p className="text-[14px] font-extrabold text-foreground">Day {day.dayNumber}</p>
+                    <p className="text-[11px] font-bold text-muted-foreground mt-1 uppercase">
                       {formatDate(addDays(startDate, day.dayNumber - 1))}
                     </p>
                   </div>
 
                   {/* Middle Column: Circle */}
                   <div className="relative z-10 flex flex-col items-center pt-2">
-                    <div className="h-4 w-4 rounded-full bg-[#E4EAF1] border-2 border-white shadow-sm" />
+                    <div className="h-4 w-4 rounded-full bg-border border-2 border-background shadow-sm" />
                   </div>
 
                   {/* Right Column: Info */}
                   <div className="flex-1 space-y-3">
-                    <h4 className="text-[15px] font-extrabold text-[#1A2B3D] leading-tight pt-1">{day.title}</h4>
+                    <h4 className="text-[15px] font-extrabold text-foreground leading-tight pt-1">{day.title}</h4>
                     <div className="space-y-3">
                       {day.activities?.map((act: Activity, i: number) => (
                         <div key={i} className="space-y-2">
-                          <p className="text-[12px] font-medium text-[#5A6E82] leading-relaxed">
+                          <p className="text-[12px] font-medium text-secondary-foreground leading-relaxed">
                             {act.title}: {act.description || "Activity details..."}
                           </p>
                           {act.images && act.images.length > 0 && (
@@ -384,7 +384,7 @@ export default function PackageDetailPage() {
                               {act.images.map((img: string, imgIdx: number) => (
                                 <img 
                                   key={imgIdx} src={img} alt="Activity" 
-                                  className="h-16 w-16 rounded-xl object-cover border border-[#E4EAF1] shadow-sm cursor-pointer transform transition hover:scale-105" 
+                                  className="h-16 w-16 rounded-xl object-cover border border-border shadow-sm cursor-pointer transform transition hover:scale-105" 
                                   onClick={() => openLightbox(act.images || [], imgIdx)}
                                 />
                               ))}
@@ -396,9 +396,9 @@ export default function PackageDetailPage() {
                   </div>
                 </div>
               )) : (
-                <div className="text-center py-12 px-4 bg-white rounded-2xl border border-dashed border-[#E4EAF1]">
-                  <ImageIcon className="h-8 w-8 text-[#2E7CF6]/20 mx-auto mb-3" />
-                  <p className="text-[13px] font-medium text-slate-500">Add an itinerary to show travel plans.</p>
+                <div className="text-center py-12 px-4 bg-card rounded-2xl border border-dashed border-border">
+                  <ImageIcon className="h-8 w-8 text-primary/20 mx-auto mb-3" />
+                  <p className="text-[13px] font-medium text-muted-foreground">Add an itinerary to show travel plans.</p>
                 </div>
               )}
             </div>

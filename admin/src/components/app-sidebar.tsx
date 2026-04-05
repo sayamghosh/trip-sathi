@@ -25,7 +25,7 @@ import {
   SidebarMenuBadge,
 } from "@/components/ui/sidebar"
 import { Link } from "@tanstack/react-router"
-import { Button } from "@/components/ui/button"
+
 
 // Menu items according to the UI image
 const items = [
@@ -95,15 +95,7 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="bg-white p-6 pt-0">
-        <div className="mb-8 overflow-hidden rounded-2xl bg-[#D0EBFF] p-6 text-center space-y-4">
-          <div className="space-y-1">
-            <p className="text-[13px] font-medium text-[#1A2B3D]/70">Enhance Your</p>
-            <p className="text-[15px] font-bold text-[#1A2B3D]">Travelie Experience!</p>
-          </div>
-          <Button variant="secondary" className="w-full bg-white text-[#1A2B3D] hover:bg-slate-50 font-semibold shadow-sm text-[13px] h-10 rounded-xl">
-            Upgrade Now
-          </Button>
-        </div>
+
 
         <SidebarMenu>
           <SidebarMenuItem>

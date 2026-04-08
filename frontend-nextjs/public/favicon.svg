@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" /> <!-- Light sky blue -->
+      <stop offset="100%" stop-color="#0284c7" /> <!-- Deep sky blue -->
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+       <stop offset="0%" stop-color="#fdf08a" />
+       <stop offset="100%" stop-color="#f59e0b" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="10" flood-opacity="0.2" />
+    </filter>
+  </defs>
+
+  <!-- Circular Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+
+  <!-- Sun -->
+  <circle cx="256" cy="220" r="80" fill="url(#sunGrad)" />
+
+  <g filter="url(#shadow)">
+    <!-- Back Mountain (Lighter gray/blue) -->
+    <path d="M 120 400 L 256 180 L 392 400 Z" fill="#94a3b8" />
+    <!-- Back Mountain Snow Peak -->
+    <path d="M 256 180 L 210 254 C 230 240, 240 260, 256 250 C 270 260, 290 240, 302 254 Z" fill="#f8fafc" />
+
+    <!-- Front Left Mountain (Darker blue) -->
+    <path d="M 40 400 L 160 210 L 280 400 Z" fill="#475569" />
+    <!-- Front Left Mountain Snow Peak -->
+    <path d="M 160 210 L 120 273 C 140 260, 150 280, 160 270 C 170 280, 190 260, 200 273 Z" fill="#f1f5f9" />
+
+    <!-- Front Right Mountain (Darker blue) -->
+    <path d="M 232 400 L 352 210 L 472 400 Z" fill="#334155" />
+    <!-- Front Right Mountain Snow Peak -->
+    <path d="M 352 210 L 312 273 C 332 260, 342 280, 352 270 C 362 280, 382 260, 392 273 Z" fill="#e2e8f0" />
+    
+    <!-- Base / Ground -->
+    <path d="M 20 400 L 492 400 C 492 400, 480 450, 400 450 L 112 450 C 32 450, 20 400, 20 400 Z" fill="#1e293b" />
+  </g>
+</svg>

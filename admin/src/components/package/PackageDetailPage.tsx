@@ -217,7 +217,7 @@ export default function PackageDetailPage() {
             Delete
           </Button>
           <Button variant="outline" className="border-border text-secondary-foreground h-9 rounded-lg text-[13px] font-bold">Duplicate</Button>
-          <Link to="/plans/edit/$packageId" params={{ packageId: plan._id }}>
+          <Link to="/packages/$packageId/edit" params={{ packageId: plan._id }}>
             <Button className="bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 h-9 rounded-lg text-[13px] font-bold px-6">Edit Data</Button>
           </Link>
         </div>
@@ -227,7 +227,7 @@ export default function PackageDetailPage() {
         {/* Main Content */}
         <div className="space-y-8">
           {/* Gallery Grid */}
-          <div className="grid grid-cols-12 grid-rows-2 gap-4 h-[440px]">
+          <div className="grid grid-cols-12 grid-rows-2 gap-4 h-110">
             <div 
               className="col-span-8 row-span-2 rounded-[20px] bg-cover bg-center shadow-sm cursor-pointer transform transition hover:brightness-110 active:scale-[0.99]"
               style={{ backgroundImage: `url(${photos[0]})` }}
@@ -353,12 +353,12 @@ export default function PackageDetailPage() {
             
             <div className="space-y-0 relative">
               {/* Vertical line connecting circles */}
-              <div className="absolute left-[39px] top-6 bottom-6 w-px bg-border z-0" />
+              <div className="absolute left-9.75 top-6 bottom-6 w-px bg-border z-0" />
               
               {sortedDays.length ? sortedDays.map((day: DayPlan) => (
                 <div key={day.dayNumber} className="relative flex gap-6 pb-10 last:pb-0">
                   {/* Left Column: Day & Date */}
-                  <div className="w-[80px] shrink-0 pt-1">
+                  <div className="w-20 shrink-0 pt-1">
                     <p className="text-[14px] font-extrabold text-foreground">Day {day.dayNumber}</p>
                     <p className="text-[11px] font-bold text-muted-foreground mt-1 uppercase">
                       {formatDate(addDays(startDate, day.dayNumber - 1))}
@@ -409,7 +409,7 @@ export default function PackageDetailPage() {
       {/* Lightbox Modal */}
       {lightbox.open && (
         <div 
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm transition-all duration-300"
+          className="fixed inset-0 z-100 flex items-center justify-center bg-black/95 backdrop-blur-sm transition-all duration-300"
           onClick={closeLightbox}
         >
           <button 

@@ -431,7 +431,7 @@ export function CreatePlanPage() {
                 <h3 className="text-[16px] font-bold text-foreground">Plan basics</h3>
                 <p className="text-[12px] text-secondary-foreground">The foundational details travelers will see first.</p>
               </div>
-              <span className="rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-[6px] text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest border border-amber-200/50 dark:border-amber-700/50">Draft</span>
+              <span className="rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest border border-amber-200/50 dark:border-amber-700/50">Draft</span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -449,7 +449,7 @@ export function CreatePlanPage() {
                   value={description} 
                   onChange={(e) => setDescription(e.target.value)} 
                   placeholder="Tell a story about what makes this trip special..." 
-                  className="min-h-[120px] w-full rounded-xl border border-border bg-secondary/20 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all leading-relaxed"
+                  className="min-h-30 w-full rounded-xl border border-border bg-secondary/20 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all leading-relaxed"
                 />
               </div>
               <div className="space-y-1.5">
@@ -572,9 +572,9 @@ export function CreatePlanPage() {
               </Button>
             </div>
             
-            <div className="flex flex-1 min-h-[500px]">
+            <div className="flex flex-1 min-h-125">
               {/* Sidebar - Minimal List */}
-              <div className="w-[180px] shrink-0 border-r border-border bg-slate-50/20 p-4 space-y-1 overflow-y-auto">
+              <div className="w-45 shrink-0 border-r border-border bg-slate-50/20 p-4 space-y-1 overflow-y-auto">
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-2 mb-3">Days</p>
                 {itinerary.map((day, idx) => {
                   const isActive = idx === activeDayIndex
@@ -601,7 +601,7 @@ export function CreatePlanPage() {
               {/* Day Details - Content Area */}
               <div className="flex-1 p-8 bg-white dark:bg-background/20 relative">
                 {itinerary[activeDayIndex] && (
-                  <div className="max-w-[800px] mx-auto space-y-8">
+                  <div className="max-w-200 mx-auto space-y-8">
                     {/* Day Header */}
                     <div className="flex items-start justify-between gap-6 px-1">
                       <div className="space-y-4 flex-1">
@@ -653,7 +653,7 @@ export function CreatePlanPage() {
                             <Plus className="h-8 w-8 transition-transform group-hover:rotate-90" />
                           </button>
                           <p className="text-[15px] font-bold text-foreground">Start building Day {activeDayIndex + 1}</p>
-                          <p className="text-[12px] text-muted-foreground mt-1 max-w-[280px]">Add transfers, sightseeing, hotels or meals to create a rich itinerary.</p>
+                          <p className="text-[12px] text-muted-foreground mt-1 max-w-70">Add transfers, sightseeing, hotels or meals to create a rich itinerary.</p>
                         </div>
                       ) : (
                         <div className="space-y-4">
@@ -699,7 +699,7 @@ export function CreatePlanPage() {
                                   {activity.images && activity.images.length > 0 && (
                                     <div className="mt-4 flex gap-2 overflow-x-auto pb-2 scrollbar-none pl-4 ml-4">
                                       {activity.images.map((img, i) => (
-                                        <div key={i} className="relative group/img h-[64px] w-[64px] shrink-0 rounded-lg overflow-hidden border border-border shadow-sm">
+                                        <div key={i} className="relative group/img h-16 w-16 shrink-0 rounded-lg overflow-hidden border border-border shadow-sm">
                                           <img src={img} alt="Activity" className="h-full w-full object-cover" />
                                           <button 
                                             onClick={(e) => {
@@ -764,7 +764,7 @@ export function CreatePlanPage() {
                 onDragLeave={(e) => handleDrag(e, false, 'banner')}
                 onDrop={(e) => handleDrop(e, 'banner')}
                 className={cn(
-                  "group relative w-full h-[320px] overflow-hidden rounded-[24px] border-2 border-dashed transition-all duration-300 shadow-sm",
+                  "group relative w-full h-80 overflow-hidden rounded-[24px] border-2 border-dashed transition-all duration-300 shadow-sm",
                   dragActive?.type === 'banner' 
                     ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
                     : "border-border bg-slate-50 hover:border-primary/40"
@@ -839,7 +839,7 @@ export function CreatePlanPage() {
                       onDragLeave={(e) => handleDrag(e, false, 'gallery', idx)}
                       onDrop={(e) => handleDrop(e, 'gallery', idx)}
                       className={cn(
-                        "group relative h-[140px] w-[220px] overflow-hidden rounded-[18px] border transition-all duration-300 shadow-sm",
+                        "group relative h-35 w-55 overflow-hidden rounded-[18px] border transition-all duration-300 shadow-sm",
                         dragActive?.type === 'gallery' && dragActive?.index === idx
                           ? "border-primary bg-primary/5 ring-4 ring-primary/10 scale-[1.05] z-10"
                           : "border-border bg-slate-50 hover:border-primary/40 hover:shadow-xl"
@@ -881,7 +881,7 @@ export function CreatePlanPage() {
                       onDrop={(e) => handleDrop(e, 'gallery', Math.max(0, bannerImages.length - 1))}
                       onClick={() => triggerUpload('gallery', Math.max(0, bannerImages.length - 1))}
                       className={cn(
-                        "group flex h-[140px] w-[220px] flex-col items-center justify-center gap-3 rounded-[18px] border-2 border-dashed transition-all duration-300",
+                        "group flex h-35 w-55 flex-col items-center justify-center gap-3 rounded-[18px] border-2 border-dashed transition-all duration-300",
                         dragActive?.type === 'gallery' && dragActive?.index === Math.max(0, bannerImages.length - 1)
                           ? "border-primary bg-primary/5 ring-4 ring-primary/10"
                           : "border-border bg-slate-50/50 hover:bg-white hover:border-primary/40 hover:shadow-md"
@@ -908,7 +908,7 @@ export function CreatePlanPage() {
           <section className="rounded-[14px] border border-border bg-card p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-[14px] font-semibold text-foreground">Launch controls</h3>
-              <span className={cn("rounded-full px-2.5 py-[3px] text-[11px] font-semibold", isPublished ? "bg-success/20 text-success" : "bg-warning/20 text-warning")}>{isPublished ? "Published" : "Draft"}</span>
+              <span className={cn("rounded-full px-2.5 py-0.75 text-[11px] font-semibold", isPublished ? "bg-success/20 text-success" : "bg-warning/20 text-warning")}>{isPublished ? "Published" : "Draft"}</span>
             </div>
 
             <div className="mt-3 space-y-3">
@@ -953,7 +953,7 @@ export function CreatePlanPage() {
               </div>
               <div className="flex flex-wrap gap-1 pt-1">
                 {tags.map((tag) => (
-                  <span key={tag} className="rounded-full bg-card px-2 py-[3px] text-[11px] font-semibold text-primary">{tag}</span>
+                  <span key={tag} className="rounded-full bg-card px-2 py-0.75 text-[11px] font-semibold text-primary">{tag}</span>
                 ))}
               </div>
             </div>
@@ -977,7 +977,7 @@ export function CreatePlanPage() {
 
       {activityModalOpen && currentActivity && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm px-4">
-          <div className="w-full max-w-[500px] bg-card rounded-[16px] border border-border shadow-2xl flex flex-col max-h-[90vh]">
+          <div className="w-full max-w-125 bg-card rounded-[16px] border border-border shadow-2xl flex flex-col max-h-[90vh]">
             <div className="flex items-center justify-between p-5 border-b border-border">
               <div className="flex items-center gap-2">
                 {currentActivity.type === "transfer" && <Clock3 className="h-4 w-4 text-primary" />}
@@ -1044,7 +1044,7 @@ export function CreatePlanPage() {
                   placeholder="Add details about what is included or what to expect..." 
                   value={currentActivity?.description || ""} 
                   onChange={(e) => setCurrentActivity(prev => prev ? { ...prev, description: e.target.value } : null)}
-                  className="w-full min-h-[90px] rounded-lg border border-border bg-background px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 leading-relaxed"
+                  className="w-full min-h-22.5 rounded-lg border border-border bg-background px-3 py-2 text-[13px] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 leading-relaxed"
                 />
               </div>
 
@@ -1055,12 +1055,12 @@ export function CreatePlanPage() {
                   onDragLeave={(e) => handleDrag(e, false, 'activity')}
                   onDrop={(e) => handleDrop(e, 'activity')}
                   className={cn(
-                    "flex gap-3 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none min-h-[120px] border-2 border-dashed transition-all duration-300 rounded-2xl",
+                    "flex gap-3 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none min-h-30 border-2 border-dashed transition-all duration-300 rounded-2xl",
                     dragActive?.type === 'activity' ? "border-primary bg-primary/10" : "border-transparent bg-slate-50/10"
                   )}
                 >
                   {currentActivity?.images && currentActivity.images.map((img, i) => (
-                    <div key={i} className="relative h-[80px] w-[80px] shrink-0 rounded-[10px] overflow-hidden border border-border group">
+                    <div key={i} className="relative h-20 w-20 shrink-0 rounded-[10px] overflow-hidden border border-border group">
                       <img src={img} alt="" className="h-full w-full object-cover" />
                       <button 
                         onClick={() => setCurrentActivity(prev => prev ? ({...prev, images: prev.images?.filter((_, idx) => idx !== i)}) : null)}
@@ -1075,7 +1075,7 @@ export function CreatePlanPage() {
                     disabled={isUploading}
                     onClick={() => triggerUpload('activity')}
                     className={cn(
-                      "w-[80px] h-[80px] shrink-0 rounded-[10px] border border-dashed transition-all duration-300 flex flex-col items-center justify-center disabled:opacity-50",
+                      "w-20 h-20 shrink-0 rounded-[10px] border border-dashed transition-all duration-300 flex flex-col items-center justify-center disabled:opacity-50",
                       dragActive?.type === 'activity' 
                         ? "border-primary bg-primary/10 scale-105 z-10 shadow-lg" 
                         : "border-input bg-secondary/50 text-secondary-foreground hover:bg-accent hover:border-primary hover:text-primary"
@@ -1102,7 +1102,7 @@ export function CreatePlanPage() {
 function ToggleTile({ icon, title, description, active, onToggle }: { icon: React.ReactNode; title: string; description: string; active: boolean; onToggle: () => void }) {
   return (
     <button type="button" onClick={onToggle} className={cn("flex w-full items-start gap-2 rounded-[12px] border px-3 py-3 text-left transition", active ? "border-primary bg-accent" : "border-border bg-card hover:border-input")}>
-      <div className="mt-[2px]">{icon}</div>
+      <div className="mt-0.5">{icon}</div>
       <div className="flex-1">
         <p className="text-[13px] font-semibold text-foreground">{title}</p>
         <p className="text-[12px] text-secondary-foreground">{description}</p>

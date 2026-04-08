@@ -24,13 +24,14 @@ import {
   SidebarMenuItem,
   SidebarMenuBadge,
 } from "@/components/ui/sidebar"
-import { Link } from "@tanstack/react-router"
+import { Link, useLocation } from "@tanstack/react-router"
+import { cn } from "@/lib/utils"
 
 
 // Menu items according to the UI image
 const items = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/" },
-  { icon: Package, label: "Packages", to: "/packages" },
+  { icon: Package, label: "Packages", to: "/packages", matchPaths: ["/packages"] },
   { icon: BookCheck, label: "Bookings", to: "/bookings" },
   { icon: CalendarDays, label: "Calendar", to: "/calendar" },
   { icon: Users, label: "Travelers", to: "/travelers" },
@@ -42,6 +43,14 @@ const items = [
 ]
 
 export function AppSidebar() {
+  const location = useLocation()
+  const pathname = location.pathname
+
+  const isActivePath = (path: string) => {
+    if (path === "/") return pathname === "/"
+    return pathname === path || pathname.startsWith(`${path}/`)
+  }
+
   const handleLogout = () => {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
@@ -71,12 +80,12 @@ export function AppSidebar() {
                   >
                     <Link
                       to={item.to as any}
-                      activeProps={{
-                        className: "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary shadow-md shadow-blue-100",
-                      }}
-                      inactiveProps={{
-                         className: "text-sidebar-foreground/60 hover:text-sidebar-foreground",
-                      }}
+                      className={cn(
+                        "flex items-center gap-3",
+                        (item.matchPaths ?? [item.to]).some(isActivePath)
+                          ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary shadow-md shadow-blue-100"
+                          : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
+                      )}
                     >
                       <item.icon className="h-5 w-5 shrink-0" />
                       <span className="text-[15px] font-medium">{item.label}</span>

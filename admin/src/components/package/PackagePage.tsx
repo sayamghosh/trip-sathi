@@ -83,8 +83,8 @@ export function PackagePage() {
             <div className="lg:col-span-2 space-y-3">
               <div className="flex items-center justify-between">
                 <h3 className="text-[17px] font-bold text-foreground">New Package</h3>
-                <Link to="/plans/create">
-                    <Button className="h-[34px] bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold px-4 rounded-lg shadow-none">
+                <Link to="/packages/new">
+                    <Button className="h-8.5 bg-primary hover:bg-primary/90 text-white text-[12px] font-semibold px-4 rounded-lg shadow-none">
                       + Add Package
                     </Button>
                   </Link>
@@ -95,9 +95,9 @@ export function PackagePage() {
                   <Link to="/packages/$packageId" params={{ packageId: heroPackage._id }} className="absolute inset-0 z-10" />
                   <div className="grid grid-cols-1 md:grid-cols-[200px_1.2fr_1fr] lg:grid-cols-[240px_1.2fr_1fr] gap-6 relative">
                     {/* Left Column - Image */}
-                    <div className="h-full min-h-[260px] rounded-[10px] bg-accent relative flex flex-col justify-end p-3 bg-cover bg-center" style={{ backgroundImage: `url(${heroPackage?.bannerImages?.[0] || ""})` }}>
+                    <div className="h-full min-h-65 rounded-[10px] bg-accent relative flex flex-col justify-end p-3 bg-cover bg-center" style={{ backgroundImage: `url(${heroPackage?.bannerImages?.[0] || ""})` }}>
                       {!heroPackage?.bannerImages?.[0] && <div className="absolute inset-0 flex items-center justify-center"><PlaneTakeoff className="h-8 w-8 text-primary/20" /></div>}
-                      <div className="flex items-center gap-2 relative z-10 w-full h-[50px]">
+                      <div className="flex items-center gap-2 relative z-10 w-full h-12.5">
                         {[1, 2, 3].map((idx) => (
                           <div 
                             key={idx} 
@@ -138,7 +138,7 @@ export function PackagePage() {
                       </div>
  
                       <div className="mt-auto relative z-20">
-                        <Link to="/plans/edit/$packageId" params={{ packageId: heroPackage._id }}>
+                        <Link to="/packages/$packageId/edit" params={{ packageId: heroPackage._id }}>
                           <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-[10px] h-12 shadow-none text-[15px] font-bold">
                             Edit Detail
                           </Button>
@@ -183,7 +183,7 @@ export function PackagePage() {
                   {popularPackages.map((pkg) => (
                     <Link key={pkg.title} to="/packages/$packageId" params={{ packageId: "mock-id" }} className="block">
                       <div className="flex items-center gap-4 rounded-[14px] bg-card p-3 shadow-sm border border-border transition hover:shadow-md cursor-pointer h-full">
-                        <div className="h-[60px] w-[60px] shrink-0 rounded-xl bg-accent flex items-center justify-center text-primary/20">
+                        <div className="h-15 w-15 shrink-0 rounded-xl bg-accent flex items-center justify-center text-primary/20">
                           <PlaneTakeoff className="h-6 w-6" />
                         </div>
                         <div className="flex-1 overflow-hidden">
@@ -195,7 +195,7 @@ export function PackagePage() {
                           <div className="flex items-center mt-2">
                             <div className="flex items-center text-[#F7B500]">
                               {[...Array(5)].map((_, i) => (
-                                <Star key={i} className={`h-[11px] w-[11px] ${i < Math.floor(pkg.rating) ? 'fill-[#F7B500]' : 'fill-border text-border'}`} />
+                                <Star key={i} className={`h-2.75 w-2.75 ${i < Math.floor(pkg.rating) ? 'fill-[#F7B500]' : 'fill-border text-border'}`} />
                               ))}
                             </div>
                             <span className="text-[10px] font-bold text-muted-foreground ml-1.5">{pkg.rating.toFixed(1)}/5</span>
@@ -218,9 +218,9 @@ export function PackagePage() {
               <div className="space-y-3">
                 {featuredPackages.map((pkg) => {
                   const card = (
-                    <div className="flex flex-col sm:flex-row rounded-[14px] border border-border bg-card shadow-sm transition hover:shadow-md overflow-hidden min-h-[220px]">
+                    <div className="flex flex-col sm:flex-row rounded-[14px] border border-border bg-card shadow-sm transition hover:shadow-md overflow-hidden min-h-55">
                       <div
-                        className="w-full sm:w-[220px] shrink-0 bg-accent bg-cover bg-center relative"
+                        className="w-full sm:w-55 shrink-0 bg-accent bg-cover bg-center relative"
                         style={{ backgroundImage: `url(${pkg.bannerImages?.[0] || "https://images.unsplash.com/photo-1542314831-c6a4d14cd44b?auto=format&fit=crop&w=400&q=80"})` }}
                       >
                         <div className="absolute top-3 right-3 bg-card/90 backdrop-blur rounded-[8px] px-2 py-0.5 flex items-center gap-1 shadow-sm">
@@ -286,7 +286,7 @@ export function PackagePage() {
                            </div>
                          </div>
                         <div className="mt-4 pt-4 border-t border-border flex justify-end gap-2 relative z-20">
-                           <Link to="/plans/edit/$packageId" params={{ packageId: pkg._id }}>
+                           <Link to="/packages/$packageId/edit" params={{ packageId: pkg._id }}>
                              <Button variant="outline" size="sm" className="h-8 text-[11px] text-[#2E7CF6]">Edit</Button>
                            </Link>
                            <Button 
@@ -332,7 +332,7 @@ export function PackagePage() {
                   <Link key={pkg._id} to="/packages/$packageId" params={{ packageId: pkg._id }} className="block h-full">
                     <div className="rounded-[16px] border border-border bg-card overflow-hidden shadow-sm transition hover:shadow-md h-full flex flex-col p-2">
                       <div
-                        className="h-[140px] w-full bg-accent bg-cover bg-center rounded-xl flex items-center justify-center text-primary/20"
+                        className="h-35 w-full bg-accent bg-cover bg-center rounded-xl flex items-center justify-center text-primary/20"
                         style={{ backgroundImage: `url(${pkg.bannerImages?.[0] || ""})` }}
                       >
                         {!pkg.bannerImages?.[0] && <PlaneTakeoff className="h-8 w-8" />}

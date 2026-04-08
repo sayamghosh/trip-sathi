@@ -38,13 +38,13 @@ const indexRoute = createRoute({
 
 const createPlanRoute = createRoute({
   getParentRoute: () => layoutRoute,
-  path: "/plans/create",
+  path: "/packages/new",
   component: CreatePlanPage,
 })
 
 const editPlanRoute = createRoute({
   getParentRoute: () => layoutRoute,
-  path: "/plans/edit/$packageId",
+  path: "/packages/$packageId/edit",
   component: CreatePlanPage,
 })
 

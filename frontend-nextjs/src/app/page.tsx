@@ -7,15 +7,19 @@ const API_BASE_URL =
     'http://localhost:5000';
 
 async function getInitialPlans(): Promise<TourPlanSummary[]> {
-    const res = await fetch(`${API_BASE_URL}/api/tour-plans/public?limit=4`, {
-        next: { revalidate: 60 },
-    });
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/tour-plans/public?limit=4`, {
+            next: { revalidate: 60 },
+        });
 
-    if (!res.ok) {
+        if (!res.ok) {
+            return [];
+        }
+
+        return res.json();
+    } catch {
         return [];
     }
-
-    return res.json();
 }
 
 export default async function Home() {

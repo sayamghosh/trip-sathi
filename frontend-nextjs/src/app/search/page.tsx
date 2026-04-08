@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -46,7 +46,7 @@ const SkeletonCard = () => (
     </div>
 );
 
-export default function SearchPage() {
+function SearchPageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const destination = useMemo(() => searchParams.get('destination') || '', [searchParams]);
@@ -207,5 +207,13 @@ export default function SearchPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen bg-linear-to-b from-[#f4f7fa] to-white pt-28 pb-20 px-4 text-sm text-slate-500">Loading search...</div>}>
+            <SearchPageContent />
+        </Suspense>
     );
 }

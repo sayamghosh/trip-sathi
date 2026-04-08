@@ -9,6 +9,7 @@ import {
   CartesianGrid,
   type TooltipProps,
 } from 'recharts';
+import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 interface InsightChartProps {
   title: string;
@@ -21,7 +22,7 @@ interface InsightChartProps {
 }
 
 export function InsightChart({ title, subtitle, data, dataKey, stroke = '#0ea5e9', icon, suffix }: InsightChartProps) {
-  const tooltipFormatter: TooltipProps<number, string>['formatter'] = (value) => {
+  const tooltipFormatter: TooltipProps<ValueType, NameType>['formatter'] = (value) => {
     const numericValue = typeof value === 'number' ? value : Number(value ?? 0);
     return [`${numericValue}${suffix ?? ''}`, title] as [string, string];
   };

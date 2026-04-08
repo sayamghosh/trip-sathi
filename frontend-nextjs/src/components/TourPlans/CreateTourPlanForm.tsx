@@ -9,7 +9,28 @@ import toast from 'react-hot-toast';
 
 const LOCAL_STORAGE_KEY = 'trip_sathi_tour_plan_draft';
 
+const DEFAULT_FORM_VALUES = {
+    title: '',
+    description: '',
+    basePrice: 0,
+    durationDays: 1,
+    durationNights: 0,
+    locations: '', // comma separated string for ease of use
+    bannerImages: [],
+    days: [
+        {
+            dayNumber: 1,
+            title: '',
+            activities: []
+        }
+    ]
+};
+
 const getInitialData = () => {
+    if (typeof window === 'undefined') {
+        return DEFAULT_FORM_VALUES;
+    }
+
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
         try {
@@ -18,22 +39,7 @@ const getInitialData = () => {
             console.error('Failed to parse saved draft', e);
         }
     }
-    return {
-        title: '',
-        description: '',
-        basePrice: 0,
-        durationDays: 1,
-        durationNights: 0,
-        locations: '', // comma separated string for ease of use
-        bannerImages: [],
-        days: [
-            {
-                dayNumber: 1,
-                title: '',
-                activities: []
-            }
-        ]
-    };
+    return DEFAULT_FORM_VALUES;
 };
 
 export default function CreateTourPlanForm({ initialData, editId, onSuccess }: { initialData?: any, editId?: string, onSuccess?: () => void }) {

@@ -81,10 +81,10 @@ export function AppSidebar() {
                     <Link
                       to={item.to as any}
                       className={cn(
-                        "flex items-center gap-3 hover:bg-sidebar-primary hover:text-white focus-visible:bg-sidebar-primary focus-visible:text-white",
+                        "flex items-center gap-3 text-slate-800 hover:bg-sidebar-accent hover:text-slate-800 focus-visible:bg-sidebar-accent focus-visible:text-slate-800",
                         (item.matchPaths ?? [item.to]).some(isActivePath)
-                          ? "bg-sidebar-primary text-white hover:bg-sidebar-primary shadow-md shadow-blue-100"
-                          : "text-sidebar-foreground/60 hover:text-white"
+                          ? "bg-sidebar-accent text-slate-800"
+                          : "text-slate-800/80"
                       )}
                     >
                       <item.icon className="h-5 w-5 shrink-0" />

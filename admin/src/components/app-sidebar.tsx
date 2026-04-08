@@ -23,6 +23,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuBadge,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Link, useLocation } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
@@ -43,6 +44,8 @@ const items = [
 ]
 
 export function AppSidebar() {
+  const { state } = useSidebar()
+  const isCollapsed = state === "collapsed"
   const location = useLocation()
   const pathname = location.pathname
 
@@ -58,40 +61,51 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className="border-r-0 border-sidebar-border">
-      <SidebarHeader className="bg-sidebar px-6 py-8">
-        <Link to="/" className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-blue-200">
+    <Sidebar collapsible="icon" className="border-r-0 border-sidebar-border transition-all duration-300 ease-in-out">
+      <SidebarHeader className={cn("bg-sidebar px-6 py-8 transition-all duration-300", isCollapsed ? "p-0 py-8 flex items-center justify-center" : "items-start")}>
+        <Link to="/" className="flex items-center">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-blue-200">
             <Compass className="h-5 w-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-sidebar-foreground">Travelie</span>
+          <span className={cn(
+            "text-xl font-bold tracking-tight text-sidebar-foreground transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+            isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+          )}>
+            Travelie
+          </span>
         </Link>
       </SidebarHeader>
 
-      <SidebarContent className="bg-sidebar px-4">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            <SidebarMenu className="gap-1">
+      <SidebarContent className={cn("bg-sidebar px-4 transition-all duration-300 ease-in-out", isCollapsed && "px-2")}>
+        <SidebarGroup className="flex-1">
+          <SidebarGroupContent className={cn("flex flex-col flex-1", isCollapsed ? "items-center gap-1" : "gap-1")}>
+            <SidebarMenu className={cn("gap-1 w-full", isCollapsed && "flex flex-col items-center")}>
               {items.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     asChild
-                    className="h-11 px-4 transition-all duration-200 group"
+                    className="h-11 px-4 transition-all duration-200 group group-data-[collapsible=icon]:size-11!"
                   >
                     <Link
                       to={item.to as any}
                       className={cn(
-                        "flex items-center gap-3 text-slate-800 hover:bg-sidebar-accent hover:text-slate-800 focus-visible:bg-sidebar-accent focus-visible:text-slate-800",
+                        "flex w-full items-center justify-start text-slate-800 hover:bg-sidebar-accent hover:text-slate-800 focus-visible:bg-sidebar-accent focus-visible:text-slate-800",
+                        isCollapsed && "justify-center px-0",
                         (item.matchPaths ?? [item.to]).some(isActivePath)
                           ? "bg-sidebar-accent text-slate-800"
                           : "text-slate-800/80"
                       )}
                     >
-                      <item.icon className="h-5 w-5 shrink-0" />
-                      <span className="text-[15px] font-medium">{item.label}</span>
+                      <item.icon className="shrink-0 size-5!" />
+                      <span className={cn(
+                        "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                        isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+                      )}>
+                        {item.label}
+                      </span>
                     </Link>
                   </SidebarMenuButton>
-                  {item.badge && (
+                  {!isCollapsed && item.badge && (
                     <SidebarMenuBadge className="right-4 bg-sidebar-primary text-sidebar-primary-foreground">
                       {item.badge}
                     </SidebarMenuBadge>
@@ -103,15 +117,23 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="bg-sidebar p-6 pt-0">
+      <SidebarFooter className={cn("bg-sidebar p-6 pt-0 transition-all duration-300", isCollapsed ? "p-0 py-8 pt-0 flex items-center justify-center" : "items-start")}>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              className="h-10 text-sidebar-foreground/60 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group"
+              className={cn(
+                "h-10 text-sidebar-foreground/60 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
+                isCollapsed && "px-0 justify-center group-data-[collapsible=icon]:size-10!"
+              )}
               onClick={handleLogout}
             >
-              <LogOut className="h-5 w-5 mr-3 transition-colors group-hover:text-red-500" />
-              <span className="text-[15px] font-medium">Logout</span>
+              <LogOut className={cn("size-5! transition-colors group-hover:text-red-500", !isCollapsed && "mr-3")} />
+              <span className={cn(
+                "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+              )}>
+                Logout
+              </span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

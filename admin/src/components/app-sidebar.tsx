@@ -76,15 +76,15 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     asChild
-                    className="h-11 px-4 transition-all duration-200 hover:bg-sidebar-accent group"
+                    className="h-11 px-4 transition-all duration-200 group"
                   >
                     <Link
                       to={item.to as any}
                       className={cn(
-                        "flex items-center gap-3",
+                        "flex items-center gap-3 hover:bg-sidebar-primary hover:text-white focus-visible:bg-sidebar-primary focus-visible:text-white",
                         (item.matchPaths ?? [item.to]).some(isActivePath)
-                          ? "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary shadow-md shadow-blue-100"
-                          : "text-sidebar-foreground/60 hover:text-sidebar-foreground"
+                          ? "bg-sidebar-primary text-white hover:bg-sidebar-primary shadow-md shadow-blue-100"
+                          : "text-sidebar-foreground/60 hover:text-white"
                       )}
                     >
                       <item.icon className="h-5 w-5 shrink-0" />

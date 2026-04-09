@@ -28,6 +28,7 @@ export function App() {
     if (pathname.startsWith("/packages/") && pathname.endsWith("/edit")) return "Edit Details"
     if (pathname === "/packages") return "Packages"
     if (pathname.startsWith("/packages/")) return "Package Details"
+    if (pathname === "/bookings") return "Bookings"
     return "Dashboard"
   }
 
@@ -42,6 +43,7 @@ export function App() {
       packages: "Packages",
       new: "New Package",
       edit: "Edit",
+      bookings: "Bookings",
     }
 
     let currentPath = ""
@@ -50,6 +52,11 @@ export function App() {
       const previous = segments[index - 1]
 
       if (segment === "packages") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
+      if (segment === "bookings") {
         crumbs.push({ label: labelMap[segment], to: currentPath })
         return
       }
@@ -79,8 +86,8 @@ export function App() {
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset>
-        <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4">
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
+        <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4 bg-background">
           <div className="flex items-center gap-4">
             <SidebarTrigger className="-ml-1" />
             <div className="flex flex-col gap-1">

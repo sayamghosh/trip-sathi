@@ -11,6 +11,7 @@ import { Dashboard } from "./pages/Dashboard"
 import CreatePlanPage from "@/components/package/CreatePlanPage"
 import { PackagePage } from "@/components/package/PackagePage"
 import PackageDetailPage from "@/components/package/PackageDetailPage"
+import Bookings from "./pages/Bookings"
 
 const rootRoute = createRootRoute({
   component: Outlet,
@@ -60,6 +61,12 @@ const packageDetailRoute = createRoute({
   component: PackageDetailPage,
 })
 
+const bookingsRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/bookings",
+  component: Bookings,
+})
+
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/login",
@@ -81,6 +88,7 @@ const routeTree = rootRoute.addChildren([
     editPlanRoute,
     packagesRoute,
     packageDetailRoute,
+    bookingsRoute,
   ]),
   loginRoute,
 ])

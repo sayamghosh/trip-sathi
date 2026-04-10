@@ -437,11 +437,11 @@ export function CreatePlanPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Plan Name</label>
-                <Input value={planName} onChange={(e) => setPlanName(e.target.value)} placeholder="e.g., Alpine Trails & Lakes" className="h-11 border-border bg-secondary/20 focus:bg-white transition-all text-sm font-medium" />
+                <Input value={planName} onChange={(e) => setPlanName(e.target.value)} placeholder="e.g., Alpine Trails & Lakes" className="h-11 border-border bg-secondary/10 focus:bg-background transition-all text-sm font-medium" />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Primary Destination</label>
-                <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="City / Country" className="h-11 border-border bg-secondary/20 focus:bg-white transition-all text-sm font-medium" />
+                <Input value={destination} onChange={(e) => setDestination(e.target.value)} placeholder="City / Country" className="h-11 border-border bg-secondary/10 focus:bg-background transition-all text-sm font-medium" />
               </div>
               <div className="col-span-2 space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Experience Description</label>
@@ -449,12 +449,12 @@ export function CreatePlanPage() {
                   value={description} 
                   onChange={(e) => setDescription(e.target.value)} 
                   placeholder="Tell a story about what makes this trip special..." 
-                  className="min-h-30 w-full rounded-xl border border-border bg-secondary/20 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all leading-relaxed"
+                  className="min-h-30 w-full rounded-xl border border-border bg-secondary/10 px-4 py-3 text-[13px] text-foreground focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all leading-relaxed"
                 />
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Travel Category</label>
-                <select value={category} onChange={(e) => setCategory(e.target.value)} className="h-11 w-full rounded-xl border border-border bg-secondary/20 px-4 text-[13px] text-foreground font-medium focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all">
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className="h-11 w-full rounded-xl border border-border bg-secondary/10 px-4 text-[13px] text-foreground font-medium focus:border-primary focus:bg-background focus:outline-none focus:ring-4 focus:ring-primary/5 transition-all">
                   <option>Adventure</option>
                   <option>Leisure</option>
                   <option>Cultural</option>
@@ -474,7 +474,7 @@ export function CreatePlanPage() {
                 {tagOptions.map((tag) => {
                   const active = tags.includes(tag)
                   return (
-                    <button key={tag} type="button" onClick={() => toggleTag(tag)} className={cn("rounded-full border px-4 py-1.5 text-[12px] font-semibold transition-all duration-200", active ? "border-primary bg-primary text-white shadow-md shadow-primary/20 scale-105" : "border-border bg-white text-secondary-foreground hover:border-primary/50 hover:bg-slate-50")}>
+                    <button key={tag} type="button" onClick={() => toggleTag(tag)} className={cn("rounded-full border px-4 py-1.5 text-[12px] font-semibold transition-all duration-200", active ? "border-primary bg-primary text-white shadow-md shadow-primary/20 scale-105" : "border-border bg-card text-secondary-foreground hover:border-primary/50 hover:bg-muted")}>
                       {active && <Check className="mr-1.5 inline h-3.5 w-3.5" />}
                       {tag}
                     </button>
@@ -499,14 +499,14 @@ export function CreatePlanPage() {
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Departure Date</label>
-                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/20 px-4 py-2.5 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 transition-all">
+                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/10 px-4 py-2.5 focus-within:bg-background focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                   <CalendarDays className="h-4 w-4 text-primary/70" />
                   <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full border-none bg-transparent text-[13px] font-medium text-foreground outline-none" />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Return Date</label>
-                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/20 px-4 py-2.5 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 transition-all">
+                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/10 px-4 py-2.5 focus-within:bg-background focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                   <CalendarDays className="h-4 w-4 text-primary/70" />
                   <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full border-none bg-transparent text-[13px] font-medium text-foreground outline-none" />
                 </div>
@@ -523,7 +523,7 @@ export function CreatePlanPage() {
             <div className="mt-4 grid grid-cols-3 gap-4">
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Base Price (INR)</label>
-                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/20 px-4 py-2.5 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 transition-all">
+                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/10 px-4 py-2.5 focus-within:bg-background focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                   <IndianRupee className="h-4 w-4 text-emerald-500" />
                   <input type="number" value={price} onChange={(e) => setPrice(Number(e.target.value) || 0)} className="w-full border-none bg-transparent text-[14px] font-bold text-foreground outline-none" />
                   <span className="text-[10px] font-bold text-muted-foreground uppercase">Per Head</span>
@@ -531,7 +531,7 @@ export function CreatePlanPage() {
               </div>
               <div className="space-y-1.5">
                 <label className="text-[11px] font-bold uppercase tracking-wider text-secondary-foreground ml-1">Total Capacity</label>
-                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/20 px-4 py-2.5 focus-within:bg-white focus-within:ring-4 focus-within:ring-primary/5 transition-all">
+                <div className="flex items-center gap-2.5 rounded-xl border border-border bg-secondary/10 px-4 py-2.5 focus-within:bg-background focus-within:ring-4 focus-within:ring-primary/5 transition-all">
                   <Users className="h-4 w-4 text-blue-500" />
                   <input type="number" value={capacity} onChange={(e) => setCapacity(Number(e.target.value) || 0)} className="w-full border-none bg-transparent text-[14px] font-bold text-foreground outline-none" />
                   <span className="text-[10px] font-bold text-muted-foreground uppercase">Seats</span>
@@ -555,8 +555,8 @@ export function CreatePlanPage() {
           </section>
 
           {/* Itinerary */}
-          <section className="rounded-[24px] border border-border bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-border flex items-center justify-between bg-white dark:bg-card">
+          <section className="rounded-[24px] border border-border bg-card shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col overflow-hidden">
+            <div className="p-6 border-b border-border flex items-center justify-between bg-card">
               <div>
                 <h3 className="text-[18px] font-extrabold text-foreground tracking-tight">Day-wise Itinerary</h3>
                 <p className="text-[12px] text-secondary-foreground mt-0.5">Craft the narrative of each day with activities, stays, and meals.</p>
@@ -574,7 +574,7 @@ export function CreatePlanPage() {
             
             <div className="flex flex-1 min-h-125">
               {/* Sidebar - Minimal List */}
-              <div className="w-45 shrink-0 border-r border-border bg-slate-50/20 p-4 space-y-1 overflow-y-auto">
+              <div className="w-45 shrink-0 border-r border-border bg-muted/20 p-4 space-y-1 overflow-y-auto">
                 <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest px-2 mb-3">Days</p>
                 {itinerary.map((day, idx) => {
                   const isActive = idx === activeDayIndex
@@ -599,7 +599,7 @@ export function CreatePlanPage() {
 
 
               {/* Day Details - Content Area */}
-              <div className="flex-1 p-8 bg-white dark:bg-background/20 relative">
+              <div className="flex-1 p-8 bg-card dark:bg-background/20 relative">
                 {itinerary[activeDayIndex] && (
                   <div className="max-w-200 mx-auto space-y-8">
                     {/* Day Header */}
@@ -613,7 +613,7 @@ export function CreatePlanPage() {
                           value={itinerary[activeDayIndex].title} 
                           onChange={(e) => updateItinerary(activeDayIndex, { title: e.target.value })} 
                           placeholder="e.g. Arrival & Evening Dhow Cruise"
-                          className="h-11 font-medium text-foreground text-[15px] border-border bg-slate-50/50 focus-visible:ring-primary/20 px-4 transition-all rounded-lg"
+                          className="h-11 font-medium text-foreground text-[15px] border-border bg-muted/30 focus-visible:ring-primary/20 px-4 transition-all rounded-lg"
                         />
                       </div>
                       {itinerary.length > 1 && (
@@ -644,11 +644,11 @@ export function CreatePlanPage() {
 
 
                       {itinerary[activeDayIndex].activities.length === 0 ? (
-                        <div className="rounded-[24px] border border-dashed border-border bg-slate-50/20 py-20 text-center flex flex-col items-center justify-center">
+                        <div className="rounded-[24px] border border-dashed border-border bg-muted/20 py-20 text-center flex flex-col items-center justify-center">
                           <button
                             type="button"
                             onClick={() => openActivityModal(activeDayIndex, "other")}
-                            className="h-16 w-16 rounded-full bg-white border border-border shadow-sm flex items-center justify-center text-primary/40 hover:text-primary hover:border-primary/40 hover:shadow-md transition-all group mb-4"
+                            className="h-16 w-16 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-primary/40 hover:text-primary hover:border-primary/40 hover:shadow-md transition-all group mb-4"
                           >
                             <Plus className="h-8 w-8 transition-transform group-hover:rotate-90" />
                           </button>
@@ -767,7 +767,7 @@ export function CreatePlanPage() {
                   "group relative w-full h-80 overflow-hidden rounded-[24px] border-2 border-dashed transition-all duration-300 shadow-sm",
                   dragActive?.type === 'banner' 
                     ? "border-primary bg-primary/5 ring-4 ring-primary/10" 
-                    : "border-border bg-slate-50 hover:border-primary/40"
+                    : "border-border bg-muted/20 hover:border-primary/40"
                 )}
               >
                 {bannerImages[0] ? (
@@ -796,7 +796,7 @@ export function CreatePlanPage() {
                   </>
                 ) : (
                   <div className="flex h-full flex-col items-center justify-center space-y-5 p-10 text-center bg-secondary/10 relative">
-                    <div className="flex h-20 w-20 items-center justify-center rounded-[28px] bg-white text-primary shadow-lg border border-border/50 transition-transform group-hover:scale-110">
+                    <div className="flex h-20 w-20 items-center justify-center rounded-[28px] bg-card text-primary shadow-lg border border-border transition-transform group-hover:scale-110">
                       <ImagePlus className="h-10 w-10" />
                     </div>
                     <div className="space-y-2">
@@ -842,7 +842,7 @@ export function CreatePlanPage() {
                         "group relative h-35 w-55 overflow-hidden rounded-[18px] border transition-all duration-300 shadow-sm",
                         dragActive?.type === 'gallery' && dragActive?.index === idx
                           ? "border-primary bg-primary/5 ring-4 ring-primary/10 scale-[1.05] z-10"
-                          : "border-border bg-slate-50 hover:border-primary/40 hover:shadow-xl"
+                          : "border-border bg-muted/20 hover:border-primary/40 hover:shadow-xl"
                       )}
                     >
                       <img src={img} alt={`Gallery ${idx + 1}`} className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -884,10 +884,10 @@ export function CreatePlanPage() {
                         "group flex h-35 w-55 flex-col items-center justify-center gap-3 rounded-[18px] border-2 border-dashed transition-all duration-300",
                         dragActive?.type === 'gallery' && dragActive?.index === Math.max(0, bannerImages.length - 1)
                           ? "border-primary bg-primary/5 ring-4 ring-primary/10"
-                          : "border-border bg-slate-50/50 hover:bg-white hover:border-primary/40 hover:shadow-md"
+                          : "border-border bg-muted/30 hover:bg-muted/50 hover:border-primary/40 hover:shadow-md"
                       )}
                     >
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white border border-border/50 text-secondary-foreground group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/30 transition-all shadow-sm">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-card border border-border text-secondary-foreground group-hover:bg-primary/10 group-hover:text-primary group-hover:border-primary/30 transition-all shadow-sm">
                         <Plus className="h-6 w-6" />
                       </div>
                       <div className="text-center">
@@ -1056,7 +1056,7 @@ export function CreatePlanPage() {
                   onDrop={(e) => handleDrop(e, 'activity')}
                   className={cn(
                     "flex gap-3 overflow-x-auto pb-6 pt-2 px-2 scrollbar-none min-h-30 border-2 border-dashed transition-all duration-300 rounded-2xl",
-                    dragActive?.type === 'activity' ? "border-primary bg-primary/10" : "border-transparent bg-slate-50/10"
+                    dragActive?.type === 'activity' ? "border-primary bg-primary/10" : "border-transparent bg-muted/10"
                   )}
                 >
                   {currentActivity?.images && currentActivity.images.map((img, i) => (
@@ -1088,8 +1088,8 @@ export function CreatePlanPage() {
               </div>
             </div>
 
-            <div className="p-4 border-t border-border bg-slate-50/50 dark:bg-card/50 rounded-b-[16px] flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setActivityModalOpen(false)} className="bg-white dark:bg-card border-border text-foreground hover:bg-slate-100 font-bold px-5">Cancel</Button>
+            <div className="p-4 border-t border-border bg-muted/30 dark:bg-card/50 rounded-b-[16px] flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setActivityModalOpen(false)} className="bg-background dark:bg-card border-border text-foreground hover:bg-accent font-bold px-5">Cancel</Button>
               <Button onClick={saveActivity} disabled={!currentActivity?.title} className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 font-bold px-6">Save Activity</Button>
             </div>
           </div>

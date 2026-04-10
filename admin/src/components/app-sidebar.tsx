@@ -64,7 +64,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0 border-sidebar-border transition-all duration-300 ease-in-out">
       <SidebarHeader className={cn("bg-sidebar px-6 py-8 transition-all duration-300", isCollapsed ? "p-0 py-8 flex items-center justify-center" : "items-start")}>
         <Link to="/" className="flex items-center">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-blue-200">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
             <Compass className="h-5 w-5" />
           </div>
           <span className={cn(
@@ -89,11 +89,11 @@ export function AppSidebar() {
                     <Link
                       to={item.to as any}
                       className={cn(
-                        "flex w-full items-center justify-start text-slate-800 hover:bg-sidebar-accent hover:text-slate-800 focus-visible:bg-sidebar-accent focus-visible:text-slate-800",
+                        "flex w-full items-center justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:bg-sidebar-accent focus-visible:text-sidebar-accent-foreground",
                         isCollapsed && "justify-center px-0",
                         (item.matchPaths ?? [item.to]).some(isActivePath)
-                          ? "bg-sidebar-accent text-slate-800"
-                          : "text-slate-800/80"
+                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                          : "text-sidebar-foreground/70"
                       )}
                     >
                       <item.icon className="shrink-0 size-5!" />
@@ -122,7 +122,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               className={cn(
-                "h-10 text-sidebar-foreground/60 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
+                "h-10 text-sidebar-foreground/80 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
                 isCollapsed && "px-0 justify-center group-data-[collapsible=icon]:size-10!"
               )}
               onClick={handleLogout}

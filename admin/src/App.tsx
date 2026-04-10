@@ -12,7 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { AppSidebar } from "@/components/app-sidebar"
-import { TopBar } from "@/components/dashboard/TopBar"
+import { TopBar } from "@/components/TopBar"
 import { Outlet, useLocation } from "@tanstack/react-router"
 import { Link } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
@@ -87,7 +87,7 @@ export function App() {
       <AppSidebar />
 
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
-        <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4 bg-background">
+        <header className="flex h-[72px] shrink-0 items-center justify-between gap-2 border-b px-5 bg-background">
           <div className="flex items-center gap-4">
             <SidebarTrigger className="-ml-1" />
             <div className="flex flex-col gap-1">

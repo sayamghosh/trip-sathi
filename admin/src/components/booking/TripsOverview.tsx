@@ -57,17 +57,17 @@ export function TripsOverview({ data }: TripsOverviewProps) {
               tick={{ fontSize: 11, fill: "var(--muted-foreground)" }}
             />
             <Tooltip
-                content={({ active, payload }) => {
-                  if (active && payload && payload.length) {
-                    return (
-                      <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
-                        <p className="font-semibold text-[14px] text-foreground mb-1">{payload[0].payload.done.toLocaleString()}</p>
-                        <p className="text-[11px] text-muted-foreground">{payload[0].payload.month}</p>
-                      </div>
-                    )
-                  }
-                  return null
-                }}
+              content={({ active, payload }) => {
+                if (active && payload && payload.length) {
+                  return (
+                    <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+                      <p className="font-semibold text-[14px] text-foreground mb-1">{payload[0].payload.done.toLocaleString()}</p>
+                      <p className="text-[11px] text-muted-foreground">{payload[0].payload.month}</p>
+                    </div>
+                  )
+                }
+                return null
+              }}
             />
             <Area
               type="monotone"

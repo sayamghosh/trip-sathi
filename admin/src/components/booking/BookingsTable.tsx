@@ -10,20 +10,20 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
       <div className="flex items-center justify-between">
         <h3 className="text-[18px] font-bold text-foreground">Bookings</h3>
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <div className="relative flex-1 sm:flex-none">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
             <input
               type="text"
               placeholder="Search name, package, etc"
-              className="h-9 w-[250px] rounded-[8px] border border-border bg-muted/50 pl-9 pr-3 text-[13px] text-foreground outline-none transition focus:border-primary/50"
+              className="h-9 w-full sm:w-[250px] rounded-[10px] border border-border bg-card pl-9 pr-3 text-[13px] text-foreground placeholder-muted-foreground/60 outline-none transition-all hover:bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/10"
             />
           </div>
-          <button className="flex h-9 items-center gap-2 rounded-[8px] border border-border bg-card px-3 text-[13px] font-medium text-foreground hover:bg-muted hover:text-accent-foreground">
-            <CalendarDays className="h-4 w-4 text-muted-foreground" />
+          <button className="flex h-9 items-center gap-2 rounded-[10px] border border-border bg-card px-3 text-[13px] font-medium text-foreground hover:bg-muted/80 transition-colors">
+            <CalendarDays className="h-4 w-4 text-muted-foreground/80" />
             Today
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            <ChevronDown className="h-4 w-4 text-muted-foreground/80" />
           </button>
-          <button className="flex h-9 items-center gap-1.5 rounded-[8px] bg-[#3B82F6] px-3.5 text-[13px] font-medium text-white hover:bg-[#3B82F6]/90">
+          <button className="flex h-9 items-center gap-1.5 rounded-[10px] bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]">
             <Plus className="h-4 w-4" />
             Add Booking
           </button>
@@ -35,13 +35,13 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
           <table className="w-full text-left text-[13px]">
             <thead className="bg-muted/50 font-medium text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-5 py-3.5 flex items-center gap-1 cursor-pointer">Name <ChevronDown className="h-3 w-3 opacity-50"/></th>
-                <th className="px-5 py-3.5">Booking Code <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1"/></th>
-                <th className="px-5 py-3.5">Package <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1"/></th>
-                <th className="px-5 py-3.5">Duration <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1"/></th>
-                <th className="px-5 py-3.5">Date <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1"/></th>
-                <th className="px-5 py-3.5">Price <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1"/></th>
-                <th className="px-5 py-3.5">Status <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1"/></th>
+                <th className="px-5 py-3.5 flex items-center gap-1 cursor-pointer">Name <ChevronDown className="h-3 w-3 opacity-50" /></th>
+                <th className="px-5 py-3.5">Booking Code <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
+                <th className="px-5 py-3.5">Package <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
+                <th className="px-5 py-3.5">Duration <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
+                <th className="px-5 py-3.5">Date <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
+                <th className="px-5 py-3.5">Price <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
+                <th className="px-5 py-3.5">Status <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -53,22 +53,22 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
                 </tr>
               ) : (
                 bookings.map((booking: any) => {
-                  const statusClass = booking.status === "contacted" 
-                    ? "bg-primary text-white" 
+                  const statusClass = booking.status === "contacted"
+                    ? "bg-primary text-white"
                     : booking.status === "pending"
-                    ? "bg-blue-500/10 text-blue-500"
-                    : "bg-red-500/10 text-red-500";
-                    
-                  const statusText = booking.status === "contacted" 
+                      ? "bg-blue-500/10 text-blue-500"
+                      : "bg-red-500/10 text-red-500";
+
+                  const statusText = booking.status === "contacted"
                     ? "Confirmed"
                     : booking.status === "pending"
-                    ? "Pending"
-                    : "Cancelled";
+                      ? "Pending"
+                      : "Cancelled";
 
-                  const dateString = booking.createdAt 
+                  const dateString = booking.createdAt
                     ? new Date(booking.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                     : "N/A";
-                    
+
                   return (
                     <tr key={booking._id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-5 py-4 font-medium text-foreground">
@@ -103,12 +103,12 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
             </tbody>
           </table>
         </div>
-        
+
         <div className="flex items-center justify-between border-t border-border px-5 py-3">
           <div className="text-[13px] text-muted-foreground">
             Showing{" "}
             <select className="mx-1 rounded border border-border bg-card text-foreground outline-none py-0.5 px-1">
-               <option className="bg-card text-foreground">8</option>
+              <option className="bg-card text-foreground">8</option>
             </select>{" "}
             out of 286
           </div>

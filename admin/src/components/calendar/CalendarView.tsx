@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react"
-import { ChevronDown, ChevronLeft, ChevronRight, Calendar as CalendarIcon, MapPin, Users, HelpCircle, Settings } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, MapPin, Users, HelpCircle, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export interface Event {
@@ -29,14 +29,10 @@ interface CalendarViewProps {
 }
 
 export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarViewProps) {
-  const [currentDate, setCurrentDate] = useState(new Date(2028, 6, 1))
+  const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState<"Day" | "Week" | "Month">("Month")
-  const [isPickerOpen, setIsPickerOpen] = useState(false)
 
-  const MONTHS = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ]
+
 
   const monthName = currentDate.toLocaleString("default", { month: "long" })
   const year = currentDate.getFullYear()
@@ -44,6 +40,10 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
   // Calendar logic
   const daysInMonth = new Date(year, currentDate.getMonth() + 1, 0).getDate()
   const firstDayOfMonth = new Date(year, currentDate.getMonth(), 1).getDay()
+  
+  const totalDaysNeeded = firstDayOfMonth + daysInMonth
+  const rowsCount = Math.ceil(totalDaysNeeded / 7)
+  const totalCells = rowsCount * 7
   
   const days = []
   const prevMonthLastDay = new Date(year, currentDate.getMonth(), 0).getDate()
@@ -53,7 +53,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
   for (let i = 1; i <= daysInMonth; i++) {
     days.push({ day: i, currentMonth: true })
   }
-  const remainingCells = 42 - days.length
+  const remainingCells = totalCells - days.length
   for (let i = 1; i <= remainingCells; i++) {
     days.push({ day: i, currentMonth: false })
   }
@@ -85,21 +85,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
     setCurrentDate(newDate)
   }
 
-  const getDayLabel = () => {
-    if (view === "Month") return `${monthName} ${year}`
-    if (view === "Week") {
-      const startOfWeek = new Date(currentDate)
-      startOfWeek.setDate(currentDate.getDate() - currentDate.getDay())
-      const endOfWeek = new Date(startOfWeek)
-      endOfWeek.setDate(startOfWeek.getDate() + 6)
-      
-      if (startOfWeek.getMonth() === endOfWeek.getMonth()) {
-        return `${startOfWeek.toLocaleString("default", { month: "short" })} ${startOfWeek.getDate()} - ${endOfWeek.getDate()}, ${startOfWeek.getFullYear()}`
-      }
-      return `${startOfWeek.toLocaleString("default", { month: "short" })} ${startOfWeek.getDate()} - ${endOfWeek.toLocaleString("default", { month: "short" })} ${endOfWeek.getDate()}, ${endOfWeek.getFullYear()}`
-    }
-    return currentDate.toLocaleDateString("default", { weekday: "long", month: "long", day: "numeric", year: "numeric" })
-  }
+
 
   // Row-based layout engine for visual continuity of multi-day events
   const rowAssignments = useMemo(() => {
@@ -220,7 +206,10 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                 </div>
               ))}
             </div>
-            <div className="grid flex-1 grid-cols-7 grid-rows-6">
+            <div 
+              className="grid flex-1 grid-cols-7"
+              style={{ gridTemplateRows: `repeat(${rowsCount}, minmax(0, 1fr))` }}
+            >
               {days.map((d, i) => {
                 const dayDate = new Date(year, currentDate.getMonth(), d.day)
                 if (!d.currentMonth) {
@@ -240,9 +229,9 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                   <div
                     key={i}
                     className={cn(
-                      "relative border-r border-b border-border transition-colors min-h-[120px] flex flex-col pt-2",
+                      "relative border-r border-b border-border transition-colors h-full flex flex-col pt-2 overflow-hidden",
                       (i + 1) % 7 === 0 && "border-r-0",
-                      i >= 35 && "border-b-0",
+                      i >= totalCells - 7 && "border-b-0",
                       isToday ? "bg-background" : "bg-card"
                     )}
                   >
@@ -261,7 +250,6 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                         if (event) {
                           const eStart = new Date(event.start).setHours(0,0,0,0)
                           const eEnd = new Date(event.end).setHours(0,0,0,0)
-                          const dDate = new Date(dayDate).setHours(0,0,0,0)
                           
                           const nDay = new Date(dayDate); nDay.setDate(dayDate.getDate() + 1); const nDate = nDay.setHours(0,0,0,0)
                           const pDay = new Date(dayDate); pDay.setDate(dayDate.getDate() - 1); const pDate = pDay.setHours(0,0,0,0)
@@ -341,7 +329,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                 
                 return (
                   <div key={i} className={cn(
-                    "relative border-r border-border min-h-full flex flex-col pt-3 pb-8 last:border-r-0", 
+                    "relative border-r border-border min-h-full flex flex-col pt-3 last:border-r-0", 
                     isToday ? "bg-background" : "bg-card"
                   )}>
                     <div className="flex flex-col gap-1.5 z-10 relative">
@@ -350,7 +338,6 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                         if (event) {
                           const eStart = new Date(event.start).setHours(0,0,0,0)
                           const eEnd = new Date(event.end).setHours(0,0,0,0)
-                          const dDate = new Date(dayDate).setHours(0,0,0,0)
                           
                           const nDay = new Date(dayDate); nDay.setDate(dayDate.getDate() + 1); const nDate = nDay.setHours(0,0,0,0)
                           const pDay = new Date(dayDate); pDay.setDate(dayDate.getDate() - 1); const pDate = pDay.setHours(0,0,0,0)

@@ -29,7 +29,9 @@ export function App() {
     if (pathname === "/packages") return "Packages"
     if (pathname.startsWith("/packages/")) return "Package Details"
     if (pathname === "/bookings") return "Bookings"
+    if (pathname === "/calendar") return "Calendar"
     return "Dashboard"
+
   }
 
   const buildBreadcrumbs = () => {
@@ -44,7 +46,9 @@ export function App() {
       new: "New Package",
       edit: "Edit",
       bookings: "Bookings",
+      calendar: "Calendar",
     }
+
 
     let currentPath = ""
     segments.forEach((segment, index) => {
@@ -60,6 +64,12 @@ export function App() {
         crumbs.push({ label: labelMap[segment], to: currentPath })
         return
       }
+
+      if (segment === "calendar") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
 
       if (segment === "new") {
         crumbs.push({ label: labelMap.new })

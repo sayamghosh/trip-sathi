@@ -130,7 +130,7 @@ export function App() {
           <TopBar />
         </header>
 
-        <main className="flex-1 overflow-y-auto px-5 pt-4 pb-6 bg-slate-50/50">
+        <main className="flex-1 overflow-y-auto px-5 pt-4 pb-6 bg-background">
           <Outlet />
         </main>
       </SidebarInset>

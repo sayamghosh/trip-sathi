@@ -13,6 +13,7 @@ import { PackagePage } from "@/components/package/PackagePage"
 import PackageDetailPage from "@/components/package/PackageDetailPage"
 import Bookings from "./pages/Bookings"
 import Calendar from "./pages/Calendar"
+import { Profile } from "./pages/Profile"
 
 
 const rootRoute = createRootRoute({
@@ -75,6 +76,12 @@ const calendarRoute = createRoute({
   component: Calendar,
 })
 
+const profileRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/profile",
+  component: Profile,
+})
+
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -99,6 +106,7 @@ const routeTree = rootRoute.addChildren([
     packageDetailRoute,
     bookingsRoute,
     calendarRoute,
+    profileRoute,
   ]),
 
   loginRoute,

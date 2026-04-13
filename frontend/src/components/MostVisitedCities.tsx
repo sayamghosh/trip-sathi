@@ -29,14 +29,14 @@ const cities = [
         query: 'kolkata',
         hotels: '7,850+',
         description: 'The capital and largest city of the Indian state of West Bengal.',
-        image: 'https://images.pexels.com/photos/29263819/pexels-photo-29263819.jpeg',
+        image: 'https://images.unsplash.com/photo-1558431382-27e303142255?w=1000&auto=format&fit=crop&q=80',
     },
     {
         name: 'Mumbai, India',
         query: 'Mumbai',
         hotels: '7,850+',
         description: 'Mumbai (formerly called Bombay) is a densely populated city on India’s west coast.',
-        image: 'https://images.pexels.com/photos/15528027/pexels-photo-15528027.jpeg',
+        image: 'https://images.unsplash.com/photo-1598434192043-71111c1b3f41?w=1000&auto=format&fit=crop&q=80',
     }
 ];
 

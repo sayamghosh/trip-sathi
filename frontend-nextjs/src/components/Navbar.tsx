@@ -43,7 +43,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="shrink-0 flex items-center gap-2">
             <Link href="/" className="text-2xl font-bold text-[#1a2b4c] tracking-tight">
-              <img src={logo} alt="logo" />
+              <img src={logo.src} alt="logo" />
             </Link>
           </div>
 

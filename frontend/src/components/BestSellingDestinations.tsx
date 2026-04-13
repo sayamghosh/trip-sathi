@@ -8,12 +8,12 @@ const destinations = [
     {
         id: 1,
         name: 'Munnar',
-        image: 'https://images.pexels.com/photos/1065753/pexels-photo-1065753.jpeg',
+        image: 'https://images.unsplash.com/photo-1637066742971-726bee8d9f56?w=1000&auto=format&fit=crop&q=80',
     },
     {
         id: 2,
         name: 'Andaman',
-        image: 'https://images.pexels.com/photos/2583833/pexels-photo-2583833.jpeg',
+        image: 'https://images.unsplash.com/photo-1542429296407-20c78e10f375?w=1000&auto=format&fit=crop&q=80',
     },
     {
         id: 3,
@@ -23,12 +23,12 @@ const destinations = [
     {
         id: 4,
         name: 'Coorg & Ooty',
-        image: 'https://images.pexels.com/photos/731423/pexels-photo-731423.jpeg',
+        image: 'https://images.unsplash.com/photo-1589136777351-fdc9c9cab193?w=1000&auto=format&fit=crop&q=80',
     },
     {
         id: 5,
         name: 'Kashmir',
-        image: 'https://images.pexels.com/photos/15847169/pexels-photo-15847169.jpeg',
+        image: 'https://images.unsplash.com/photo-1715457573748-8e8a70b2c1be?w=1000&auto=format&fit=crop&q=80',
     },
     {
         id: 6,

@@ -12,7 +12,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 import { AppSidebar } from "@/components/app-sidebar"
-import { TopBar } from "@/components/dashboard/TopBar"
+import { TopBar } from "@/components/TopBar"
 import { Outlet, useLocation } from "@tanstack/react-router"
 import { Link } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
@@ -28,7 +28,10 @@ export function App() {
     if (pathname.startsWith("/packages/") && pathname.endsWith("/edit")) return "Edit Details"
     if (pathname === "/packages") return "Packages"
     if (pathname.startsWith("/packages/")) return "Package Details"
+    if (pathname === "/bookings") return "Bookings"
+    if (pathname === "/calendar") return "Calendar"
     return "Dashboard"
+
   }
 
   const buildBreadcrumbs = () => {
@@ -42,7 +45,10 @@ export function App() {
       packages: "Packages",
       new: "New Package",
       edit: "Edit",
+      bookings: "Bookings",
+      calendar: "Calendar",
     }
+
 
     let currentPath = ""
     segments.forEach((segment, index) => {
@@ -53,6 +59,17 @@ export function App() {
         crumbs.push({ label: labelMap[segment], to: currentPath })
         return
       }
+
+      if (segment === "bookings") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
+      if (segment === "calendar") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
 
       if (segment === "new") {
         crumbs.push({ label: labelMap.new })
@@ -79,8 +96,8 @@ export function App() {
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset>
-        <header className="flex shrink-0 items-center justify-between gap-2 border-b px-5 py-4">
+      <SidebarInset className="flex flex-col h-screen overflow-hidden">
+        <header className="flex h-[72px] shrink-0 items-center justify-between gap-2 border-b px-5 bg-background">
           <div className="flex items-center gap-4">
             <SidebarTrigger className="-ml-1" />
             <div className="flex flex-col gap-1">
@@ -113,7 +130,7 @@ export function App() {
           <TopBar />
         </header>
 
-        <main className="flex-1 overflow-y-auto px-5 pt-4 pb-6 bg-slate-50/50">
+        <main className="flex-1 overflow-y-auto px-5 pt-4 pb-6 bg-background">
           <Outlet />
         </main>
       </SidebarInset>

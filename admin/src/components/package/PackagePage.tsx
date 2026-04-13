@@ -218,9 +218,9 @@ export function PackagePage() {
               <div className="space-y-3">
                 {featuredPackages.map((pkg) => {
                   const card = (
-                    <div className="flex flex-col sm:flex-row rounded-[14px] border border-border bg-card shadow-sm transition hover:shadow-md overflow-hidden min-h-55">
+                    <div className="flex flex-col sm:flex-row rounded-[14px] border border-border bg-card shadow-sm transition hover:shadow-md overflow-hidden min-h-72">
                       <div
-                        className="w-full sm:w-55 shrink-0 bg-accent bg-cover bg-center relative"
+                        className="w-full sm:w-80 shrink-0 bg-accent bg-cover bg-center relative"
                         style={{ backgroundImage: `url(${pkg.bannerImages?.[0] || "https://images.unsplash.com/photo-1542314831-c6a4d14cd44b?auto=format&fit=crop&w=400&q=80"})` }}
                       >
                         <div className="absolute top-3 right-3 bg-card/90 backdrop-blur rounded-[8px] px-2 py-0.5 flex items-center gap-1 shadow-sm">

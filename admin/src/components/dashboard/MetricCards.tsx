@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 
 export function MetricCards() {
   const [totalPlans, setTotalPlans] = useState<number | string>("...")
@@ -122,7 +123,11 @@ export function MetricCards() {
               </p>
             </div>
             <div
-              className={`flex h-[36px] w-[36px] items-center justify-center rounded-[10px] ${m.iconBg}`}
+              className={cn(
+                "flex h-[36px] w-[36px] items-center justify-center rounded-[10px]",
+                m.iconBg,
+                "dark:bg-primary/10"
+              )}
             >
               {m.icon}
             </div>

@@ -8,12 +8,13 @@ import { router } from "./router"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 
 const GOOGLE_CLIENT_ID =
-  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
-  "868218151901-dudv5hns1427j9m9s9i9i6c31u5f60tq.apps.googleusercontent.com"
+  import.meta.env.VITE_GOOGLE_CLIENT_ID || ""
 
 const rootElement = document.getElementById("root")
 if (!rootElement) {
   console.error("Root element not found")
+} else if (!GOOGLE_CLIENT_ID) {
+  console.error("Missing VITE_GOOGLE_CLIENT_ID in admin/.env")
 } else {
   createRoot(rootElement).render(
     <StrictMode>

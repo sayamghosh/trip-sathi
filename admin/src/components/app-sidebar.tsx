@@ -71,7 +71,7 @@ export function AppSidebar() {
             "text-xl font-bold tracking-tight text-sidebar-foreground transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
             isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
           )}>
-            Travelie
+            TripSathi
           </span>
         </Link>
       </SidebarHeader>

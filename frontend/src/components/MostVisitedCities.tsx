@@ -8,7 +8,7 @@ const cities = [
         query: 'delhi',
         hotels: '1,450+',
         description: 'Delhi, India’s capital territory, is a massive metropolitan area in the country’s north.',
-        image: 'https://images.pexels.com/photos/31709020/pexels-photo-31709020.jpeg',
+        image: 'https://images.unsplash.com/photo-1678966432189-d58296e45ad2?w=1000&auto=format&fit=crop&q=80',
     },
     {
         name: 'Goa, India',

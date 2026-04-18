@@ -70,7 +70,7 @@ const PopularPackages = () => {
     const { pendingAction, requestAuth, clearPendingAction } = useAuthFlow();
 
     useEffect(() => {
-        getAllTourPlans(4)
+        getAllTourPlans(6)
             .then(setPlans)
             .catch(console.error)
             .finally(() => setLoading(false));
@@ -203,7 +203,7 @@ const PopularPackages = () => {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {loading ? (
-                        Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)
+                        Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
                     ) : plans.length === 0 ? (
                         <p className="col-span-4 text-center text-gray-400 py-12 text-lg">No tour plans available yet.</p>
                     ) : (

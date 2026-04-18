@@ -196,7 +196,7 @@ const PopularPackages = () => {
                         <h3 className="text-brand-primary font-semibold uppercase tracking-wider mb-2">Best Selling</h3>
                         <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 font-display">Popular Tour Packages</h2>
                     </div>
-                    <Link to="/guides" className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all">
+                    <Link to="/allpackages" className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all">
                         View All Packages <ArrowRight size={20} />
                     </Link>
                 </div>
@@ -208,7 +208,7 @@ const PopularPackages = () => {
                         <p className="col-span-4 text-center text-gray-400 py-12 text-lg">No tour plans available yet.</p>
                     ) : (
                         plans.map((plan, index) => (
-                            <Link to="/guides/$id" params={{ id: plan._id }} key={plan._id} className="block">
+                            <Link to="/allpackages/$id" params={{ id: plan._id }} key={plan._id} className="block">
                                 <motion.div
                                     initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}

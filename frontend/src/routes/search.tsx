@@ -133,7 +133,7 @@ function SearchComponent() {
                 </div>
             ) : (
                 plans.map((plan, index) => (
-                    <Link to="/guides/$id" params={{ id: plan._id }} key={plan._id} className="block">
+                    <Link to="/allpackages/$id" params={{ id: plan._id }} key={plan._id} className="block">
                         <motion.div
                             initial={{ opacity: 0, y: 30 }}
                             animate={{ opacity: 1, y: 0 }}

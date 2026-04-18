@@ -1,5 +1,7 @@
 
 
+const BECOME_TRAVEL_AGENT_URL = import.meta.env.VITE_ADMIN_APP_URL || "http://localhost:3001/login"
+
 const Footer = () => {
     return (
         <footer className="w-full bg-[#f8fafc] sm:bg-transparent p-0 sm:p-6 lg:p-8">
@@ -38,6 +40,7 @@ const Footer = () => {
                                     <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
                                     <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
                                     <li><a href="#" className="hover:text-white transition-colors">Press & Media</a></li>
+                                    <li><a href={BECOME_TRAVEL_AGENT_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Become a Travel Agent</a></li>
                                 </ul>
                             </div>
                             <div>

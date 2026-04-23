@@ -73,7 +73,10 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
         const needsContact = !user || user.role !== 'guide' || !user.phone || !user.address;
 
         if (needsContact && (!trimmedPhone || !trimmedAddress)) {
-            res.status(400).json({ message: 'Phone number and address are required to register as a guide.' });
+            res.status(400).json({ 
+                message: 'Phone number and address are required to register as a guide.',
+                requiresRegistration: true
+            });
             return;
         }
 

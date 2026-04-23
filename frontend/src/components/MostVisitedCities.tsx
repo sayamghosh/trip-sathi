@@ -8,7 +8,7 @@ const cities = [
         query: 'delhi',
         hotels: '1,450+',
         description: 'Delhi, India’s capital territory, is a massive metropolitan area in the country’s north.',
-        image: 'https://images.unsplash.com/photo-1678966432189-d58296e45ad2?auto=format&fit=crop&q=80&w=800&h=1200',
+        image: 'https://images.unsplash.com/photo-1678966432189-d58296e45ad2?w=1000&auto=format&fit=crop&q=80',
     },
     {
         name: 'Goa, India',
@@ -29,14 +29,14 @@ const cities = [
         query: 'kolkata',
         hotels: '7,850+',
         description: 'The capital and largest city of the Indian state of West Bengal.',
-        image: 'https://images.unsplash.com/photo-1682582036641-91dfe7b66ba6?auto=format&fit=crop&q=80&w=800&h=1200',
+        image: 'https://images.unsplash.com/photo-1558431382-27e303142255?w=1000&auto=format&fit=crop&q=80',
     },
     {
         name: 'Mumbai',
         query: 'Mumbai',
         hotels: '7,850+',
-        description: 'Mumbai is a densely populated city on India’s west coast.',
-        image: 'https://images.unsplash.com/photo-1598434192043-71111c1b3f41?auto=format&fit=crop&q=80&w=800&h=1200',
+        description: 'Mumbai (formerly called Bombay) is a densely populated city on India’s west coast.',
+        image: 'https://images.unsplash.com/photo-1598434192043-71111c1b3f41?w=1000&auto=format&fit=crop&q=80',
     }
 ];
 

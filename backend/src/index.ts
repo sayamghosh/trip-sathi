@@ -33,7 +33,12 @@ app.get('/', (req, res) => {
     res.send('Trip Sathi API is running');
 });
 
-// Start Server
-app.listen(PORT, () => {
-    console.log(`Server started on port ${PORT}`);
-});
+// Export app for Vercel serverless runtime.
+export default app;
+
+// Start server only for non-serverless local/runtime usage.
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`Server started on port ${PORT}`);
+    });
+}

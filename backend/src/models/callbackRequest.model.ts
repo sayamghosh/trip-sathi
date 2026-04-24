@@ -7,7 +7,7 @@ export interface ICallbackRequest extends Document {
     requesterName?: string;
     requesterEmail?: string;
     requesterPhone?: string;
-    status: 'pending' | 'contacted';
+    status: 'pending' | 'contacted' | 'positive' | 'negative';
 }
 
 const CallbackRequestSchema: Schema = new Schema({
@@ -17,7 +17,7 @@ const CallbackRequestSchema: Schema = new Schema({
     requesterName: { type: String },
     requesterEmail: { type: String },
     requesterPhone: { type: String },
-    status: { type: String, enum: ['pending', 'contacted'], default: 'pending' }
+    status: { type: String, enum: ['pending', 'contacted', 'positive', 'negative'], default: 'pending' }
 }, { timestamps: true });
 
 export default mongoose.model<ICallbackRequest>('CallbackRequest', CallbackRequestSchema);

@@ -59,8 +59,9 @@ export const createCallbackRequest = async (req: Request, res: Response): Promis
 // Guide: list callback requests for their tours
 export const getGuideCallbacks = async (req: Request, res: Response): Promise<void> => {
     try {
-        const guideId = (req as any).user.id;
-        const callbacks = await CallbackRequest.find({ guideId })
+        const user = (req as any).user;
+        // Fetch all callbacks for the admin panel regardless of user role for now
+        const callbacks = await CallbackRequest.find({})
             .sort({ createdAt: -1 })
             .populate('tourPlanId', 'title locations')
             .lean();
@@ -74,7 +75,7 @@ export const getGuideCallbacks = async (req: Request, res: Response): Promise<vo
 
 export const markCallbackAsRead = async (req: Request, res: Response): Promise<void> => {
     try {
-        const guideId = (req as any).user.id;
+        const user = (req as any).user;
         const { id } = req.params;
 
         if (!id) {
@@ -82,8 +83,10 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
             return;
         }
 
+        const query = { _id: id };
+
         const callback = await CallbackRequest.findOneAndUpdate(
-            { _id: id, guideId },
+            query,
             { status: 'contacted' },
             { new: true }
         ).populate('tourPlanId', 'title locations');
@@ -96,6 +99,42 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
         res.status(200).json({ message: 'Callback marked as contacted', callback });
     } catch (error: any) {
         console.error('Mark callback as read error', error);
+        res.status(500).json({ message: 'Error updating callback status', error: error.message });
+    }
+};
+
+export const updateCallbackStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = (req as any).user;
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!id) {
+            res.status(400).json({ message: 'Callback id is required' });
+            return;
+        }
+
+        if (!['pending', 'contacted', 'positive', 'negative'].includes(status)) {
+            res.status(400).json({ message: 'Invalid status value' });
+            return;
+        }
+
+        const query = { _id: id };
+
+        const callback = await CallbackRequest.findOneAndUpdate(
+            query,
+            { status },
+            { new: true }
+        ).populate('tourPlanId', 'title locations');
+
+        if (!callback) {
+            res.status(404).json({ message: 'Callback not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Callback status updated', callback });
+    } catch (error: any) {
+        console.error('Update callback status error', error);
         res.status(500).json({ message: 'Error updating callback status', error: error.message });
     }
 };

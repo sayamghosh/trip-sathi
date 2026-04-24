@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { Badge } from './ui/badge';
 import OptimizedImage from './ui/OptimizedImage';
+import goaImage from '../assets/lading-page/goa.jpg';
+import rajasthanImage from '../assets/lading-page/rajasthan.jpg';
+import kashmirImage from '../assets/lading-page/kashmir.jpg';
+import keralaImage from '../assets/lading-page/kerala.jpg';
+import andamanImage from '../assets/lading-page/andaman.jpg';
 
 const cities = [
     {
@@ -8,35 +13,35 @@ const cities = [
         query: 'delhi',
         hotels: '1,450+',
         description: 'Delhi, India’s capital territory, is a massive metropolitan area in the country’s north.',
-        image: 'https://images.pexels.com/photos/31709020/pexels-photo-31709020.jpeg',
+        image: andamanImage.src,
     },
     {
         name: 'Goa, India',
         query: 'goa',
         hotels: '4,320+',
         description: 'Cliffside temples with ocean views and stunning golden hours.',
-        image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&w=1000&q=80',
+        image: goaImage.src,
     },
     {
         name: 'Jaipur, India',
         query: 'jaipur',
         hotels: '7,850+',
         description: 'Panoramic skyline views with a luxe ambience and iconic backdrop.',
-        image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&w=1000&q=80',
+        image: rajasthanImage.src,
     },
     {
         name: 'Kolkata, India',
         query: 'kolkata',
         hotels: '7,850+',
         description: 'The capital and largest city of the Indian state of West Bengal.',
-        image: 'https://images.pexels.com/photos/29263819/pexels-photo-29263819.jpeg',
+        image: keralaImage.src,
     },
     {
         name: 'Mumbai, India',
         query: 'Mumbai',
         hotels: '7,850+',
         description: 'Mumbai (formerly called Bombay) is a densely populated city on India’s west coast.',
-        image: 'https://images.pexels.com/photos/15528027/pexels-photo-15528027.jpeg',
+        image: kashmirImage.src,
     }
 ];
 

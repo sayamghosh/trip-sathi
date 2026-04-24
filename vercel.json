@@ -1,0 +1,16 @@
+{
+  "experimentalServices": {
+    "frontend": {
+      "path": "./frontend"
+    },
+    "backend": {
+      "path": "./backend"
+    },
+    "admin": {
+      "path": "./admin"
+    },
+    "frontend-nextjs": {
+      "path": "./frontend-nextjs"
+    }
+  }
+}

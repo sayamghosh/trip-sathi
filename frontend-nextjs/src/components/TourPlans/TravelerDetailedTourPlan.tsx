@@ -13,7 +13,6 @@ import { getTourPlanById } from '../../services/tourPlan.service';
 import { requestCallback } from '../../services/callback.service';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthFlow } from '../../context/AuthFlowContext';
-import ContactModal from '../guide/ContactModal';
 import { getOptimizedImageUrl } from '../../lib/utils';
 import type { TourPlanDetailed, TourPlanDay } from '../../types/tourPlan';
 
@@ -22,6 +21,12 @@ type PendingPlanPayload = {
     title: string;
     guideId?: TourPlanDetailed['guideId'];
 };
+
+const WhatsappIcon = ({ size = 24, className = '' }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 0 0-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
+    </svg>
+);
 
 export default function TravelerDetailedTourPlan() {
     const params = useParams();
@@ -32,42 +37,9 @@ export default function TravelerDetailedTourPlan() {
     const [activeTab, setActiveTab] = useState<'itinerary' | 'policies' | 'summary'>('itinerary');
     const [activeDay, setActiveDay] = useState(1);
     const dayRefs = useRef<Record<number, HTMLDivElement | null>>({});
-    const [contactOpen, setContactOpen] = useState(false);
-    const [userPhone, setUserPhone] = useState('');
-    const [userName, setUserName] = useState('');
-    const [callbackError, setCallbackError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
-    const { user, isAuthenticated, updateUser } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     const { pendingAction, requestAuth, clearPendingAction } = useAuthFlow();
-    const contactStorageKey = user?.id ? `callbackContact:${user.id}` : null;
-
-    const loadStoredContact = useCallback(() => {
-        if (!contactStorageKey) return { name: '', phone: '' };
-        try {
-            const raw = localStorage.getItem(contactStorageKey);
-            if (!raw) return { name: '', phone: '' };
-            const parsed = JSON.parse(raw);
-            return { name: parsed?.name ?? '', phone: parsed?.phone ?? '' };
-        } catch {
-            return { name: '', phone: '' };
-        }
-    }, [contactStorageKey]);
-
-    const persistContact = useCallback((name: string, phone: string) => {
-        if (!contactStorageKey) return;
-        localStorage.setItem(contactStorageKey, JSON.stringify({ name, phone }));
-    }, [contactStorageKey]);
-
-    const prefillContactFields = useCallback(() => {
-        if (!user) {
-            setUserName('');
-            setUserPhone('');
-            return;
-        }
-        const stored = loadStoredContact();
-        setUserName(stored.name || user.name || '');
-        setUserPhone(stored.phone || user.phone || '');
-    }, [user, loadStoredContact]);
 
     const queueAuthFlow = useCallback(() => {
         if (!plan) return;
@@ -91,92 +63,57 @@ export default function TravelerDetailedTourPlan() {
             .finally(() => setLoading(false));
     }, [id]);
 
-    const openContactModal = useCallback(() => {
+    const handleWhatsappRequest = useCallback(async () => {
         if (!plan) return;
-        if (!isAuthenticated) {
+        if (!isAuthenticated || !user) {
             queueAuthFlow();
-            toast('Sign in to call the guide', { icon: '🔐' });
+            toast('Sign in to contact the guide', { icon: '🔐' });
             return;
         }
-        prefillContactFields();
-        setContactOpen(true);
-        setCallbackError(null);
-    }, [plan, isAuthenticated, queueAuthFlow, prefillContactFields]);
 
-    const closeContactModal = useCallback(() => {
-        if (submitting) return;
-        setContactOpen(false);
-        setCallbackError(null);
-        setUserPhone('');
-        setUserName('');
-    }, [submitting]);
+        if (!plan.guideId?.phone) {
+            toast.error('The guide has not provided a phone number.');
+            return;
+        }
+
+        try {
+            setSubmitting(true);
+            await requestCallback({
+                tourPlanId: plan._id,
+            });
+            
+            const message = encodeURIComponent(`I am interested for the "${plan.title}"`);
+            const phone = plan.guideId.phone.replace(/[^0-9+]/g, '');
+            window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+            
+            toast.success('Redirecting to WhatsApp...');
+        } catch (error: unknown) {
+            if (axios.isAxiosError(error) && error.response?.status === 401) {
+                queueAuthFlow();
+                toast.error('Please sign in to contact the guide.');
+            } else if ((error as Error)?.message === 'AUTH_REQUIRED') {
+                queueAuthFlow();
+            } else {
+                toast.error('Could not send request, please try again');
+            }
+        } finally {
+            setSubmitting(false);
+        }
+    }, [plan, isAuthenticated, user, queueAuthFlow]);
 
     const resumePendingAction = useCallback(() => {
         if (!pendingAction || !isAuthenticated || !plan) return;
         if (pendingAction.type !== 'CALL_GUIDE') return;
         const pendingPlan = pendingAction.payload?.plan as PendingPlanPayload | undefined;
         if (pendingPlan && pendingPlan._id === plan._id) {
-            prefillContactFields();
-            setContactOpen(true);
-            setCallbackError(null);
+            handleWhatsappRequest();
         }
         clearPendingAction();
-    }, [pendingAction, isAuthenticated, plan, prefillContactFields, clearPendingAction]);
+    }, [pendingAction, isAuthenticated, plan, handleWhatsappRequest, clearPendingAction]);
 
     useEffect(() => {
         resumePendingAction();
     }, [resumePendingAction]);
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            setContactOpen(false);
-            setUserPhone('');
-            setUserName('');
-        }
-    }, [isAuthenticated]);
-
-    const handleSubmitCallback = useCallback(async () => {
-        if (!plan) return;
-        if (!isAuthenticated || !user) {
-            queueAuthFlow();
-            return;
-        }
-        const trimmedPhone = userPhone.trim();
-        if (!trimmedPhone) {
-            setCallbackError('Please enter your phone number');
-            return;
-        }
-        try {
-            setSubmitting(true);
-            setCallbackError(null);
-            const trimmedName = userName.trim();
-            const response = await requestCallback({
-                tourPlanId: plan._id,
-                requesterPhone: trimmedPhone,
-                requesterName: trimmedName || undefined,
-            });
-            if (response?.user) {
-                updateUser(response.user);
-            }
-            persistContact(trimmedName || response?.user?.name || user.name || '', trimmedPhone);
-            toast.success('Callback request sent to the guide!');
-            setContactOpen(false);
-            setUserPhone('');
-            setUserName('');
-        } catch (error: unknown) {
-            if (axios.isAxiosError(error) && error.response?.status === 401) {
-                setContactOpen(false);
-                queueAuthFlow();
-                toast.error('Please sign in to call the guide.');
-            } else if ((error as Error)?.message === 'AUTH_REQUIRED') {
-                queueAuthFlow();
-            } else {
-                setCallbackError((axios.isAxiosError(error) && error.response?.data?.message) || 'Could not send request, please try again');
-            }
-        } finally {
-            setSubmitting(false);
-        }
-    }, [plan, isAuthenticated, user, userPhone, userName, queueAuthFlow, updateUser, persistContact]);
 
     // Scroll spy: update active day based on scroll position
     useEffect(() => {
@@ -735,12 +672,13 @@ export default function TravelerDetailedTourPlan() {
                                     <p className="text-[11px] text-gray-400 mb-5">Excluding applicable taxes</p>
 
                                     <button
-                                        className="w-full bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-sm tracking-wide disabled:opacity-70"
-                                        onClick={openContactModal}
+                                        className="w-full text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 text-sm tracking-wide disabled:opacity-70"
+                                        style={{ backgroundColor: '#25D366' }}
+                                        onClick={handleWhatsappRequest}
                                         disabled={submitting}
                                         type="button"
                                     >
-                                        REQUEST CALLBACK <ChevronRight size={16} />
+                                        <WhatsappIcon size={18} /> Request via WhatsApp
                                     </button>
                                     <p className="text-center text-[11px] text-gray-500 mt-2.5 flex items-center justify-center gap-1">
                                         <Check size={13} className="text-green-500" /> Connect directly with your assigned guide
@@ -823,29 +761,15 @@ export default function TravelerDetailedTourPlan() {
                     </div>
                 </div>
                 <button
-                    className="flex-1 bg-brand-primary hover:bg-brand-dark text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 text-sm disabled:opacity-70 whitespace-nowrap"
-                    onClick={openContactModal}
+                    className="flex-1 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 text-sm disabled:opacity-70 whitespace-nowrap"
+                    style={{ backgroundColor: '#25D366' }}
+                    onClick={handleWhatsappRequest}
                     disabled={submitting}
                     type="button"
                 >
-                    REQUEST CALLBACK <ChevronRight size={16} />
+                    <WhatsappIcon size={16} /> Request via WhatsApp
                 </button>
             </div>
-
-            {plan && (
-                <ContactModal
-                    open={contactOpen}
-                    onClose={closeContactModal}
-                    plan={{ title: plan.title, guideId: plan.guideId }}
-                    userPhone={userPhone}
-                    setUserPhone={setUserPhone}
-                    userName={userName}
-                    setUserName={setUserName}
-                    error={callbackError}
-                    onSubmit={handleSubmitCallback}
-                    submitting={submitting}
-                />
-            )}
         </div>
     );
 }

@@ -1,8 +1,6 @@
 {
   "experimentalServices": {
-    "frontend": {
-      "path": "./frontend"
-    },
+    "frontend": {},
     "backend": {
       "path": "./backend"
     },

@@ -6,12 +6,24 @@ import { TripsOverview } from "@/components/booking/TripsOverview"
 import { TopPackages } from "@/components/booking/TopPackages"
 import { BookingsTable } from "@/components/booking/BookingsTable"
 
+type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
+
+interface CallbackRequest {
+  _id: string
+  createdAt?: string
+  status: CallbackStatus
+  tourPlanId?: {
+    title?: string
+    basePrice?: number
+  }
+}
+
 export default function Bookings() {
-  const { data: bookings = [] } = useQuery({
+  const { data: bookings = [] } = useQuery<CallbackRequest[]>({
     queryKey: ['callbacks'],
     queryFn: async () => {
       const { data } = await api.get('/api/callbacks/mine')
-      return data
+      return data as CallbackRequest[]
     }
   })
 

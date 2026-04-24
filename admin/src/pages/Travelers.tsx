@@ -2,14 +2,27 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { Check, X, Clock, CheckCircle2, XCircle } from "lucide-react"
 
+type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
+
+interface CallbackRequest {
+  _id: string
+  createdAt?: string
+  requesterName?: string
+  requesterEmail?: string
+  status: CallbackStatus
+  tourPlanId?: {
+    title?: string
+  }
+}
+
 export default function Travelers() {
   const queryClient = useQueryClient()
 
-  const { data: requests = [], isLoading: loading } = useQuery({
+  const { data: requests = [], isLoading: loading } = useQuery<CallbackRequest[]>({
     queryKey: ['callbacks'],
     queryFn: async () => {
       const { data } = await api.get('/api/callbacks/mine')
-      return data
+      return data as CallbackRequest[]
     }
   })
 
@@ -64,7 +77,7 @@ export default function Travelers() {
                 requests.map((req) => (
                   <tr key={req._id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
                     <td className="p-4 align-middle">
-                      {new Date(req.createdAt).toLocaleDateString()}
+                      {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : "N/A"}
                     </td>
                     <td className="p-4 align-middle font-medium">
                       {req.requesterName || "Anonymous"}

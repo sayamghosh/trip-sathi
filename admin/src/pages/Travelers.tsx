@@ -1,33 +1,32 @@
-import { useEffect, useState } from "react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { Check, X, Clock, CheckCircle2, XCircle } from "lucide-react"
 
 export default function Travelers() {
-  const [requests, setRequests] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
 
-  const fetchRequests = async () => {
-    try {
+  const { data: requests = [], isLoading: loading } = useQuery({
+    queryKey: ['callbacks'],
+    queryFn: async () => {
       const { data } = await api.get('/api/callbacks/mine')
-      setRequests(data)
-    } catch (error) {
-      console.error("Error fetching travelers/requests:", error)
-    } finally {
-      setLoading(false)
+      return data
     }
-  }
+  })
 
-  useEffect(() => {
-    fetchRequests()
-  }, [])
-
-  const updateStatus = async (id: string, status: 'positive' | 'negative') => {
-    try {
+  const updateStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: 'positive' | 'negative' }) => {
       await api.patch(`/api/callbacks/${id}/status`, { status })
-      setRequests(requests.map(req => req._id === id ? { ...req, status } : req))
-    } catch (error) {
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['callbacks'] })
+    },
+    onError: (error) => {
       console.error("Error updating status:", error)
     }
+  })
+
+  const updateStatus = (id: string, status: 'positive' | 'negative') => {
+    updateStatusMutation.mutate({ id, status })
   }
 
   return (
@@ -88,14 +87,16 @@ export default function Travelers() {
                       <div className="flex items-center justify-center gap-3">
                         <button 
                           onClick={() => updateStatus(req._id, 'positive')}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm"
+                          disabled={updateStatusMutation.isPending}
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm disabled:opacity-50"
                           title="Mark as Interested"
                         >
                           <Check size={18} strokeWidth={3} />
                         </button>
                         <button 
                           onClick={() => updateStatus(req._id, 'negative')}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm"
+                          disabled={updateStatusMutation.isPending}
+                          className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm disabled:opacity-50"
                           title="Mark as Not Interested"
                         >
                           <X size={18} strokeWidth={3} />

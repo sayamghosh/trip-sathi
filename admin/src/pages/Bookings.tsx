@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from "react"
+import { useMemo } from "react"
+import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { BookingMetrics } from "@/components/booking/BookingMetrics"
 import { TripsOverview } from "@/components/booking/TripsOverview"
@@ -6,19 +7,13 @@ import { TopPackages } from "@/components/booking/TopPackages"
 import { BookingsTable } from "@/components/booking/BookingsTable"
 
 export default function Bookings() {
-  const [bookings, setBookings] = useState<any[]>([])
-
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const { data } = await api.get('/api/callbacks/mine')
-        setBookings(data)
-      } catch (error) {
-        console.error("Error fetching bookings:", error)
-      }
+  const { data: bookings = [] } = useQuery({
+    queryKey: ['callbacks'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/callbacks/mine')
+      return data
     }
-    fetchBookings()
-  }, [])
+  })
 
   const { computedMetrics, computedTrips, computedPackages } = useMemo(() => {
     // 1. Metrics

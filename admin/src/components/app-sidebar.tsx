@@ -11,6 +11,8 @@ import {
   ThumbsUp,
   LogOut,
 } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import api from "@/lib/axios"
 
 import {
   Sidebar,
@@ -29,13 +31,13 @@ import { Link, useLocation } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
 
 
-// Menu items according to the UI image
-const items = [
+// Base menu items
+const baseItems = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/" },
   { icon: Package, label: "Packages", to: "/packages", matchPaths: ["/packages"] },
   { icon: BookCheck, label: "Bookings", to: "/bookings" },
   { icon: CalendarDays, label: "Calendar", to: "/calendar" },
-  { icon: Users, label: "Travelers", to: "/travelers" },
+  { icon: Users, label: "Travelers", to: "/travelers" }, // Badge will be injected dynamically
   { icon: Compass, label: "Guides", to: "/guides" },
   { icon: ImageIcon, label: "Gallery", to: "/gallery" },
   { icon: MessageCircle, label: "Messages", to: "/messages", badge: 7 },
@@ -53,6 +55,24 @@ export function AppSidebar() {
     if (path === "/") return pathname === "/"
     return pathname === path || pathname.startsWith(`${path}/`)
   }
+
+  // Fetch callbacks using react-query (this shares the cache with Travelers and Bookings pages)
+  const { data: callbacks = [] } = useQuery({
+    queryKey: ['callbacks'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/callbacks/mine')
+      return data
+    }
+  })
+
+  const unreadCount = callbacks.filter((c: any) => c.status === 'pending').length
+
+  const items = baseItems.map(item => {
+    if (item.label === "Travelers" && unreadCount > 0) {
+      return { ...item, badge: unreadCount }
+    }
+    return item
+  })
 
   const handleLogout = () => {
     localStorage.removeItem("token")

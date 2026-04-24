@@ -4,48 +4,56 @@ import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import OptimizedImage from './ui/OptimizedImage';
+import andamanImage from '../assets/lading-page/andaman.jpg';
+import goaImage from '../assets/lading-page/goa.jpg';
+import kashmirImage from '../assets/lading-page/kashmir.jpg';
+import keralaImage from '../assets/lading-page/kerala.jpg';
+import munnarImage from '../assets/lading-page/munnar.jpg';
+import ootyImage from '../assets/lading-page/ooty.jpg';
+import rajasthanImage from '../assets/lading-page/rajasthan.jpg';
+import sikkimImage from '../assets/lading-page/sikkim.jpg';
 
-// Dummy data for Indian destinations using high-quality Unsplash image URLs
+// Destination cards backed by local bundled assets
 const destinations = [
     {
         id: 1,
         name: 'Munnar',
-        image: 'https://images.pexels.com/photos/1065753/pexels-photo-1065753.jpeg',
+        image: munnarImage.src,
     },
     {
         id: 2,
         name: 'Andaman',
-        image: 'https://images.pexels.com/photos/2583833/pexels-photo-2583833.jpeg',
+        image: andamanImage.src,
     },
     {
         id: 3,
         name: 'Rajasthan',
-        image: 'https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&q=80&w=800&h=1200',
+        image: rajasthanImage.src,
     },
     {
         id: 4,
         name: 'Coorg & Ooty',
-        image: 'https://images.pexels.com/photos/731423/pexels-photo-731423.jpeg',
+        image: ootyImage.src,
     },
     {
         id: 5,
         name: 'Kashmir',
-        image: 'https://images.pexels.com/photos/15847169/pexels-photo-15847169.jpeg',
+        image: kashmirImage.src,
     },
     {
         id: 6,
         name: 'Kerala',
-        image: 'https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&q=80&w=800&h=1200',
+        image: keralaImage.src,
     },
     {
         id: 7,
         name: 'Sikkim',
-        image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&q=80&w=800&h=1200',
+        image: sikkimImage.src,
     },
     {
         id: 8,
         name: 'Goa',
-        image: 'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?auto=format&fit=crop&q=80&w=800&h=1200',
+        image: goaImage.src,
     },
 ];
 

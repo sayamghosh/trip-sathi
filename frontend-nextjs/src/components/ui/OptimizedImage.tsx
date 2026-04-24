@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useState, type ImgHTMLAttributes } from 'react';
+import { useEffect, useRef, useState, type ImgHTMLAttributes } from 'react';
 import { cn, getOptimizedImageUrl } from '../../lib/utils';
 
 interface OptimizedImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'onLoad' | 'onError'> {
@@ -41,21 +41,33 @@ export default function OptimizedImage({
     containerClassName,
     ...rest
 }: OptimizedImageProps) {
-    const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
-    const [failedSrc, setFailedSrc] = useState<string | null>(null);
+    const [loaded, setLoaded] = useState(false);
+    const [error, setError] = useState(false);
+    const imgRef = useRef<HTMLImageElement>(null);
 
     // Optimise URL through Cloudinary/Unsplash transforms
     const primarySrc = getOptimizedImageUrl(src, width);
     const fallbackOptimizedSrc = fallbackSrc ? getOptimizedImageUrl(fallbackSrc, width) : undefined;
-    const isPrimaryFailed = failedSrc === primarySrc;
-    const optimizedSrc = isPrimaryFailed && fallbackOptimizedSrc ? fallbackOptimizedSrc : primarySrc;
-    const isLoaded = loadedSrc === optimizedSrc;
+    const optimizedSrc = error && fallbackOptimizedSrc ? fallbackOptimizedSrc : primarySrc;
+
+    // Cached images may already be complete before onLoad attaches.
+    useEffect(() => {
+        if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
+            setLoaded(true);
+        }
+    }, [optimizedSrc]);
+
+    // Reset state when source changes.
+    useEffect(() => {
+        setLoaded(false);
+        setError(false);
+    }, [src]);
 
     return (
         <div
             className={cn(
                 'relative overflow-hidden',
-                !isLoaded && 'animate-shimmer bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 bg-size-[200%_100%]',
+                !loaded && 'animate-shimmer bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 bg-size-[200%_100%]',
                 containerClassName,
             )}
             style={{
@@ -64,6 +76,7 @@ export default function OptimizedImage({
             }}
         >
             <img
+                ref={imgRef}
                 src={optimizedSrc}
                 alt={alt}
                 width={width}
@@ -73,16 +86,15 @@ export default function OptimizedImage({
                 fetchPriority={priority ? 'high' : undefined}
                 className={cn(
                     'transition-opacity duration-300',
-                    isLoaded ? 'opacity-100' : 'opacity-0',
+                    loaded ? 'opacity-100' : 'opacity-0',
                     className,
                 )}
-                onLoad={() => setLoadedSrc(optimizedSrc)}
+                onLoad={() => setLoaded(true)}
                 onError={() => {
-                    if (optimizedSrc === primarySrc && fallbackOptimizedSrc) {
-                        setFailedSrc(primarySrc);
-                        return;
+                    if (!error && fallbackOptimizedSrc) {
+                        setError(true);
                     }
-                    setLoadedSrc(optimizedSrc); // stop shimmer even on final error
+                    setLoaded(true); // stop shimmer even on final error
                 }}
                 {...rest}
             />

@@ -1,14 +1,8 @@
 {
   "experimentalServices": {
     "frontend": {},
-    "backend": {
-      "path": "./backend"
-    },
-    "admin": {
-      "path": "./admin"
-    },
-    "frontend-nextjs": {
-      "path": "./frontend-nextjs"
-    }
+    "backend": {},
+    "admin": {},
+    "frontend-nextjs": {}
   }
 }

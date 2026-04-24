@@ -80,7 +80,6 @@ export default function Travelers() {
                         {req.status === 'pending' && <span className="inline-flex items-center gap-1.5 text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><Clock size={14} /> Pending</span>}
                         {req.status === 'positive' && <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><CheckCircle2 size={14} /> Interested</span>}
                         {req.status === 'negative' && <span className="inline-flex items-center gap-1.5 text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><XCircle size={14} /> Not Interested</span>}
-                        {req.status === 'contacted' && <span className="inline-flex items-center gap-1.5 text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><CheckCircle2 size={14} /> Contacted</span>}
                       </div>
                     </td>
                     <td className="p-4 align-middle">

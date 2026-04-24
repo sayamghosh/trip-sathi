@@ -65,8 +65,8 @@ export default function Bookings() {
       const key = `${m} ${y}`;
       const trip = trips.find(t => t.month === key);
       if (trip) {
-         if (b.status === 'contacted') trip.done++;
-         else trip.canceled++;
+         if (b.status === 'positive') trip.done++;
+         else if (b.status === 'negative') trip.canceled++;
       }
     });
 

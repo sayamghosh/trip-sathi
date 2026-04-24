@@ -21,7 +21,7 @@ const LimitedTimeDeals = () => {
                     >
                         {/* Background — paraglider over tropical island */}
                         <OptimizedImage
-                            src="https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg"
+                            src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1000&auto=format&fit=crop&q=80"
                             alt="Stay Longer and Save 15% OFF"
                             width={600}
                             height={280}
@@ -30,7 +30,7 @@ const LimitedTimeDeals = () => {
                         />
 
                         {/* Dark overlay */}
-                        <div className="absolute inset-0 bg-black/55 group-hover:bg-black/50 transition-colors duration-300" />
+                        <div className="absolute inset-0 bg-black/35 group-hover:bg-black/50 transition-colors duration-300" />
 
                         {/* Content — bottom left */}
                         <div className="absolute inset-0 p-6 flex flex-col justify-end">
@@ -56,7 +56,7 @@ const LimitedTimeDeals = () => {
                     >
                         {/* Background — Manali green valley */}
                         <OptimizedImage
-                            src="https://images.pexels.com/photos/414807/pexels-photo-414807.jpeg"
+                            src="https://images.unsplash.com/photo-1684089696366-17ed91c386ca?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
                             alt="New Year Holiday Getaway Manali 35% OFF"
                             width={600}
                             height={280}
@@ -65,17 +65,17 @@ const LimitedTimeDeals = () => {
                         />
 
                         {/* Subtle dark overlay */}
-                        <div className="absolute inset-0 bg-black/40 group-hover:bg-black/35 transition-colors duration-300" />
+                        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/35 transition-colors duration-300" />
 
                         {/* MANALI watermark — large, centered-right */}
-                        <div className="absolute inset-0 flex items-center justify-end pr-6 pointer-events-none">
+                        {/* <div className="absolute inset-0 flex items-center justify-end pr-6 pointer-events-none">
                             <span
-                                className="text-white/25 font-black tracking-widest uppercase select-none leading-none"
+                                className="text-white font-black tracking-widest uppercase select-none leading-none"
                                 style={{ fontSize: 'clamp(3rem, 10vw, 5.5rem)' }}
                             >
                                 MANALI
                             </span>
-                        </div>
+                        </div> */}
 
                         {/* Content — bottom left */}
                         <div className="absolute inset-0 p-6 flex flex-col justify-end">
@@ -89,7 +89,7 @@ const LimitedTimeDeals = () => {
                                 35% OFF
                             </h3>
                             <p className="text-white/55 text-xs font-medium mt-4">
-                                All Tripvio Packages
+                                All Travel Sathi Packages
                             </p>
                         </div>
                     </Link>

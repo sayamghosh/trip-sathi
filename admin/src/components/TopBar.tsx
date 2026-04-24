@@ -32,7 +32,7 @@ export function TopBar() {
 
   const markAsReadMutation = useMutation({
     mutationFn: async (id: string) => {
-      await api.patch(`/api/callbacks/${id}/status`, { status: 'contacted' })
+      await api.patch(`/api/callbacks/${id}/read`)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['callbacks'] })
@@ -42,12 +42,12 @@ export function TopBar() {
   const handleNotificationClick = (req: any) => {
     setSheetOpen(false)
     navigate({ to: '/travelers' })
-    if (req.status === 'pending') {
+    if (!req.isRead) {
       markAsReadMutation.mutate(req._id)
     }
   }
 
-  const unreadCount = callbacks.filter((c: any) => c.status === 'pending').length
+  const unreadCount = callbacks.filter((c: any) => !c.isRead && c.status === 'pending').length
   const recentCallbacks = callbacks.slice(0, 10)
 
   useEffect(() => {
@@ -136,7 +136,7 @@ export function TopBar() {
               </div>
             ) : (
               recentCallbacks.map((req: any) => {
-                const isUnread = req.status === 'pending'
+                const isUnread = !req.isRead && req.status === 'pending'
                 return (
                   <div 
                     key={req._id} 

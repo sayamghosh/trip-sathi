@@ -65,7 +65,7 @@ export function AppSidebar() {
     }
   })
 
-  const unreadCount = callbacks.filter((c: any) => c.status === 'pending').length
+  const unreadCount = callbacks.filter((c: any) => !c.isRead && c.status === 'pending').length
 
   const items = baseItems.map(item => {
     if (item.label === "Travelers" && unreadCount > 0) {

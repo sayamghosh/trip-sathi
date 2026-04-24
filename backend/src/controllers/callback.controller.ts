@@ -73,9 +73,9 @@ export const getGuideCallbacks = async (req: Request, res: Response): Promise<vo
     }
 };
 
+
 export const markCallbackAsRead = async (req: Request, res: Response): Promise<void> => {
     try {
-        const user = (req as any).user;
         const { id } = req.params;
 
         if (!id) {
@@ -83,11 +83,9 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
             return;
         }
 
-        const query = { _id: id };
-
         const callback = await CallbackRequest.findOneAndUpdate(
-            query,
-            { status: 'contacted' },
+            { _id: id },
+            { isRead: true },
             { new: true }
         ).populate('tourPlanId', 'title locations');
 
@@ -96,7 +94,7 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
             return;
         }
 
-        res.status(200).json({ message: 'Callback marked as contacted', callback });
+        res.status(200).json({ message: 'Callback marked as read', callback });
     } catch (error: any) {
         console.error('Mark callback as read error', error);
         res.status(500).json({ message: 'Error updating callback status', error: error.message });
@@ -114,7 +112,7 @@ export const updateCallbackStatus = async (req: Request, res: Response): Promise
             return;
         }
 
-        if (!['pending', 'contacted', 'positive', 'negative'].includes(status)) {
+        if (!['pending', 'positive', 'negative'].includes(status)) {
             res.status(400).json({ message: 'Invalid status value' });
             return;
         }
@@ -123,7 +121,7 @@ export const updateCallbackStatus = async (req: Request, res: Response): Promise
 
         const callback = await CallbackRequest.findOneAndUpdate(
             query,
-            { status },
+            { status, isRead: true },
             { new: true }
         ).populate('tourPlanId', 'title locations');
 

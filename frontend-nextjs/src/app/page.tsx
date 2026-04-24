@@ -8,7 +8,7 @@ const API_BASE_URL =
 
 async function getInitialPlans(): Promise<TourPlanSummary[]> {
     try {
-        const res = await fetch(`${API_BASE_URL}/api/tour-plans/public?limit=4`, {
+        const res = await fetch(`${API_BASE_URL}/api/tour-plans/public?limit=6`, {
             next: { revalidate: 60 },
         });
 

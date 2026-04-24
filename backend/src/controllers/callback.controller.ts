@@ -2,12 +2,10 @@ import type { Request, Response } from 'express';
 import CallbackRequest from '../models/callbackRequest.model.js';
 import TourPlan from '../models/tourPlan.model.js';
 import User from '../models/user.model.js';
-import { sendEmail } from '../utils/email.js';
-
 // Create a callback request for a tour plan
 export const createCallbackRequest = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { tourPlanId, requesterPhone, requesterName } = req.body;
+        const { tourPlanId } = req.body;
         const authUserId = (req as any)?.user?.id;
 
         if (!authUserId) {
@@ -28,46 +26,16 @@ export const createCallbackRequest = async (req: Request, res: Response): Promis
         if (!plan) { res.status(404).json({ message: 'Tour plan not found' }); return; }
         if (!user) { res.status(404).json({ message: 'User not found' }); return; }
 
-        const trimmedPhoneFromBody = typeof requesterPhone === 'string' ? requesterPhone.trim() : '';
-        const trimmedNameFromBody = typeof requesterName === 'string' ? requesterName.trim() : '';
-
-        const finalPhone = trimmedPhoneFromBody || user.phone || '';
-        const finalName = trimmedNameFromBody || user.name || undefined;
-
-        if (!finalPhone) {
-            res.status(400).json({ message: 'A phone number is required to request a callback.' });
-            return;
-        }
-
         const guide = plan.guideId as any;
-        const callbackPayload: Record<string, unknown> = {
+        const callbackPayload = {
             tourPlanId,
             guideId: guide._id,
-            requesterPhone: finalPhone,
             userId: user._id,
+            requesterName: user.name,
+            requesterEmail: user.email,
         };
 
-        if (finalName) {
-            callbackPayload.requesterName = finalName;
-        }
-
         const callback = await CallbackRequest.create(callbackPayload);
-
-        const shouldUpdatePhone = trimmedPhoneFromBody && trimmedPhoneFromBody !== user.phone;
-        const shouldUpdateName = trimmedNameFromBody && trimmedNameFromBody !== user.name;
-        if (shouldUpdatePhone || shouldUpdateName) {
-            if (shouldUpdatePhone) user.phone = trimmedPhoneFromBody;
-            if (shouldUpdateName) user.name = trimmedNameFromBody;
-            await user.save();
-        }
-
-        if (guide?.email) {
-            const subject = `New callback request for ${plan.title}`;
-            const body = `Hello ${guide.name || 'Guide'},\n\nYou have a new callback request.\nPlan: ${plan.title}\nRequester phone: ${finalPhone}${finalName ? `\nRequester name: ${finalName}` : ''}\n\nLogin to your dashboard to respond.`;
-            sendEmail(guide.email, subject, body).catch((err) => {
-                console.error('Email send failed', err);
-            });
-        }
 
         res.status(201).json({
             message: 'Callback request submitted',
@@ -91,8 +59,9 @@ export const createCallbackRequest = async (req: Request, res: Response): Promis
 // Guide: list callback requests for their tours
 export const getGuideCallbacks = async (req: Request, res: Response): Promise<void> => {
     try {
-        const guideId = (req as any).user.id;
-        const callbacks = await CallbackRequest.find({ guideId })
+        const user = (req as any).user;
+        // Fetch all callbacks for the admin panel regardless of user role for now
+        const callbacks = await CallbackRequest.find({})
             .sort({ createdAt: -1 })
             .populate('tourPlanId', 'title locations')
             .lean();
@@ -104,9 +73,9 @@ export const getGuideCallbacks = async (req: Request, res: Response): Promise<vo
     }
 };
 
+
 export const markCallbackAsRead = async (req: Request, res: Response): Promise<void> => {
     try {
-        const guideId = (req as any).user.id;
         const { id } = req.params;
 
         if (!id) {
@@ -115,8 +84,8 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
         }
 
         const callback = await CallbackRequest.findOneAndUpdate(
-            { _id: id, guideId },
-            { status: 'contacted' },
+            { _id: id },
+            { isRead: true },
             { new: true }
         ).populate('tourPlanId', 'title locations');
 
@@ -125,9 +94,45 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
             return;
         }
 
-        res.status(200).json({ message: 'Callback marked as contacted', callback });
+        res.status(200).json({ message: 'Callback marked as read', callback });
     } catch (error: any) {
         console.error('Mark callback as read error', error);
+        res.status(500).json({ message: 'Error updating callback status', error: error.message });
+    }
+};
+
+export const updateCallbackStatus = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const user = (req as any).user;
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!id) {
+            res.status(400).json({ message: 'Callback id is required' });
+            return;
+        }
+
+        if (!['pending', 'positive', 'negative'].includes(status)) {
+            res.status(400).json({ message: 'Invalid status value' });
+            return;
+        }
+
+        const query = { _id: id };
+
+        const callback = await CallbackRequest.findOneAndUpdate(
+            query,
+            { status, isRead: true },
+            { new: true }
+        ).populate('tourPlanId', 'title locations');
+
+        if (!callback) {
+            res.status(404).json({ message: 'Callback not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Callback status updated', callback });
+    } catch (error: any) {
+        console.error('Update callback status error', error);
         res.status(500).json({ message: 'Error updating callback status', error: error.message });
     }
 };

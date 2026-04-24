@@ -5,8 +5,10 @@ export interface ICallbackRequest extends Document {
     tourPlanId: mongoose.Types.ObjectId;
     userId?: mongoose.Types.ObjectId;
     requesterName?: string;
-    requesterPhone: string;
-    status: 'pending' | 'contacted';
+    requesterEmail?: string;
+    requesterPhone?: string;
+    status: 'pending' | 'positive' | 'negative';
+    isRead: boolean;
 }
 
 const CallbackRequestSchema: Schema = new Schema({
@@ -14,8 +16,10 @@ const CallbackRequestSchema: Schema = new Schema({
     tourPlanId: { type: Schema.Types.ObjectId, ref: 'TourPlan', required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User' },
     requesterName: { type: String },
-    requesterPhone: { type: String, required: true },
-    status: { type: String, enum: ['pending', 'contacted'], default: 'pending' }
+    requesterEmail: { type: String },
+    requesterPhone: { type: String },
+    status: { type: String, enum: ['pending', 'positive', 'negative'], default: 'pending' },
+    isRead: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.model<ICallbackRequest>('CallbackRequest', CallbackRequestSchema);

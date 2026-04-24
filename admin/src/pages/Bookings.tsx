@@ -1,24 +1,31 @@
-import { useEffect, useState, useMemo } from "react"
+import { useMemo } from "react"
+import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { BookingMetrics } from "@/components/booking/BookingMetrics"
 import { TripsOverview } from "@/components/booking/TripsOverview"
 import { TopPackages } from "@/components/booking/TopPackages"
 import { BookingsTable } from "@/components/booking/BookingsTable"
 
-export default function Bookings() {
-  const [bookings, setBookings] = useState<any[]>([])
+type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
 
-  useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const { data } = await api.get('/api/callbacks/mine')
-        setBookings(data)
-      } catch (error) {
-        console.error("Error fetching bookings:", error)
-      }
+interface CallbackRequest {
+  _id: string
+  createdAt?: string
+  status: CallbackStatus
+  tourPlanId?: {
+    title?: string
+    basePrice?: number
+  }
+}
+
+export default function Bookings() {
+  const { data: bookings = [] } = useQuery<CallbackRequest[]>({
+    queryKey: ['callbacks'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/callbacks/mine')
+      return data as CallbackRequest[]
     }
-    fetchBookings()
-  }, [])
+  })
 
   const { computedMetrics, computedTrips, computedPackages } = useMemo(() => {
     // 1. Metrics
@@ -70,8 +77,8 @@ export default function Bookings() {
       const key = `${m} ${y}`;
       const trip = trips.find(t => t.month === key);
       if (trip) {
-         if (b.status === 'contacted') trip.done++;
-         else trip.canceled++;
+         if (b.status === 'positive') trip.done++;
+         else if (b.status === 'negative') trip.canceled++;
       }
     });
 

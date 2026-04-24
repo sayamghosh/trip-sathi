@@ -1,13 +1,54 @@
 import { useState, useEffect, useRef } from "react"
 import { Search, Bell, ChevronDown, Moon, Sun, User, Settings, CreditCard, LogOut } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import api from "@/lib/axios"
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 
 export function TopBar() {
   const [user, setUser] = useState<{ name: string; picture: string; role: string; email?: string } | null>(null)
   const { theme, setTheme } = useTheme()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [sheetOpen, setSheetOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const { data: callbacks = [] } = useQuery({
+    queryKey: ['callbacks'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/callbacks/mine')
+      return data
+    }
+  })
+
+  const markAsReadMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.patch(`/api/callbacks/${id}/read`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['callbacks'] })
+    }
+  })
+
+  const handleNotificationClick = (req: any) => {
+    setSheetOpen(false)
+    navigate({ to: '/travelers' })
+    if (!req.isRead) {
+      markAsReadMutation.mutate(req._id)
+    }
+  }
+
+  const unreadCount = callbacks.filter((c: any) => !c.isRead && c.status === 'pending').length
+  const recentCallbacks = callbacks.slice(0, 10)
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -69,10 +110,65 @@ export function TopBar() {
       </button>
 
       {/* Notification */}
-      <button className="relative flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-border bg-card transition hover:bg-accent">
-        <Bell className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.8} />
-        <span className="absolute -top-[2px] -right-[2px] h-[8px] w-[8px] rounded-full bg-primary ring-2 ring-card" />
-      </button>
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetTrigger asChild>
+          <button className="relative flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-border bg-card transition hover:bg-accent cursor-pointer">
+            <Bell className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.8} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-[3px] -right-[3px] flex h-[15px] w-[15px] items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground ring-2 ring-card">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+        </SheetTrigger>
+        <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+          <SheetHeader className="mb-4">
+            <SheetTitle>Notifications</SheetTitle>
+            <SheetDescription>
+              You have {unreadCount} unread callback {unreadCount === 1 ? 'request' : 'requests'}.
+            </SheetDescription>
+          </SheetHeader>
+          <div className="flex flex-col gap-3">
+            {recentCallbacks.length === 0 ? (
+              <div className="text-sm text-muted-foreground py-10 text-center flex flex-col items-center gap-2">
+                <Bell className="h-8 w-8 text-muted-foreground/30" />
+                No notifications found.
+              </div>
+            ) : (
+              recentCallbacks.map((req: any) => {
+                const isUnread = !req.isRead && req.status === 'pending'
+                return (
+                  <div 
+                    key={req._id} 
+                    onClick={() => handleNotificationClick(req)}
+                    className={`flex flex-col gap-1.5 p-4 rounded-xl border transition-all shadow-sm cursor-pointer ${
+                      isUnread 
+                        ? 'bg-primary/5 border-primary/20 hover:bg-primary/10' 
+                        : 'bg-card hover:bg-accent/50 opacity-75'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-semibold flex items-center gap-2 ${isUnread ? 'text-primary' : 'text-foreground'}`}>
+                        {isUnread && <span className="h-2 w-2 rounded-full bg-primary" />}
+                        {req.requesterName || "Anonymous Traveler"}
+                      </span>
+                      <span className="text-[11px] font-medium text-muted-foreground">
+                        {new Date(req.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className={`text-[13px] ${isUnread ? 'text-foreground/80' : 'text-muted-foreground'} pl-4`}>
+                      Requested a callback for <span className="font-semibold">{req.tourPlanId?.title || "Unknown Plan"}</span>.
+                    </p>
+                    <p className="text-[12px] text-muted-foreground pl-4">
+                      <span className="font-medium">{req.requesterEmail || "N/A"}</span>
+                    </p>
+                  </div>
+                )
+              })
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
 
       {/* User Dropdown */}
       <div className="relative" ref={dropdownRef}>

@@ -14,6 +14,7 @@ import PackageDetailPage from "@/components/package/PackageDetailPage"
 import Bookings from "./pages/Bookings"
 import Calendar from "./pages/Calendar"
 import { Profile } from "./pages/Profile"
+import Travelers from "./pages/Travelers"
 
 
 const rootRoute = createRootRoute({
@@ -82,6 +83,12 @@ const profileRoute = createRoute({
   component: Profile,
 })
 
+const travelersRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/travelers",
+  component: Travelers,
+})
+
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -107,6 +114,7 @@ const routeTree = rootRoute.addChildren([
     bookingsRoute,
     calendarRoute,
     profileRoute,
+    travelersRoute,
   ]),
 
   loginRoute,

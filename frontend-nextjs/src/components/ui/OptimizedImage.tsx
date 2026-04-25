@@ -50,18 +50,18 @@ export default function OptimizedImage({
     const fallbackOptimizedSrc = fallbackSrc ? getOptimizedImageUrl(fallbackSrc, width) : undefined;
     const optimizedSrc = error && fallbackOptimizedSrc ? fallbackOptimizedSrc : primarySrc;
 
-    // Cached images may already be complete before onLoad attaches.
-    useEffect(() => {
-        if (imgRef.current?.complete && imgRef.current.naturalWidth > 0) {
-            setLoaded(true);
-        }
-    }, [optimizedSrc]);
-
     // Reset state when source changes.
     useEffect(() => {
         setLoaded(false);
         setError(false);
     }, [src]);
+
+    // Cached images may already be complete before onLoad attaches.
+    useEffect(() => {
+        if (imgRef.current?.complete) {
+            setLoaded(true);
+        }
+    }, [optimizedSrc]);
 
     return (
         <div

@@ -3,9 +3,9 @@ import { Badge } from './ui/badge';
 import OptimizedImage from './ui/OptimizedImage';
 import goaImage from '../assets/landing-page/goa.jpg';
 import rajasthanImage from '../assets/landing-page/rajasthan.jpg';
-import kashmirImage from '../assets/landing-page/kashmir.jpg';
-import keralaImage from '../assets/landing-page/kerala.jpg';
-import andamanImage from '../assets/landing-page/andaman.jpg';
+import delhiImage from '../assets/landing-page/delhi.jpg';
+import kolkataImage from '../assets/landing-page/kolkata.jpg';
+import mumbaiImage from '../assets/landing-page/mumbai.jpg';
 
 const cities = [
     {
@@ -13,7 +13,7 @@ const cities = [
         query: 'delhi',
         hotels: '1,450+',
         description: 'Delhi, India’s capital territory, is a massive metropolitan area in the country’s north.',
-        image: andamanImage.src,
+        image: delhiImage.src,
     },
     {
         name: 'Goa, India',
@@ -34,14 +34,14 @@ const cities = [
         query: 'kolkata',
         hotels: '7,850+',
         description: 'The capital and largest city of the Indian state of West Bengal.',
-        image: keralaImage.src,
+        image: kolkataImage.src,
     },
     {
         name: 'Mumbai, India',
         query: 'Mumbai',
         hotels: '7,850+',
         description: 'Mumbai (formerly called Bombay) is a densely populated city on India’s west coast.',
-        image: kashmirImage.src,
+        image: mumbaiImage.src,
     }
 ];
 

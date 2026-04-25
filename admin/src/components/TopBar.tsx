@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Search, Bell, ChevronDown, Moon, Sun, User, Settings, CreditCard, LogOut } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
-import { Link, useNavigate } from "@tanstack/react-router"
+import { Link } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import {
@@ -19,7 +19,6 @@ export function TopBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: callbacks = [] } = useQuery({
@@ -39,10 +38,15 @@ export function TopBar() {
     }
   })
 
-  const handleNotificationClick = (req: any) => {
-    setSheetOpen(false)
-    navigate({ to: '/travelers' })
+  const handleNotificationClick = (e: React.MouseEvent, req: any) => {
+    // Stop propagation so this click doesn't bleed through the Sheet
+    // closing animation onto buttons on the underlying page
+    e.stopPropagation()
     if (!req.isRead) {
+      // Optimistically mark as read in the local cache immediately
+      queryClient.setQueryData(['callbacks'], (prev: any[]) =>
+        prev?.map((c) => c._id === req._id ? { ...c, isRead: true } : c) ?? []
+      )
       markAsReadMutation.mutate(req._id)
     }
   }
@@ -140,7 +144,7 @@ export function TopBar() {
                 return (
                   <div 
                     key={req._id} 
-                    onClick={() => handleNotificationClick(req)}
+                    onClick={(e) => handleNotificationClick(e, req)}
                     className={`flex flex-col gap-1.5 p-4 rounded-xl border transition-all shadow-sm cursor-pointer ${
                       isUnread 
                         ? 'bg-primary/5 border-primary/20 hover:bg-primary/10' 

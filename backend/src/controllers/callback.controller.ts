@@ -60,8 +60,8 @@ export const createCallbackRequest = async (req: Request, res: Response): Promis
 export const getGuideCallbacks = async (req: Request, res: Response): Promise<void> => {
     try {
         const user = (req as any).user;
-        // Fetch all callbacks for the admin panel regardless of user role for now
-        const callbacks = await CallbackRequest.find({})
+        const query = user.role === 'admin' ? {} : { guideId: user.id };
+        const callbacks = await CallbackRequest.find(query)
             .sort({ createdAt: -1 })
             .populate('tourPlanId', 'title locations')
             .lean();

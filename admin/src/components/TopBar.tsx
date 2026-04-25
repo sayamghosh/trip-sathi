@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Search, Bell, ChevronDown, Moon, Sun, User, Settings, CreditCard, LogOut } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
-import { Link } from "@tanstack/react-router"
+import { Link, useNavigate } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import {
@@ -19,6 +19,7 @@ export function TopBar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
 
   const { data: callbacks = [] } = useQuery({
@@ -42,6 +43,7 @@ export function TopBar() {
     // Stop propagation so this click doesn't bleed through the Sheet
     // closing animation onto buttons on the underlying page
     e.stopPropagation()
+
     if (!req.isRead) {
       // Optimistically mark as read in the local cache immediately
       queryClient.setQueryData(['callbacks'], (prev: any[]) =>
@@ -49,6 +51,14 @@ export function TopBar() {
       )
       markAsReadMutation.mutate(req._id)
     }
+
+    // Close the sheet first, then navigate after the close animation
+    // finishes (~300ms). This prevents the click event from bleeding
+    // through the Sheet onto buttons on the newly rendered page.
+    setSheetOpen(false)
+    setTimeout(() => {
+      navigate({ to: '/travelers' })
+    }, 300)
   }
 
   const unreadCount = callbacks.filter((c: any) => !c.isRead && c.status === 'pending').length

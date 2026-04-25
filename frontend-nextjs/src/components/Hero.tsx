@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
+import Image from 'next/image';
 import bannerImg from '../assets/banner-tripsathi.png';
 
 type SlideDirection = 'down' | 'up';
@@ -58,9 +59,17 @@ const Hero = () => {
             <div className="max-w-7xl mx-auto">
                 {/* Image Container with rounded corners */}
                 <div
-                    className="relative w-full mx-auto rounded-2xl sm:rounded-4xl overflow-hidden bg-no-repeat bg-center bg-cover h-112.5 sm:h-125 lg:h-137.5 flex flex-col items-center justify-center text-center shadow-xl sm:shadow-2xl"
-                    style={{ backgroundImage: `url(${bannerImg.src})` }}
+                    className="relative w-full mx-auto rounded-2xl sm:rounded-4xl overflow-hidden h-112.5 sm:h-125 lg:h-137.5 flex flex-col items-center justify-center text-center shadow-xl sm:shadow-2xl"
                 >
+                    <Image
+                        src={bannerImg}
+                        alt="Trip Sathi Hero Banner"
+                        fill
+                        priority
+                        placeholder="blur"
+                        quality={85}
+                        className="object-cover object-center absolute inset-0 z-0"
+                    />
                     {/* Dark overlay for better text readability */}
                     <div className="absolute inset-0 bg-black/20 sm:bg-black/10"></div>
 

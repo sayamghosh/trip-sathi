@@ -39,12 +39,26 @@ export function TopBar() {
     }
   })
 
-  const handleNotificationClick = (req: any) => {
-    setSheetOpen(false)
-    navigate({ to: '/travelers' })
+  const handleNotificationClick = (e: React.MouseEvent, req: any) => {
+    // Stop propagation so this click doesn't bleed through the Sheet
+    // closing animation onto buttons on the underlying page
+    e.stopPropagation()
+
     if (!req.isRead) {
+      // Optimistically mark as read in the local cache immediately
+      queryClient.setQueryData(['callbacks'], (prev: any[]) =>
+        prev?.map((c) => c._id === req._id ? { ...c, isRead: true } : c) ?? []
+      )
       markAsReadMutation.mutate(req._id)
     }
+
+    // Close the sheet first, then navigate after the close animation
+    // finishes (~300ms). This prevents the click event from bleeding
+    // through the Sheet onto buttons on the newly rendered page.
+    setSheetOpen(false)
+    setTimeout(() => {
+      navigate({ to: '/travelers' })
+    }, 300)
   }
 
   const unreadCount = callbacks.filter((c: any) => !c.isRead && c.status === 'pending').length
@@ -140,7 +154,7 @@ export function TopBar() {
                 return (
                   <div 
                     key={req._id} 
-                    onClick={() => handleNotificationClick(req)}
+                    onClick={(e) => handleNotificationClick(e, req)}
                     className={`flex flex-col gap-1.5 p-4 rounded-xl border transition-all shadow-sm cursor-pointer ${
                       isUnread 
                         ? 'bg-primary/5 border-primary/20 hover:bg-primary/10' 

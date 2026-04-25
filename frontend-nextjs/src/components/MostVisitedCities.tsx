@@ -1,11 +1,11 @@
 import Link from 'next/link';
 import { Badge } from './ui/badge';
 import OptimizedImage from './ui/OptimizedImage';
-import goaImage from '../assets/lading-page/goa.jpg';
-import rajasthanImage from '../assets/lading-page/rajasthan.jpg';
-import kashmirImage from '../assets/lading-page/kashmir.jpg';
-import keralaImage from '../assets/lading-page/kerala.jpg';
-import andamanImage from '../assets/lading-page/andaman.jpg';
+import goaImage from '../assets/landing-page/goa.jpg';
+import rajasthanImage from '../assets/landing-page/rajasthan.jpg';
+import kashmirImage from '../assets/landing-page/kashmir.jpg';
+import keralaImage from '../assets/landing-page/kerala.jpg';
+import andamanImage from '../assets/landing-page/andaman.jpg';
 
 const cities = [
     {

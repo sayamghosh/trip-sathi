@@ -4,14 +4,14 @@ import { useRef } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import OptimizedImage from './ui/OptimizedImage';
-import andamanImage from '../assets/lading-page/andaman.jpg';
-import goaImage from '../assets/lading-page/goa.jpg';
-import kashmirImage from '../assets/lading-page/kashmir.jpg';
-import keralaImage from '../assets/lading-page/kerala.jpg';
-import munnarImage from '../assets/lading-page/munnar.jpg';
-import ootyImage from '../assets/lading-page/ooty.jpg';
-import rajasthanImage from '../assets/lading-page/rajasthan.jpg';
-import sikkimImage from '../assets/lading-page/sikkim.jpg';
+import andamanImage from '../assets/landing-page/andaman.jpg';
+import goaImage from '../assets/landing-page/goa.jpg';
+import kashmirImage from '../assets/landing-page/kashmir.jpg';
+import keralaImage from '../assets/landing-page/kerala.jpg';
+import munnarImage from '../assets/landing-page/munnar.jpg';
+import ootyImage from '../assets/landing-page/ooty.jpg';
+import rajasthanImage from '../assets/landing-page/rajasthan.jpg';
+import sikkimImage from '../assets/landing-page/sikkim.jpg';
 
 // Destination cards backed by local bundled assets
 const destinations = [

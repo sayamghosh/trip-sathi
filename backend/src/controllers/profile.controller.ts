@@ -2,10 +2,10 @@ import type { Request, Response } from 'express';
 import User from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 
-// ─── Update guide profile (phone + address) ──────────────────────────────────
+// ─── Update guide profile ────────────────────────────────────────────────────
 export const updateGuideProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { phone, address } = req.body;
+        const { name, phone, address, bio } = req.body;
 
         // The user ID comes from the JWT middleware (set as req.user in middleware)
         const userInReq = (req as any).user;
@@ -20,9 +20,22 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
             return;
         }
 
+        const updates: { name?: string; phone: string; address: string; bio?: string } = {
+            phone,
+            address,
+        };
+
+        if (typeof name === 'string' && name.trim()) {
+            updates.name = name.trim();
+        }
+
+        if (typeof bio === 'string') {
+            updates.bio = bio.trim();
+        }
+
         const user = await User.findByIdAndUpdate(
             userId,
-            { phone, address },
+            updates,
             { returnDocument: 'after' }
         );
 
@@ -41,6 +54,7 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
                 role: user.role,
                 phone: user.phone,
                 address: user.address,
+                bio: user.bio,
             },
         });
     } catch (error: any) {

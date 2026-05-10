@@ -57,6 +57,7 @@ export const searchTourPlans = async (destination: string): Promise<TourPlanSumm
 
 const tourPlanService = {
     createTourPlan,
+    getAllTourPlans,
     getTourPlansByGuide,
     getTourPlanById,
     updateTourPlan,

@@ -4,7 +4,7 @@ import Providers from "./providers";
 import ClientShell from "./client-shell";
 
 export const metadata: Metadata = {
-  title: "Trip Sathi",
+  title: "Tripsathi",
   description: "Discover local guides and curated travel experiences.",
 };
 

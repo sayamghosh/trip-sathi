@@ -75,8 +75,8 @@ const Hero = () => {
 
                     {/* Content over image */}
                     <div className="relative z-10 w-full px-4 sm:px-6 flex flex-col items-center">
-                        <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-[64px] mb-6 sm:mb-8 font-display tracking-wide font-light leading-tight">
-                            Discovery&Beyond
+                        <h1 className="text-white text-[32px] sm:text-[48px] lg:text-[56px] mb-6 sm:mb-8 font-medium leading-[1.1] tracking-[-0.04em]">
+                            Discovery & Beyond
                         </h1>
 
                         {/* Search Bar Wrapper */}
@@ -137,10 +137,10 @@ const Hero = () => {
 
                 {/* Bottom Text Area */}
                 <div className="mt-3 sm:mt-4 text-center max-w-3xl mx-auto px-2 sm:px-0">
-                    <h2 className="text-2xl sm:text-3xl md:text-[32px] font-bold text-gray-800 mb-2 sm:mb-3 tracking-tight">
+                    <h2 className="text-[24px] sm:text-[32px] lg:text-[40px] font-medium text-gray-800 mb-2 sm:mb-3 tracking-[-0.03em]">
                         Unforgettable Trips & Unbeatable Prices
                     </h2>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+                    <p className="text-gray-600 text-[14px] lg:text-[16px] font-normal leading-relaxed">
                         Browse thousands of tour packages created by certified local guides.<br className="hidden sm:block" />
                         <span className="sm:hidden"> </span>No middleman commissions—just direct connections.
                     </p>

@@ -344,7 +344,7 @@ export default function AboutPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="mx-auto max-w-[1512px] px-2 pb-2">
+      <section className="mx-auto max-w-[1504px] px-2 pb-3 mt-8">
         <div className="relative overflow-hidden rounded-[20px] bg-[#f5f5f5]">
           <div className="absolute inset-0">
             <ImageTile src={destinations[7].image} alt="Travel CTA background" className="opacity-20 grayscale" />

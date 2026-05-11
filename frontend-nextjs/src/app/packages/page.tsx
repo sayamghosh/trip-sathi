@@ -191,7 +191,7 @@ export default function PackagesPage() {
                 )}
             </section>
 
-            <section className="mx-auto max-w-[1504px] px-2 pb-2 mt-8">
+            <section className="mx-auto max-w-[1504px] px-2 pb-3 mt-8">
                 <div className="relative flex min-h-[430px] items-center justify-center overflow-hidden rounded-[20px] bg-[#9d9d9d] text-center text-white">
                     <img src={destinations[4].image} alt="Travel stay" className="absolute inset-0 h-full w-full object-cover opacity-35 grayscale" />
                     <div className="absolute inset-0 bg-[#777]/45" />

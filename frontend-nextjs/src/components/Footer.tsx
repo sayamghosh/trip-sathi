@@ -3,11 +3,11 @@ const BECOME_TRAVEL_AGENT_URL =
 
 const Footer = () => {
     return (
-        <footer className="w-[1512px] px-1 sm:px-2 lg:px-3 pb-2 mx-auto">
+        <footer className="w-full max-w-[1512px] px-2 pb-3 mx-auto">
             <div className="w-full bg-[#1452D9] rounded-[20px] text-white overflow-hidden">
                 <div className="px-6 sm:px-8 lg:px-12 pt-10 lg:pt-14 pb-8">
                     {/* TOP SECTION */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-14">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14">
                         {/* LEFT SECTION */}
                         <div className="lg:col-span-5 flex flex-col justify-between">
                             <div>
@@ -15,7 +15,7 @@ const Footer = () => {
                                     tripsathi
                                 </h2>
 
-                                <h3 className="text-[32px] sm:text-[40px] leading-[1.1] font-medium max-w-[520px]">
+                                <h3 className="text-[24px] sm:text-[32px] lg:text-[40px] leading-[1.1] font-medium max-w-[520px]">
                                     Get Fresh Deals & Travel Tips in Your Inbox
                                 </h3>
                             </div>
@@ -36,7 +36,7 @@ const Footer = () => {
 
                         {/* RIGHT SECTION */}
                         <div className="lg:col-span-6 lg:col-start-7">
-                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-10">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-10 sm:gap-10">
                                 {/* COLUMN 1 */}
                                 <div>
                                     <h4 className="text-white font-medium mb-6">TripSathi</h4>

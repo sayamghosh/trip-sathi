@@ -240,7 +240,7 @@ export default function GalleryPage() {
       )}
 
       {/* CTA Section (from About page) */}
-      <section className="mx-auto max-w-[1504px] px-2 pb-2 mt-8">
+      <section className="mx-auto max-w-[1504px] px-2 pb-3 mt-8">
         <div className="relative overflow-hidden rounded-[20px] bg-[#333]">
           <div className="absolute inset-0">
             <ImageTile src={galleryImages[0].image} alt="Travel CTA background" className="opacity-40" />

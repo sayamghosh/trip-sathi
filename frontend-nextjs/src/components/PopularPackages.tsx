@@ -150,7 +150,7 @@ const PopularPackages = ({ initialPlans }: PopularPackagesProps) => {
                         <h3 className="text-brand-primary font-semibold uppercase tracking-wider mb-2">Best Selling</h3>
                         <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 font-display">Popular Tour Packages</h2>
                     </div>
-                    <Link href="/guides" className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all">
+                    <Link href="/packages" className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all">
                         View All Packages <ArrowRight size={20} />
                     </Link>
                 </div>

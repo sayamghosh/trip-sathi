@@ -48,6 +48,7 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
                 role: user.role,
                 phone: user.phone,
                 address: user.address,
+                bio: user.bio,
             }
         });
     } catch (error: any) {
@@ -96,7 +97,7 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
             // Existing user — upgrade to guide and sync profile/contact info if missing
             user.role = 'guide';
             user.picture = picture || user.picture;
-            user.name = name || user.name;
+            user.name = user.name || name || '';
 
             if (needsContact) {
                 user.phone = trimmedPhone;
@@ -119,6 +120,7 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 role: user.role,
                 phone: user.phone,
                 address: user.address,
+                bio: user.bio,
             }
         });
     } catch (error: any) {

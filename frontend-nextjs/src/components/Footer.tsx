@@ -1,92 +1,169 @@
-
+const BECOME_TRAVEL_AGENT_URL =
+    process.env.NEXT_PUBLIC_ADMIN_APP_URL || "http://localhost:3001/login";
 
 const Footer = () => {
     return (
-        <footer className="w-full bg-[#f8fafc] sm:bg-transparent p-0 sm:p-6 lg:p-8">
-            <div className="max-w-[90rem] mx-auto bg-[#1351D8] sm:rounded-3xl p-8 md:p-14 lg:p-16 text-white overflow-hidden">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8">
-                    {/* Left Section */}
-                    <div className="lg:col-span-5 flex flex-col justify-between">
-                        <div className="text-xl font-bold mb-8 lg:mb-12">Trip Sathi</div>
-                        <div>
-                            <h2 className="text-3xl md:text-[2.5rem] font-medium mb-4 leading-tight">
-                                Get Fresh Deals & Travel Tips<br className="hidden md:block" /> in Your Inbox
-                            </h2>
-                            <p className="text-white/80 mb-8 max-w-md text-sm md:text-base leading-relaxed">
-                                Be the first to know about flash sales, new packages,<br className="hidden md:block" /> and destination ideas.
-                            </p>
-                            
-                            <div className="flex flex-col sm:flex-row gap-3">
-                                <input 
-                                    type="email" 
-                                    placeholder="Enter your email" 
-                                    className="bg-[#306CE6] text-white placeholder-white/80 rounded-full px-6 py-3.5 w-full sm:w-[280px] outline-none focus:ring-2 focus:ring-white/50 text-sm"
+        <footer className="w-[1512px] px-1 sm:px-2 lg:px-3 pb-2 mx-auto">
+            <div className="w-full bg-[#1452D9] rounded-[20px] text-white overflow-hidden">
+                <div className="px-6 sm:px-8 lg:px-12 pt-10 lg:pt-14 pb-8">
+                    {/* TOP SECTION */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-14">
+                        {/* LEFT SECTION */}
+                        <div className="lg:col-span-5 flex flex-col justify-between">
+                            <div>
+                                <h2 className="text-[20px] font-semibold tracking-tight mb-12">
+                                    tripsathi
+                                </h2>
+
+                                <h3 className="text-[32px] sm:text-[40px] leading-[1.1] font-medium max-w-[520px]">
+                                    Get Fresh Deals & Travel Tips in Your Inbox
+                                </h3>
+                            </div>
+
+                            {/* SUBSCRIBE */}
+                            <div className="mt-10 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    className="w-full sm:w-[320px] h-[52px] rounded-full bg-[#2E69E3] px-6 text-white placeholder:text-white/70 outline-none border border-white/10 focus:border-white/40"
                                 />
-                                <button className="bg-white text-gray-900 font-medium rounded-full px-8 py-3.5 hover:bg-gray-100 transition-colors whitespace-nowrap text-sm">
+
+                                <button className="h-[52px] px-8 rounded-full bg-white text-black font-medium cursor-pointer hover:bg-neutral-200">
                                     Subscribe
                                 </button>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Right Section - Links */}
-                    <div className="lg:col-span-6 lg:col-start-7 pt-2 lg:pt-0">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
-                            <div>
-                                <h4 className="font-semibold text-white mb-6">Trip Sathi</h4>
-                                <ul className="space-y-4 text-white/80 text-sm">
-                                    <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">How It Works</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Press & Media</a></li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-white mb-6">Explore</h4>
-                                <ul className="space-y-4 text-white/80 text-sm">
-                                    <li><a href="#" className="hover:text-white transition-colors">Destinations</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Hotels</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Packages</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Experiences</a></li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-white mb-6">Support</h4>
-                                <ul className="space-y-4 text-white/80 text-sm">
-                                    <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Payment & Refunds</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Terms & Conditions</a></li>
-                                    <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-                                </ul>
+                        {/* RIGHT SECTION */}
+                        <div className="lg:col-span-6 lg:col-start-7">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-10">
+                                {/* COLUMN 1 */}
+                                <div>
+                                    <h4 className="text-white font-medium mb-6">TripSathi</h4>
+
+                                    <ul className="space-y-4 text-white/75 text-sm">
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                About Us
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                How It Works
+                                            </a>
+                                        </li>
+
+                                        <li><a href={BECOME_TRAVEL_AGENT_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Become a Agent</a></li>
+                                    </ul>
+                                </div>
+
+                                {/* COLUMN 2 */}
+                                <div>
+                                    <h4 className="text-white font-medium mb-6">Explore</h4>
+
+                                    <ul className="space-y-4 text-white/75 text-sm">
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Destinations
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Packages
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Experiences
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                {/* COLUMN 3 */}
+                                <div>
+                                    <h4 className="text-white font-medium mb-6">Support</h4>
+
+                                    <ul className="space-y-4 text-white/75 text-sm">
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Help Center
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Contact Us
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Terms & Conditions
+                                            </a>
+                                        </li>
+
+                                        <li>
+                                            <a href="#" className="hover:text-white transition-all">
+                                                Privacy Policy
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <hr className="my-10 lg:my-12 border-[#306CE6]" />
+                    {/* DIVIDER */}
+                    <div className="w-full h-[1px] bg-white/15 my-10 lg:my-12" />
 
-                <div className="flex flex-col md:flex-row justify-between gap-8 md:items-start">
-                    <div>
-                        <h4 className="font-semibold text-white mb-4">Contact</h4>
-                        <div className="text-white/80 text-sm space-y-2">
-                            <p className="flex flex-wrap items-center gap-2">
-                                Kolkata, Madhyamgram - 700132. 
-                                <span className="hidden sm:inline opacity-50">•</span> 
-                                support@tripsathi.com
-                            </p>
-                            <p>+62 21 0000 1234</p>
+                    {/* BOTTOM SECTION */}
+                    <div className="flex flex-col lg:flex-row justify-between gap-10">
+                        {/* CONTACT */}
+                        <div>
+                            <h4 className="font-medium mb-5">Contact</h4>
+
+                            <div className="space-y-3 text-sm text-white/75">
+                                <div className="flex gap-3 items-center flex-wrap">
+                                    <p>1, Madhyamgram, Kolkata - 700132</p>
+                                    <span className="opacity-40">•</span>
+                                    <p>support@tripsathi.com</p>
+                                </div>
+
+                                <p>+91 91X XXX XXX0</p>
+                            </div>
                         </div>
-                    </div>
-                    <div>
-                        <h4 className="font-semibold text-white mb-4">Social</h4>
-                        <div className="text-white/80 text-sm flex flex-wrap items-center gap-2 sm:gap-3">
-                            <a href="#" className="hover:text-white transition-colors">Facebook</a>
-                            <span className="opacity-50">•</span>
-                            <a href="#" className="hover:text-white transition-colors">Instagram</a>
-                            <span className="opacity-50">•</span>
-                            <a href="#" className="hover:text-white transition-colors">X</a>
-                            <span className="opacity-50">•</span>
-                            <a href="#" className="hover:text-white transition-colors">YouTube</a>
+
+                        {/* SOCIAL */}
+                        <div>
+                            <h4 className="font-medium mb-5">Social</h4>
+
+                            <div className="flex flex-wrap items-center gap-4 text-sm text-white/75">
+                                <a href="#" className="hover:text-white transition-all">
+                                    Facebook
+                                </a>
+
+                                <span className="opacity-40">•</span>
+
+                                <a href="#" className="hover:text-white transition-all">
+                                    Instagram
+                                </a>
+
+                                <span className="opacity-40">•</span>
+
+                                <a href="#" className="hover:text-white transition-all">
+                                    X
+                                </a>
+
+                                <span className="opacity-40">•</span>
+
+                                <a href="#" className="hover:text-white transition-all">
+                                    YouTube
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

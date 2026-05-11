@@ -1,5 +1,5 @@
 /* Google Font must be first */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
 
 @import "tailwindcss";
 
@@ -9,12 +9,42 @@
   --color-brand-dark: #0C4A6E;
   --color-brand-light: #F0F9FF;
 
-  --font-display: "Manrope", sans-serif;
+  --font-display: "DM Sans", sans-serif;
 }
 
 @layer base {
   html {
-    font-family: "Manrope", sans-serif;
+    font-family: "DM Sans", sans-serif;
+    color: #202124;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1 {
+    @apply text-[32px] lg:text-[56px] font-medium leading-[1.1] tracking-[-0.04em];
+  }
+
+  h2 {
+    @apply text-[24px] lg:text-[40px] font-medium leading-[1.1] tracking-[-0.03em];
+  }
+
+  h3 {
+    @apply text-[20px] lg:text-[28px] font-medium leading-[1.2] tracking-[-0.02em];
+  }
+
+  h4 {
+    @apply text-[18px] lg:text-[24px] font-medium leading-[1.2];
+  }
+
+  h5 {
+    @apply text-[16px] lg:text-[20px] font-medium leading-[1.2];
+  }
+
+  h6 {
+    @apply text-[14px] lg:text-[16px] font-medium leading-[1.2];
+  }
+
+  p {
+    @apply text-[14px] lg:text-[16px] font-normal leading-[1.6];
   }
 }
 
@@ -77,4 +107,37 @@ html.lenis body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
   /* Chrome/Safari */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes marquee-reverse {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-reverse {
+  animation: marquee-reverse 35s linear infinite;
+}
+
+.group:hover .animate-marquee,
+.group:hover .animate-marquee-reverse {
+  animation-play-state: paused !important;
 }

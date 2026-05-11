@@ -49,10 +49,10 @@ const Navbar = () => {
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/about" className="text-sm font-semibold text-gray-800 hover:text-brand-primary transition-colors">About</Link>
-            <a href="#" className="text-sm font-semibold  text-gray-800 hover:text-brand-primary transition-colors">Gallery</a>
-            <a href="#" className="text-sm font-semibold  text-gray-800 hover:text-brand-primary transition-colors">Packages</a>
-            <a href="#" className="text-sm font-semibold  text-gray-800 hover:text-brand-primary transition-colors">Blog</a>
+            <Link href="/about" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">About</Link>
+            <Link href="/gallery" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">Gallery</Link>
+            <Link href="/packages" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">Packages</Link>
+            {/* <Link href="/" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">Blog</Link> */}
           </div>
 
           {/* Action Buttons */}
@@ -145,9 +145,9 @@ const Navbar = () => {
           >
             <div className="px-6 pt-4 pb-8 space-y-4">
               <Link href="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>About</Link>
-              <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Gallery</a>
-              <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Packages</a>
-              <a href="#" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Blog</a>
+              <Link href="/gallery" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Gallery</Link>
+              <Link href="/packages" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Packages</Link>
+              {/* <Link href="/" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Blog</Link> */}
               {isAuthenticated && user?.role === 'guide' ? (
                 <Link href="/guide/dashboard" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Guide Dashboard</Link>
               ) : !isAuthenticated ? (

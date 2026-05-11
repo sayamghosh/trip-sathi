@@ -1,25 +1,62 @@
-import { useState, useEffect } from "react"
-import { Camera, Mail, Phone, MapPin, Building, Shield, Bell, Key, Loader2, Edit3, Image as ImageIcon } from "lucide-react"
+import type { ReactNode } from "react"
+import { useEffect, useState } from "react"
+import {
+  BadgeCheck,
+  Camera,
+  Check,
+  Edit3,
+  Image as ImageIcon,
+  Loader2,
+  Mail,
+  MapPin,
+  Phone,
+  Shield,
+  Sparkles,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import api from "@/lib/axios"
+
+type ProfileUser = {
+  id?: string
+  name: string
+  picture: string
+  role: string
+  email?: string
+  phone?: string
+  address?: string
+  bio?: string
+}
+
+const DEFAULT_BIO = "Senior Administrator managing global travel operations. Passionate about ensuring seamless travel experiences."
 
 export function Profile() {
-  const [user, setUser] = useState<{ name: string; picture: string; role: string; email?: string } | null>(null)
+  const [user, setUser] = useState<ProfileUser | null>(() => {
+    const storedUser = localStorage.getItem("user")
+    return storedUser ? JSON.parse(storedUser) : null
+  })
   const [isLoading, setIsLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState("general")
+  const [isSaving, setIsSaving] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [saveError, setSaveError] = useState("")
+  const [fullName, setFullName] = useState(() => user?.name || "")
+  const [phone, setPhone] = useState(() => user?.phone || "")
+  const [address, setAddress] = useState(() => user?.address || "")
+  const [bio, setBio] = useState(() => user?.bio || DEFAULT_BIO)
 
   useEffect(() => {
-    // Simulating data fetch
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-    setTimeout(() => setIsLoading(false), 600)
+    const timer = window.setTimeout(() => setIsLoading(false), 600)
+    return () => window.clearTimeout(timer)
   }, [])
 
   const getInitials = (name: string) => {
     if (!name) return "RH"
-    return name.split(" ").map((n) => n[0]).join("").substring(0, 2).toUpperCase()
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .substring(0, 2)
+      .toUpperCase()
   }
 
   if (isLoading) {
@@ -27,204 +64,242 @@ export function Profile() {
       <div className="flex h-[70vh] items-center justify-center rounded-[24px] border border-dashed border-border bg-card/60 backdrop-blur-sm">
         <div className="flex items-center gap-3 text-secondary-foreground">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          <span>Loading profile…</span>
+          <span>Loading profile...</span>
         </div>
       </div>
     )
   }
 
+  const name = fullName || user?.name || "Ruben Herwitz"
+  const role = user?.role || "Administrator"
+  const email = user?.email || "admin@tripsathi.com"
+  const displayAddress = address || "Location not added"
+  const canSave = isEditing && Boolean(fullName.trim() && phone.trim() && address.trim() && !isSaving)
+
+  const handleSaveChanges = async () => {
+    if (!canSave) return
+
+    try {
+      setIsSaving(true)
+      setSaveError("")
+      const response = await api.patch("/api/profile/guide", {
+        name: fullName.trim(),
+        phone: phone.trim(),
+        address: address.trim(),
+        bio: bio.trim(),
+      })
+      const updatedUser = response.data.user as ProfileUser
+      setUser(updatedUser)
+      setFullName(updatedUser.name || "")
+      setPhone(updatedUser.phone || "")
+      setAddress(updatedUser.address || "")
+      setBio(updatedUser.bio || DEFAULT_BIO)
+      localStorage.setItem("user", JSON.stringify(updatedUser))
+      setIsEditing(false)
+    } catch (error) {
+      console.error("Profile save failed:", error)
+      setSaveError("Could not save your changes. Please try again.")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleEditButtonClick = () => {
+    if (isEditing) {
+      void handleSaveChanges()
+      return
+    }
+
+    setSaveError("")
+    setIsEditing(true)
+  }
+
+  const editableInputClass = isEditing
+    ? "border-border bg-background text-foreground focus:border-primary focus:ring-4 focus:ring-primary/15"
+    : "cursor-default border-border/80 bg-background/40 text-foreground"
+
+  const profileStats = [
+    { label: "Profile health", value: "96%", detail: "Ready for review" },
+    { label: "Response time", value: "8m", detail: "Top performer" },
+    { label: "Trust score", value: "4.9", detail: "Verified admin" },
+  ]
+
   return (
-    <div className="space-y-8 pb-12 w-full max-w-7xl mx-auto">
-      {/* Header section with gradient cover */}
-      <div className="relative rounded-[24px] bg-card border border-border shadow-sm overflow-hidden">
-        {/* Cover Background */}
-        <div className="h-48 w-full bg-linear-to-r from-primary/80 via-primary to-[#818CF8] relative cursor-pointer group">
-          <div className="absolute inset-0 bg-black/10 transition-colors group-hover:bg-black/20" />
-          <Button variant="secondary" size="sm" className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 text-white border-none shadow-sm backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity">
-            <ImageIcon className="h-4 w-4 mr-2" />
+    <div className="mx-auto w-full max-w-[1320px] space-y-6 pb-10">
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-card/50 shadow-sm backdrop-blur-sm">
+        <div className="group relative min-h-[290px] bg-linear-to-br from-[#1d4ed8] via-primary to-[#7c3aed] p-6 sm:p-8">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_25%,rgba(255,255,255,0.22),transparent_28%),radial-gradient(circle_at_78%_8%,rgba(255,255,255,0.16),transparent_24%)]" />
+          <Button variant="secondary" size="sm" className="absolute right-5 top-5 z-10 h-9 rounded-full border-white/20 bg-white/15 px-4 text-white shadow-sm backdrop-blur-md hover:bg-white/25">
+            <ImageIcon className="mr-2 h-4 w-4" />
             Change Cover
           </Button>
-        </div>
 
-        {/* Profile Info Overlay */}
-        <div className="px-8 pb-8 relative">
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-16 sm:-mt-20">
-            {/* Avatar */}
-            <div className="relative group">
-              <div className="h-32 w-32 rounded-full border-4 border-card bg-card overflow-hidden shadow-xl">
+          <div className="relative z-10 mt-14 grid gap-6 lg:grid-cols-[auto_1fr_auto] lg:items-end">
+            <div className="group/avatar relative justify-self-center lg:justify-self-start">
+              <div className="h-36 w-36 overflow-hidden rounded-full border-[6px] border-white/25 bg-card shadow-2xl shadow-black/30">
                 {user?.picture ? (
                   <img src={user.picture} alt="Profile" className="h-full w-full object-cover" />
                 ) : (
-                  <div className="h-full w-full bg-linear-to-br from-primary to-[#818CF8] flex items-center justify-center">
-                    <span className="text-[40px] font-bold text-white">{getInitials(user?.name || "Ruben Herwitz")}</span>
+                  <div className="flex h-full w-full items-center justify-center bg-linear-to-br from-primary to-[#818CF8]">
+                    <span className="text-[44px] font-extrabold text-white">{getInitials(name)}</span>
                   </div>
                 )}
               </div>
-              <button className="absolute bottom-2 right-2 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg hover:scale-105 transition-transform">
+              <button className="absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full border-4 border-white/20 bg-primary text-white shadow-lg transition-all hover:scale-105 hover:bg-primary/90">
                 <Camera className="h-4 w-4" />
               </button>
             </div>
 
-            {/* Info details */}
-            <div className="flex-1 text-center sm:text-left mb-2">
-              <h1 className="text-[28px] font-extrabold text-foreground tracking-tight">{user?.name || "Ruben Herwitz"}</h1>
-              <p className="text-[14px] font-medium text-primary mt-1 flex items-center justify-center sm:justify-start gap-2">
-                <Shield className="h-4 w-4" />
-                {user?.role || "Administrator"}
-              </p>
+            <div className="min-w-0 text-center text-white lg:text-left">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-[12px] font-extrabold uppercase tracking-[0.22em] text-white/90 backdrop-blur-md">
+                <Sparkles className="h-3.5 w-3.5" />
+                Admin Agent Profile
+              </div>
+              <h1 className="text-[36px] font-black leading-tight tracking-tight sm:text-[44px]">{name}</h1>
+              <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-[14px] font-bold text-white/85 lg:justify-start">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
+                  <Shield className="h-4 w-4" />
+                  {role}
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
+                  <BadgeCheck className="h-4 w-4" />
+                  Verified
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
+                  <MapPin className="h-4 w-4" />
+                  {displayAddress}
+                </span>
+              </div>
             </div>
-            
-            {/* Actions */}
-            <div className="flex gap-3 mb-2">
-              <Button variant="outline" className="h-10 px-6 rounded-xl border-border font-bold text-[13px]">View Public Profile</Button>
-              <Button className="h-10 px-6 rounded-xl bg-primary hover:bg-primary/90 text-white font-bold shadow-primary/20 shadow-lg text-[13px]">Save Changes</Button>
+
+            <div className="hidden lg:block" />
+          </div>
+        </div>
+
+        <div className="grid gap-px bg-border/70 sm:grid-cols-3">
+          {profileStats.map((stat) => (
+            <div key={stat.label} className="bg-card px-6 py-5">
+              <p className="text-[11px] font-extrabold uppercase tracking-[0.22em] text-muted-foreground">{stat.label}</p>
+              <div className="mt-2 flex items-end gap-3">
+                <span className="text-3xl font-black tracking-tight text-foreground">{stat.value}</span>
+                <span className="pb-1 text-[13px] font-bold text-primary">{stat.detail}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="min-h-[400px]">
+        <div className="rounded-3xl border border-border bg-card/50 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <div className="mb-8 flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-foreground">Personal Information</h2>
+              <p className="mt-1 text-[13px] font-medium text-muted-foreground">Update your personal details and how others see you.</p>
+            </div>
+            <Button
+              variant={isEditing ? "default" : "outline"}
+              size="icon"
+              onClick={handleEditButtonClick}
+              disabled={isSaving || (isEditing && !canSave)}
+              className="h-10 w-10 rounded-full bg-background text-muted-foreground hover:text-primary data-[variant=default]:bg-primary data-[variant=default]:text-white data-[variant=default]:hover:bg-primary/90"
+              title={isEditing ? "Save personal information" : "Edit personal information"}
+            >
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : isEditing ? <Check className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
+            </Button>
+          </div>
+
+          {isEditing && (
+            <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-[13px] font-bold text-primary">
+              Editing is enabled. Click the check button to keep your updates.
+            </div>
+          )}
+
+          {saveError && (
+            <div className="mb-6 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-[13px] font-bold text-destructive">
+              {saveError}
+            </div>
+          )}
+
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <ProfileField label="Full Name">
+                <input
+                  type="text"
+                  value={fullName}
+                  readOnly={!isEditing}
+                  onChange={(event) => setFullName(event.target.value)}
+                  className={`h-12 w-full rounded-2xl border px-4 text-[14px] font-bold outline-none transition-all ${editableInputClass}`}
+                />
+              </ProfileField>
+
+              <ProfileField label="Email Address">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="email"
+                    value={email}
+                    readOnly
+                    aria-readonly="true"
+                    title="Email is managed by your Google account"
+                    className="h-12 w-full cursor-not-allowed rounded-2xl border border-border bg-muted/60 pl-10 pr-32 text-[14px] font-bold text-muted-foreground outline-none"
+                  />
+                  <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[11px] font-extrabold text-primary">
+                    Google account
+                  </span>
+                </div>
+              </ProfileField>
+
+              <ProfileField label="Phone Number">
+                <div className="relative">
+                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="tel"
+                    value={phone}
+                    readOnly={!isEditing}
+                    onChange={(event) => setPhone(event.target.value)}
+                    placeholder="Add phone number"
+                    className={`h-12 w-full rounded-2xl border pl-10 pr-4 text-[14px] font-bold outline-none transition-all placeholder:text-muted-foreground/60 ${editableInputClass}`}
+                  />
+                </div>
+              </ProfileField>
+
+              <ProfileField label="Location">
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={address}
+                    readOnly={!isEditing}
+                    onChange={(event) => setAddress(event.target.value)}
+                    placeholder="Add location"
+                    className={`h-12 w-full rounded-2xl border pl-10 pr-4 text-[14px] font-bold outline-none transition-all placeholder:text-muted-foreground/60 ${editableInputClass}`}
+                  />
+                </div>
+              </ProfileField>
+            </div>
+
+            <div className="mt-6 space-y-2 border-t border-border pt-6">
+              <label className="text-[12px] font-bold uppercase tracking-wider text-foreground/70">Bio</label>
+              <textarea
+                rows={4}
+                value={bio}
+                readOnly={!isEditing}
+                onChange={(event) => setBio(event.target.value)}
+                className={`min-h-32 w-full resize-none rounded-2xl border p-4 text-[14px] font-bold leading-6 outline-none transition-all ${editableInputClass}`}
+              />
             </div>
           </div>
         </div>
       </div>
+    </div>
+  )
+}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-        {/* Sidebar Nav */}
-        <aside className="space-y-2">
-          <button 
-            onClick={() => setActiveTab("general")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all ${activeTab === 'general' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}
-          >
-            <Building className="h-5 w-5" />
-            General Info
-          </button>
-          <button 
-            onClick={() => setActiveTab("security")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all ${activeTab === 'security' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}
-          >
-            <Key className="h-5 w-5" />
-            Security
-          </button>
-          <button 
-            onClick={() => setActiveTab("notifications")}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[14px] font-semibold transition-all ${activeTab === 'notifications' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}
-          >
-            <Bell className="h-5 w-5" />
-            Notifications
-          </button>
-        </aside>
-
-        {/* Content Area */}
-        <div className="min-h-[400px]">
-          {activeTab === "general" && (
-            <div className="rounded-[24px] border border-border bg-card p-8 shadow-sm">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-[20px] font-extrabold text-foreground">Personal Information</h2>
-                  <p className="text-[13px] text-muted-foreground mt-1">Update your personal details and how others see you.</p>
-                </div>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                  <Edit3 className="h-4 w-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* First Name */}
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">Full Name</label>
-                    <div className="relative">
-                      <input 
-                        type="text" 
-                        defaultValue={user?.name || "Ruben Herwitz"}
-                        className="w-full h-11 px-4 rounded-xl border border-border bg-background text-[14px] font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Email */}
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">Email Address</label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        <Mail className="h-4 w-4" />
-                      </div>
-                      <input 
-                        type="email" 
-                        defaultValue={user?.email || "admin@tripsathi.com"}
-                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background text-[14px] font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Phone */}
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">Phone Number</label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        <Phone className="h-4 w-4" />
-                      </div>
-                      <input 
-                        type="tel" 
-                        defaultValue="+91 98765 43210"
-                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background text-[14px] font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Location */}
-                  <div className="space-y-2">
-                    <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">Location</label>
-                    <div className="relative">
-                      <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                        <MapPin className="h-4 w-4" />
-                      </div>
-                      <input 
-                        type="text" 
-                        defaultValue="Mumbai, India"
-                        className="w-full h-11 pl-10 pr-4 rounded-xl border border-border bg-background text-[14px] font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bio */}
-                <div className="space-y-2 pt-4 border-t border-border mt-6">
-                  <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">Bio</label>
-                  <textarea 
-                    rows={4}
-                    defaultValue="Senior Administrator managing global travel operations. Passionate about ensuring seamless travel experiences."
-                    className="w-full p-4 rounded-xl border border-border bg-background text-[14px] font-medium text-foreground focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all resize-none"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "security" && (
-            <div className="rounded-[24px] border border-border bg-card p-8 shadow-sm">
-              <h2 className="text-[20px] font-extrabold text-foreground mb-1">Security Settings</h2>
-              <p className="text-[13px] text-muted-foreground mb-8">Manage your password and security preferences.</p>
-              
-              <div className="max-w-md space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">Current Password</label>
-                  <input type="password" placeholder="••••••••" className="w-full h-11 px-4 rounded-xl border border-border bg-background text-[14px] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-[12px] font-bold text-foreground/70 uppercase tracking-wider">New Password</label>
-                  <input type="password" placeholder="••••••••" className="w-full h-11 px-4 rounded-xl border border-border bg-background text-[14px] focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all" />
-                </div>
-                <Button className="h-10 px-6 rounded-xl bg-primary text-white font-bold shadow-sm text-[13px]">Update Password</Button>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "notifications" && (
-            <div className="rounded-[24px] border border-border bg-card p-8 shadow-sm flex items-center justify-center h-64">
-              <div className="text-center">
-                <Bell className="h-10 w-10 text-muted-foreground mx-auto mb-3 opacity-50" />
-                <p className="text-[14px] font-medium text-muted-foreground">Notification settings coming soon.</p>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
+function ProfileField({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="space-y-2">
+      <label className="text-[12px] font-bold uppercase tracking-wider text-foreground/70">{label}</label>
+      {children}
     </div>
   )
 }

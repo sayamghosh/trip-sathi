@@ -1,6 +1,5 @@
 import { useState } from "react"
 import { GoogleLogin } from "@react-oauth/google"
-import { useRouter } from "@tanstack/react-router"
 import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,7 +7,6 @@ import { Input } from "@/components/ui/input"
 const API_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000"
 
 export function Login() {
-  const router = useRouter()
   const [step, setStep] = useState(1)
   const [googleToken, setGoogleToken] = useState("")
   const [phone, setPhone] = useState("")
@@ -32,7 +30,7 @@ export function Login() {
       // Success
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("user", JSON.stringify(response.data.user))
-      router.navigate({ to: "/" })
+      window.location.href = "/"
     } catch (err) {
       if (
         axios.isAxiosError(err) &&
@@ -77,7 +75,7 @@ export function Login() {
 
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("user", JSON.stringify(response.data.user))
-      router.navigate({ to: "/" })
+      window.location.href = "/"
     } catch (err) {
       if (axios.isAxiosError(err)) {
         setError(

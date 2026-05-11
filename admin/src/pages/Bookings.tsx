@@ -1,10 +1,12 @@
-import { useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { BookingMetrics } from "@/components/booking/BookingMetrics"
 import { TripsOverview } from "@/components/booking/TripsOverview"
 import { TopPackages } from "@/components/booking/TopPackages"
 import { BookingsTable } from "@/components/booking/BookingsTable"
+import { Link } from "@tanstack/react-router"
+import { BookCheck } from "lucide-react"
 
 type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
 
@@ -19,12 +21,22 @@ interface CallbackRequest {
 }
 
 export default function Bookings() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isCheckLoading, setIsCheckLoading] = useState(true)
+
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    setIsAuthenticated(!!user)
+    setIsCheckLoading(false)
+  }, [])
+
   const { data: bookings = [] } = useQuery<CallbackRequest[]>({
     queryKey: ['callbacks'],
     queryFn: async () => {
       const { data } = await api.get('/api/callbacks/mine')
       return data as CallbackRequest[]
-    }
+    },
+    enabled: isAuthenticated
   })
 
   const { computedMetrics, computedTrips, computedPackages } = useMemo(() => {
@@ -108,6 +120,30 @@ export default function Bookings() {
 
     return { computedMetrics: metricsData, computedTrips: trips, computedPackages: packagesArray };
   }, [bookings])
+
+  if (isCheckLoading) return null
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center p-8 bg-card/50 rounded-3xl border border-dashed border-border backdrop-blur-sm">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary mb-2">
+          <BookCheck className="h-10 w-10" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-black tracking-tight text-foreground">Sign in to view Bookings</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Please sign in with your administrator account to view and manage booking requests and earnings.
+          </p>
+        </div>
+        <Link
+          to="/login"
+          className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-10 text-[15px] font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 active:scale-95"
+        >
+          Sign In
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col gap-6 pt-2">

@@ -99,7 +99,7 @@ export function App() {
       <SidebarInset className="flex flex-col h-screen overflow-hidden">
         <header className="flex h-[72px] shrink-0 items-center justify-between gap-2 border-b px-5 bg-background">
           <div className="flex items-center gap-4">
-            <SidebarTrigger className="-ml-1" />
+            <SidebarTrigger className="-ml-1 cursor-pointer" />
             <div className="flex flex-col gap-1">
               <Breadcrumb>
                 <BreadcrumbList>

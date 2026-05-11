@@ -27,6 +27,7 @@ import {
   SidebarMenuBadge,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { useTheme } from "@/components/theme-provider"
 import { Link, useLocation } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
 
@@ -50,6 +51,9 @@ export function AppSidebar() {
   const isCollapsed = state === "collapsed"
   const location = useLocation()
   const pathname = location.pathname
+  const { theme } = useTheme()
+
+  const logoSrc = theme === "dark" ? "/full-logo-dark.png" : "/full-logo-light.png"
 
   const isActivePath = (path: string) => {
     if (path === "/") return pathname === "/"
@@ -82,17 +86,16 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon" className="border-r-0 border-sidebar-border transition-all duration-300 ease-in-out">
-      <SidebarHeader className={cn("bg-sidebar px-6 py-8 transition-all duration-300", isCollapsed ? "p-0 py-8 flex items-center justify-center" : "items-start")}>
+      <SidebarHeader className={cn("bg-sidebar px-6 py-6 transition-all duration-300", isCollapsed ? "px-0 py-6 flex items-center justify-center" : "items-start")}>
         <Link to="/" className="flex items-center">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
-            <Compass className="h-5 w-5" />
-          </div>
-          <span className={cn(
-            "text-xl font-bold tracking-tight text-sidebar-foreground transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
-            isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
-          )}>
-            TripSathi
-          </span>
+          <img 
+            src={isCollapsed ? "/logo.png" : logoSrc} 
+            alt="TripSathi" 
+            className={cn(
+              "transition-all duration-300 ease-in-out",
+              isCollapsed ? "h-12 w-12 object-contain" : "h-16 w-auto object-contain"
+            )}
+          />
         </Link>
       </SidebarHeader>
 
@@ -104,7 +107,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
                     asChild
-                    className="h-11 px-4 transition-all duration-200 group group-data-[collapsible=icon]:size-11!"
+                    className="h-11 px-4 transition-all duration-200 group group-data-[collapsible=icon]:size-11! cursor-pointer"
                   >
                     <Link
                       to={item.to as any}
@@ -142,7 +145,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               className={cn(
-                "h-10 text-sidebar-foreground/80 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
+                "h-10 text-sidebar-foreground/80 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group cursor-pointer",
                 isCollapsed && "px-0 justify-center group-data-[collapsible=icon]:size-10!"
               )}
               onClick={handleLogout}

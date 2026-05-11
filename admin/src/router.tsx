@@ -25,14 +25,6 @@ const layoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "layout",
   component: App,
-  beforeLoad: () => {
-    const token = localStorage.getItem("token")
-    if (!token) {
-      throw redirect({
-        to: "/login",
-      })
-    }
-  },
 })
 
 const indexRoute = createRoute({
@@ -96,7 +88,8 @@ const loginRoute = createRoute({
   component: Login,
   beforeLoad: () => {
     const token = localStorage.getItem("token")
-    if (token) {
+    const user = localStorage.getItem("user")
+    if (token && user) {
       throw redirect({
         to: "/",
       })

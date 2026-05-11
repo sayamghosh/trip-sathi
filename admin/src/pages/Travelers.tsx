@@ -1,6 +1,8 @@
+import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
-import { Check, X, Clock, CheckCircle2, XCircle } from "lucide-react"
+import { Check, X, Clock, CheckCircle2, XCircle, Users } from "lucide-react"
+import { Link } from "@tanstack/react-router"
 
 type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
 
@@ -16,6 +18,15 @@ interface CallbackRequest {
 }
 
 export default function Travelers() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isCheckLoading, setIsCheckLoading] = useState(true)
+
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    setIsAuthenticated(!!user)
+    setIsCheckLoading(false)
+  }, [])
+
   const queryClient = useQueryClient()
 
   const { data: requests = [], isLoading: loading } = useQuery<CallbackRequest[]>({
@@ -23,7 +34,8 @@ export default function Travelers() {
     queryFn: async () => {
       const { data } = await api.get('/api/callbacks/mine')
       return data as CallbackRequest[]
-    }
+    },
+    enabled: isAuthenticated
   })
 
   const updateStatusMutation = useMutation({
@@ -40,6 +52,30 @@ export default function Travelers() {
 
   const updateStatus = (id: string, status: 'positive' | 'negative') => {
     updateStatusMutation.mutate({ id, status })
+  }
+
+  if (isCheckLoading) return null
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center p-8 bg-card/50 rounded-3xl border border-dashed border-border backdrop-blur-sm">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary mb-2">
+          <Users className="h-10 w-10" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-black tracking-tight text-foreground">Sign in to view Travelers</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Please sign in with your administrator account to manage traveler requests and callbacks.
+          </p>
+        </div>
+        <Link
+          to="/login"
+          className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-10 text-[15px] font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 active:scale-95"
+        >
+          Sign In
+        </Link>
+      </div>
+    )
   }
 
   return (

@@ -16,6 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import api from "@/lib/axios"
+import { Link } from "@tanstack/react-router"
 
 type ProfileUser = {
   id?: string
@@ -50,7 +51,7 @@ export function Profile() {
   }, [])
 
   const getInitials = (name: string) => {
-    if (!name) return "RH"
+    if (!name) return "U"
     return name
       .split(" ")
       .map((n) => n[0])
@@ -70,9 +71,9 @@ export function Profile() {
     )
   }
 
-  const name = fullName || user?.name || "Ruben Herwitz"
-  const role = user?.role || "Administrator"
-  const email = user?.email || "admin@tripsathi.com"
+  const name = fullName || user?.name || "User"
+  const role = user?.role || "Admin"
+  const email = user?.email || ""
   const displayAddress = address || "Location not added"
   const canSave = isEditing && Boolean(fullName.trim() && phone.trim() && address.trim() && !isSaving)
 
@@ -123,6 +124,28 @@ export function Profile() {
     { label: "Response time", value: "8m", detail: "Top performer" },
     { label: "Trust score", value: "4.9", detail: "Verified admin" },
   ]
+
+  if (!user && !isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[50vh] gap-6 text-center p-8 bg-card/50 rounded-3xl border border-dashed border-border backdrop-blur-sm">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary mb-2">
+          <Mail className="h-10 w-10" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-black tracking-tight text-foreground">Sign in to view your profile</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Please sign in with your administrator account to view and manage your profile details.
+          </p>
+        </div>
+        <Link
+          to="/login"
+          className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-10 text-[15px] font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 active:scale-95"
+        >
+          Sign In
+        </Link>
+      </div>
+    )
+  }
 
   return (
     <div className="mx-auto w-full max-w-[1320px] space-y-6 pb-10">

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, User as UserIcon, LogOut } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useAuthFlow } from "../context/AuthFlowContext";
@@ -17,6 +17,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
   const router = useRouter();
+  const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -40,38 +41,50 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed w-full z-50 bg-brand-light/90 backdrop-blur-md border-b border-sky-100">
-      <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
+    <nav className="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-[#eaedf1]">
+      <div className="mx-auto max-w-[1390px] px-6 sm:px-10 lg:px-12">
         <div className="flex justify-between gap-20 h-20 items-center">
           {/* Logo */}
           
-          <div className="shrink-0 flex items-center gap-2">
+          <div className="shrink-0 flex items-center">
             <Link
               href="/"
-              className="text-2xl font-bold text-[#1a2b4c] tracking-tight"
+              className="flex items-center"
             >
               <img src={compactLogo.src} alt="logo" className="w-[45px] h-auto md:hidden" />
-              <img src={fullLogo.src} alt="logo" className="w-[160px] h-auto hidden md:block" />
+              <img src={fullLogo.src} alt="logo" className="w-[155px] h-auto hidden md:block" />
             </Link>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-10">
             <Link
               href="/about"
-              className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors"
+              className={`text-[15px] font-medium transition-colors ${
+                pathname === "/about"
+                  ? "text-[#1458df]"
+                  : "text-[#202124] hover:text-[#1458df]"
+              }`}
             >
               About
             </Link>
             <Link
               href="/gallery"
-              className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors"
+              className={`text-[15px] font-medium transition-colors ${
+                pathname === "/gallery"
+                  ? "text-[#1458df]"
+                  : "text-[#202124] hover:text-[#1458df]"
+              }`}
             >
               Gallery
             </Link>
             <Link
               href="/packages"
-              className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors"
+              className={`text-[15px] font-medium transition-colors ${
+                pathname === "/packages"
+                  ? "text-[#1458df]"
+                  : "text-[#202124] hover:text-[#1458df]"
+              }`}
             >
               Packages
             </Link>
@@ -89,29 +102,36 @@ const Navbar = () => {
             </button> */}
 
             <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() =>
-                  isAuthenticated
-                    ? setIsProfileOpen(!isProfileOpen)
-                    : openLoginModal()
-                }
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors focus:outline-none"
-              >
-                {isAuthenticated && user?.picture ? (
-                  <img
-                    src={user.picture}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover"
-                    width={40}
-                    height={40}
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <UserIcon size={18} className="text-gray-400" />
-                )}
-              </button>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors focus:outline-none overflow-hidden cursor-pointer"
+                >
+                  {user?.picture ? (
+                    <img
+                      src={user.picture}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                      width={40}
+                      height={40}
+                      loading="lazy"
+                      decoding="async"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-[#1458df] text-white flex items-center justify-center font-bold">
+                      {user?.name?.charAt(0) || "U"}
+                    </div>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={openLoginModal}
+                  className="px-6 py-2.5 bg-[#1458df] text-white text-[14px] font-bold rounded-full hover:bg-[#1049ba] transition-all shadow-sm active:scale-95 cursor-pointer"
+                >
+                  Sign In
+                </button>
+              )}
 
               <AnimatePresence>
                 {isProfileOpen && isAuthenticated && (
@@ -130,21 +150,21 @@ const Navbar = () => {
                       </p>
                     </div>
                     <div className="p-2">
-                      {user?.role === "guide" && (
+                      {/* {user?.role === "guide" && (
                         <Link
                           href="/guide/dashboard"
                           className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-2 transition-colors"
                         >
                           Guide Dashboard
                         </Link>
-                      )}
-                      <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-2 transition-colors">
+                      )} */}
+                      <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-2 transition-colors cursor-pointer">
                         <UserIcon size={18} />
                         My Profile
                       </button>
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors mt-1"
+                        className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors mt-1 cursor-pointer"
                       >
                         <LogOut size={18} />
                         Log Out
@@ -180,21 +200,27 @@ const Navbar = () => {
             <div className="px-8 pt-6 pb-10 space-y-5">
               <Link
                 href="/about"
-                className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary"
+                className={`block py-2 text-lg font-medium ${
+                  pathname === "/about" ? "text-[#1458df]" : "text-gray-700"
+                } hover:text-brand-primary`}
                 onClick={() => setIsOpen(false)}
               >
                 About
               </Link>
               <Link
                 href="/gallery"
-                className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary"
+                className={`block py-2 text-lg font-medium ${
+                  pathname === "/gallery" ? "text-[#1458df]" : "text-gray-700"
+                } hover:text-brand-primary`}
                 onClick={() => setIsOpen(false)}
               >
                 Gallery
               </Link>
               <Link
                 href="/packages"
-                className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary"
+                className={`block py-2 text-lg font-medium ${
+                  pathname === "/packages" ? "text-[#1458df]" : "text-gray-700"
+                } hover:text-brand-primary`}
                 onClick={() => setIsOpen(false)}
               >
                 Packages
@@ -219,15 +245,15 @@ const Navbar = () => {
               ) : null}
               <div className="pt-4 flex flex-col gap-3">
                 {!isAuthenticated ? (
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      openLoginModal();
-                    }}
-                    className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer"
-                  >
-                    Log In / Sign Up
-                  </button>
+                    <button
+                      onClick={() => {
+                        setIsOpen(false);
+                        openLoginModal();
+                      }}
+                      className="block w-full text-center px-6 py-3.5 bg-[#1458df] text-white rounded-xl font-bold hover:bg-[#1049ba] cursor-pointer shadow-md"
+                    >
+                      Log In / Sign Up
+                    </button>
                 ) : (
                   <div className="border border-sky-100 rounded-xl overflow-hidden bg-sky-50/30">
                     <div className="p-4 flex items-center gap-3 border-b border-sky-100 bg-white">

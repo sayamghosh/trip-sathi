@@ -41,9 +41,22 @@ const popularPackages = [
 ]
 
 export function PackagePage() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isCheckLoading, setIsCheckLoading] = useState(true)
+
+  useEffect(() => {
+    const user = localStorage.getItem("user")
+    setIsAuthenticated(!!user)
+    setIsCheckLoading(false)
+  }, [])
+
   const [packages, setPackages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLoading(false)
+      return
+    }
     const fetchPackages = async () => {
       try {
         const response = await api.get("/api/tour-plans")
@@ -56,7 +69,31 @@ export function PackagePage() {
     }
 
     fetchPackages()
-  }, [])
+  }, [isAuthenticated])
+
+  if (isCheckLoading) return null
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-6 text-center p-8 bg-card/50 rounded-3xl border border-dashed border-border backdrop-blur-sm">
+        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 text-primary mb-2">
+          <PlaneTakeoff className="h-10 w-10" />
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-3xl font-black tracking-tight text-foreground">Sign in to view Packages</h2>
+          <p className="text-muted-foreground max-w-md mx-auto">
+            Please sign in with your administrator account to view, create, and manage your tour packages.
+          </p>
+        </div>
+        <Link
+          to="/login"
+          className="inline-flex h-12 items-center justify-center rounded-xl bg-primary px-10 text-[15px] font-bold text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 active:scale-95"
+        >
+          Sign In
+        </Link>
+      </div>
+    )
+  }
 
   // Re-map slices
   const source = packages

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Heart, Search, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Heart, Search, Check, MapPin } from "lucide-react";
 import tourPlanService from "@/services/tourPlan.service";
 import type { TourPlanSummary } from "@/types/tourPlan";
 
@@ -136,36 +136,40 @@ export default function PackagesPage() {
             </section>
 
             <section className="mx-auto max-w-[1390px] px-6 pb-[108px] sm:px-10 lg:px-12">
-                <div className="grid items-start gap-8 lg:grid-cols-[1fr_0.72fr]">
+                <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
                     <h2 className="max-w-[440px] text-[24px] font-medium leading-[1.1] tracking-[-0.03em] sm:text-[32px] lg:text-[40px]">
                         Best-Value Destination for Your Next Trip
                     </h2>
-                    <p className="max-w-[420px] justify-self-start pt-7 text-[14px] font-normal leading-[1.65] text-[#73777f] lg:justify-self-center lg:text-[16px]">
-                        Highly rated stays with great locations, fair prices, and trusted guest reviews.
-                    </p>
-                </div>
-
-                <div className="mt-[60px] flex min-h-[92px] items-center rounded-[10px] border border-[#eaedf1] bg-white px-5 shadow-[0_8px_24px_rgba(15,23,42,0.03)]">
-                    <label className="flex flex-1 flex-col gap-1.5 pl-1">
-                        <span className="text-[12px] font-semibold text-[#404348]">Destination</span>
-                        <input
-                            className="h-5 w-full border-0 p-0 text-[13px] font-medium text-[#767b84] outline-none placeholder:text-[#767b84]"
-                            placeholder="Enter destination"
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        />
-                    </label>
-                    <div className="mr-8 hidden h-10 w-px bg-[repeating-linear-gradient(to_right,#edf0f4_0,#edf0f4_1px,transparent_1px,transparent_10px)] sm:block sm:w-[88px]" />
-                    <button 
-                        onClick={handleSearch}
-                        className="inline-flex h-10 items-center justify-center gap-2 rounded-full bg-[#1458df] px-6 text-[12px] font-semibold text-white transition hover:bg-[#1049ba]" 
-                        type="button"
-                    >
-                        <Search className="h-3.5 w-3.5" />
-                        {loading ? "Searching..." : "Search Best Deals"}
-                    </button>
+                    
+                    <div className="group flex flex-1 max-w-[620px] min-h-[64px] items-center rounded-full border border-[#eaedf1] bg-white p-1.5 pl-7 shadow-[0_4px_20px_rgba(15,23,42,0.04)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(15,23,42,0.08)] focus-within:border-[#1458df] focus-within:ring-4 focus-within:ring-[#1458df]/5">
+                        <div className="flex flex-1 items-center gap-3.5">
+                            <MapPin className="h-4.5 w-4.5 text-[#1458df]" />
+                            <label className="flex flex-1 flex-col justify-center">
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-[#9aa0a9]">Destination</span>
+                                <input
+                                    className="h-6 w-full border-0 p-0 text-[14px] font-medium text-[#2a2d31] outline-none placeholder:text-[#767b84]"
+                                    placeholder="Where are you going?"
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                                />
+                            </label>
+                        </div>
+                        
+                        <button 
+                            onClick={handleSearch}
+                            className="ml-3 inline-flex h-[52px] items-center justify-center gap-2.5 rounded-full bg-[#1458df] px-8 text-[14px] font-bold text-white shadow-[0_4px_12px_rgba(20,88,223,0.15)] transition-all duration-300 hover:bg-[#1049ba] hover:shadow-[0_8px_16px_rgba(20,88,223,0.25)] active:scale-95" 
+                            type="button"
+                        >
+                            {loading ? (
+                                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                            ) : (
+                                <Search className="h-4.5 w-4.5" />
+                            )}
+                            {loading ? "Searching..." : "Search"}
+                        </button>
+                    </div>
                 </div>
 
                 {loading ? (

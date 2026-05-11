@@ -107,7 +107,7 @@ const BestSellingDestinations = () => {
                 {/* Horizontal Scrollable Carousel */}
                 <div 
                     ref={scrollContainerRef}
-                    className="flex overflow-x-auto gap-4 pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory hide-scrollbar"
+                    className="flex overflow-x-auto gap-4 pb-8 mx-1 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory hide-scrollbar"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {destinations.map((dest) => (

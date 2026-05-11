@@ -4,7 +4,7 @@ import OptimizedImage from './ui/OptimizedImage';
 const LimitedTimeDeals = () => {
     return (
         <section className="py-16 sm:py-24 bg-[#f8f8f8]">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
 
                 {/* Heading */}
                 <h2 className="text-3xl sm:text-4xl md:text-[40px] font-black text-gray-900 tracking-tight font-display leading-tight mb-10">
@@ -17,7 +17,7 @@ const LimitedTimeDeals = () => {
                     {/* Card 1 — 15% OFF */}
                     <Link
                         href={{ pathname: '/search', query: { destination: 'hotels' } }}
-                        className="relative flex-1 rounded-2xl overflow-hidden h-60 sm:h-70 group cursor-pointer block"
+                        className="relative flex-1 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-auto sm:h-80 lg:h-96 group cursor-pointer block"
                     >
                         {/* Background — paraglider over tropical island */}
                         <OptimizedImage
@@ -52,7 +52,7 @@ const LimitedTimeDeals = () => {
                     {/* Card 2 — 35% OFF Manali */}
                     <Link
                         href={{ pathname: '/search', query: { destination: 'manali' } }}
-                        className="relative flex-1 rounded-2xl overflow-hidden h-60 sm:h-70 group cursor-pointer block"
+                        className="relative flex-1 rounded-2xl overflow-hidden aspect-[4/3] sm:aspect-auto sm:h-80 lg:h-96 group cursor-pointer block"
                     >
                         {/* Background — Manali green valley */}
                         <OptimizedImage

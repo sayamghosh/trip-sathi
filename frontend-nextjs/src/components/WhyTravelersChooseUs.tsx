@@ -6,7 +6,7 @@ const features = [
     {
         icon: Banknote,
         title: 'Best Price Transparency',
-        desc: 'Every hotel and activity is screened for quality, location, and guest satisfaction.'
+        desc: 'We compare hundreds of providers to ensure you get the absolute best value for your trip.'
     },
     {
         icon: Building2,
@@ -27,8 +27,8 @@ const features = [
 
 const WhyTravelersChooseUs = () => {
     return (
-        <section className="py-12 bg-white relative">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 sm:py-24 bg-white relative">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
                 <div className="grid lg:grid-cols-2 gap-10 items-center">
                     
                     {/* Left Content */}
@@ -70,7 +70,7 @@ const WhyTravelersChooseUs = () => {
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        className="relative h-[400px] lg:h-[500px] w-full lg:w-[450px] ml-auto"
+                        className="relative h-[350px] sm:h-[450px] lg:h-[500px] w-full lg:w-[450px] ml-auto rounded-[24px] overflow-hidden shadow-xl"
                     >
                         <OptimizedImage 
                             src="https://images.pexels.com/photos/868097/pexels-photo-868097.jpeg" 

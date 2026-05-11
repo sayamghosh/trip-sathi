@@ -80,7 +80,7 @@ const Hero = () => {
                         </h1>
 
                         {/* Search Bar Wrapper */}
-                        <div className="h-14 sm:h-16 w-full max-w-xl sm:max-w-2xl mb-8 sm:mb-12 relative z-99999">
+                        <div className="h-14 sm:h-16 w-full max-w-xl sm:max-w-2xl mb-8 sm:mb-12 relative z-[60]">
                             <AnimatePresence initial={false} mode="wait">
                                 <motion.div
                                     key={isSticky ? 'sticky-search' : 'hero-search'}
@@ -90,9 +90,9 @@ const Hero = () => {
                                     animate="center"
                                     exit="exit"
                                     layout
-                                    className={`bg-white p-1 sm:p-1.5 rounded-full flex items-center shadow-lg ${
+                                    className={`bg-white p-1 sm:p-1.5 rounded-full flex items-center shadow-lg transition-all duration-300 ${
                                         isSticky
-                                            ? 'fixed top-24 left-1/2 -translate-x-1/2 w-[92vw] max-w-3xl shadow-2xl border border-gray-200 z-99999'
+                                            ? 'fixed top-24 left-1/2 -translate-x-1/2 w-[90vw] sm:w-[92vw] max-w-3xl shadow-2xl border border-gray-200 z-[60]'
                                             : 'relative z-50 w-full max-w-xl sm:max-w-2xl'
                                     }`}
                                 >

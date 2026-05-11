@@ -48,7 +48,7 @@ const cities = [
 const MostVisitedCities = () => {
     return (
         <section className="py-16 sm:py-24 bg-white">
-            <div className="max-w-360 mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
                 {/* Header Area */}
                 <div className="text-center mb-10 sm:mb-14">
                     <h2 className="text-3xl sm:text-4xl md:text-[40px] font-black text-gray-900 tracking-tight font-display mb-4">
@@ -59,14 +59,14 @@ const MostVisitedCities = () => {
                     </p>
                 </div>
 
-                {/* Grid Area – horizontal scroll on mobile, wrap on md+ */}
-                <div className="-mx-4 sm:mx-0">
-                    <div className="flex flex-row md:flex-wrap md:justify-center gap-6 lg:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory pl-5 pr-4 sm:px-0 scroll-pl-5 md:scroll-pl-0 pb-4 md:pb-0 scrollbar-hide">
+                {/* Grid Area – horizontal scroll on mobile, 5 columns on desktop */}
+                <div className="-mx-6 sm:mx-0">
+                    <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-6 lg:gap-6 overflow-x-auto sm:overflow-visible snap-x snap-mandatory px-6 sm:px-0 scroll-pl-6 sm:scroll-pl-0 pb-6 sm:pb-0 scrollbar-hide">
                         {cities.map((city) => (
                             <Link
                                 key={city.name}
                                 href={{ pathname: '/search', query: { destination: city.query } }}
-                                className="group block w-50 sm:w-55 shrink-0 snap-start"
+                                className="group block w-64 sm:w-auto shrink-0 sm:shrink snap-start"
                             >
                                 <div className="rounded-2xl overflow-hidden aspect-3/4 border border-gray-100 mb-5 relative bg-gray-50">
                                     <OptimizedImage

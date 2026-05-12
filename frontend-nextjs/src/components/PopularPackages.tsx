@@ -145,12 +145,12 @@ const PopularPackages = ({ initialPlans }: PopularPackagesProps) => {
         <section className="py-20 relative bg-white">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-                <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-end mb-12 gap-3 md:gap-6">
                     <div className="text-left">
                         <h3 className="text-brand-primary font-semibold uppercase tracking-wider mb-2">Best Selling</h3>
                         <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 font-display">Popular Tour Packages</h2>
                     </div>
-                    <Link href="/packages" className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all">
+                    <Link href="/packages" className="flex items-center gap-2 text-brand-primary font-bold hover:gap-4 transition-all self-start md:self-auto">
                         View All Packages <ArrowRight size={20} />
                     </Link>
                 </div>

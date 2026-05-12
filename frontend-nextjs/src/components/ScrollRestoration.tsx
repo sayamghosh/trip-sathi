@@ -7,8 +7,11 @@ const ScrollRestoration = () => {
     const pathname = usePathname();
 
     useEffect(() => {
-        // Scroll to top when route changes
-        window.scrollTo(0, 0);
+        // Small delay to ensure navigation has completed
+        const timer = setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'instant' });
+        }, 10);
+        return () => clearTimeout(timer);
     }, [pathname]);
 
     return null;

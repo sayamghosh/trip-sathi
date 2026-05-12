@@ -141,3 +141,62 @@ html.lenis body {
 .group:hover .animate-marquee-reverse {
   animation-play-state: paused !important;
 }
+
+/* Page Loader Animations */
+@keyframes loader-in {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+@keyframes loader-out {
+  from {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  to {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+.animate-loader-page {
+  animation: loader-show 1s ease-out forwards, loader-shimmer 1s ease-in-out infinite;
+  transform-origin: left;
+}
+
+@keyframes loader-show {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  20% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  80% {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+
+@keyframes loader-hide {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Loader shimmer with brand gradient */
+@keyframes loader-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

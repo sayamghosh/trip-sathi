@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import Lenis from 'lenis';
 
 interface SmoothScrollProps {
@@ -13,6 +14,7 @@ interface SmoothScrollProps {
  */
 export default function SmoothScroll({ children }: SmoothScrollProps) {
     const lenisRef = useRef<Lenis | null>(null);
+    const pathname = usePathname();
 
     useEffect(() => {
         // Initialize Lenis with optimized settings for smooth scrolling
@@ -42,6 +44,15 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
             lenisRef.current = null;
         };
     }, []);
+
+    // Reset scroll position on route change
+    useEffect(() => {
+        // Small delay to ensure page transition completes
+        const timer = setTimeout(() => {
+            lenisRef.current?.scrollTo(0, { immediate: true });
+        }, 50);
+        return () => clearTimeout(timer);
+    }, [pathname]);
 
     return <>{children}</>;
 }

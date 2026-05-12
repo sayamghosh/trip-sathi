@@ -3,12 +3,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useAuthFlow } from '../context/AuthFlowContext';
 import LoginModal from './LoginModal';
 import logo from '../assets/logo.svg';
+
+const navItems = [
+  { href: '/about', label: 'About' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/packages', label: 'Packages' },
+];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,6 +22,7 @@ const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
   const router = useRouter();
+  const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,10 +56,22 @@ const Navbar = () => {
 
           {/* Desktop Links */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/about" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">About</Link>
-            <Link href="/gallery" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">Gallery</Link>
-            <Link href="/packages" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">Packages</Link>
-            {/* <Link href="/" className="text-sm font-medium text-gray-800 hover:text-brand-primary transition-colors">Blog</Link> */}
+            {navItems.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'text-brand-primary'
+                      : 'text-gray-800 hover:text-brand-primary'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
 
           {/* Action Buttons */}
@@ -144,9 +163,23 @@ const Navbar = () => {
             className="md:hidden bg-white border-t border-sky-100 overflow-hidden"
           >
             <div className="px-6 pt-4 pb-8 space-y-4">
-              <Link href="/about" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>About</Link>
-              <Link href="/gallery" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Gallery</Link>
-              <Link href="/packages" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Packages</Link>
+              {navItems.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`block py-2 text-lg font-medium transition-colors ${
+                      isActive
+                        ? 'text-brand-primary underline underline-offset-4'
+                        : 'text-gray-700 hover:text-brand-primary'
+                    }`}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
               {/* <Link href="/" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Blog</Link> */}
               {isAuthenticated && user?.role === 'guide' ? (
                 <Link href="/guide/dashboard" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Guide Dashboard</Link>

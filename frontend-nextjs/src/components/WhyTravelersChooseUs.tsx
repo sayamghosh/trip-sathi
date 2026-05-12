@@ -56,7 +56,7 @@ const WhyTravelersChooseUs = () => {
                                     </div>
                                     <div>
                                         <h4 className="text-base font-bold text-gray-900 mb-1">{feature.title}</h4>
-                                        <p className="text-gray-500 leading-relaxed text-sm pr-4 lg:pr-12">
+                                        <p className="text-gray-500 leading-relaxed text-sm pr-16 text-justify lg:pr-12">
                                             {feature.desc}
                                         </p>
                                     </div>

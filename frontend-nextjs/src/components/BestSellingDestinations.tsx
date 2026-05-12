@@ -72,7 +72,7 @@ const BestSellingDestinations = () => {
     };
 
     return (
-        <section className="py-16 sm:py-24 bg-white overflow-hidden">
+        <section className="py-8 sm:py-24 bg-white overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Header Area */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 sm:mb-12 gap-6">
@@ -107,7 +107,7 @@ const BestSellingDestinations = () => {
                 {/* Horizontal Scrollable Carousel */}
                 <div 
                     ref={scrollContainerRef}
-                    className="flex overflow-x-auto gap-4 pb-8 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory hide-scrollbar"
+                    className="flex overflow-x-auto gap-4 pb-8 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory hide-scrollbar"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {destinations.map((dest) => (

@@ -27,7 +27,7 @@ const features = [
 
 const WhyTravelersChooseUs = () => {
     return (
-        <section className="py-12 bg-white relative">
+        <section className=" bg-white relative">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="grid lg:grid-cols-2 gap-10 items-center">
                     
@@ -56,7 +56,7 @@ const WhyTravelersChooseUs = () => {
                                     </div>
                                     <div>
                                         <h4 className="text-base font-bold text-gray-900 mb-1">{feature.title}</h4>
-                                        <p className="text-gray-500 leading-relaxed text-sm pr-4 lg:pr-12">
+                                        <p className="text-gray-500 leading-relaxed text-sm pr-16 text-justify lg:pr-12">
                                             {feature.desc}
                                         </p>
                                     </div>

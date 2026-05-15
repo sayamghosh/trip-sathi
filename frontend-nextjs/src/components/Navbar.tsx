@@ -1,33 +1,69 @@
 "use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { Menu, X, User as UserIcon, LogOut } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from '../context/AuthContext';
-import { useAuthFlow } from '../context/AuthFlowContext';
-import LoginModal from './LoginModal';
-import logo from '../assets/logo.svg';
+import { useState, useRef, useEffect } from "react";
+import { Menu, X, User as UserIcon, LogOut, Search } from "lucide-react";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
+import { useAuthFlow } from "../context/AuthFlowContext";
+import dynamic from 'next/dynamic';
+const LoginModal = dynamic(() => import('./LoginModal'), { ssr: false });
+import SearchModal from "./SearchModal";
 
 const navItems = [
-  { href: '/about', label: 'About' },
-  { href: '/gallery', label: 'Gallery' },
-  { href: '/packages', label: 'Packages' },
+  { href: "/about", label: "About" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/packages", label: "Packages" },
 ];
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
-  const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
+  const { isLoginModalOpen, openLoginModal, closeLoginModal, isSearchModalOpen, openSearchModal, closeSearchModal } = useAuthFlow();
   const router = useRouter();
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  const [scrolled, setScrolled] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [isPackagesSearchVisible, setIsPackagesSearchVisible] = useState(true);
+
+  useEffect(() => {
+    const handleVisibility = (e: any) => {
+      setIsPackagesSearchVisible(e.detail.isVisible);
+    };
+    window.addEventListener('packagesSearchVisibility', handleVisibility);
+    return () => window.removeEventListener('packagesSearchVisibility', handleVisibility);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrolled(currentScrollY > 20);
+      
+      // Show search icon based on page and scroll position
+      if (pathname === "/") {
+        setShowSearch(currentScrollY > 400);
+      } else if (pathname === "/packages") {
+        setShowSearch(!isPackagesSearchVisible);
+      } else {
+        setShowSearch(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll(); // Initial check on mount/navigation
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname, isPackagesSearchVisible]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     };
@@ -39,99 +75,120 @@ const Navbar = () => {
     logout();
     setIsProfileOpen(false);
     setIsOpen(false);
-    router.push('/');
+    router.push("/");
   };
 
   return (
-    <nav className="fixed w-full z-50 bg-brand-light/90 backdrop-blur-md border-b border-sky-100">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between gap-20 h-20 items-center">
-
-          {/* Logo */}
-          <div className="shrink-0 flex items-center gap-2">
-            <Link href="/" className="text-2xl font-bold text-[#1a2b4c] tracking-tight">
-              <img src={logo.src} alt="logo" />
-            </Link>
-          </div>
-
-          {/* Desktop Links */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-              return (
+    <nav
+      className={`fixed w-full z-50 transition-all duration-300 ${
+        scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-4">
+        <div className="flex justify-between h-15 items-center">
+          {/* Desktop Navigation Links */}
+          <div className="hidden md:flex items-center">
+            {navItems.map((item, index) => (
+              <div key={item.href} className="flex items-center">
                 <Link
-                  key={item.href}
                   href={item.href}
-                  className={`text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'text-brand-primary'
-                      : 'text-gray-800 hover:text-brand-primary'
+                  className={`text-[16px] font-medium transition-colors ${
+                    pathname === item.href
+                      ? "text-[#1458df] "
+                      : "text-gray-600 hover:text-[#1458df]"
                   }`}
                 >
                   {item.label}
                 </Link>
-              );
-            })}
+                {index < navItems.length - 1 && (
+                  <div className="h-4 w-px mx-4 bg-gray-200" />
+                )}
+              </div>
+            ))}
           </div>
 
-          {/* Action Buttons */}
-          <div className="hidden md:flex items-center gap-5 ml-auto">
-            {/* <button className="relative text-[#1a2b4c] hover:text-brand-primary transition-colors">
-              <Bell size={22} />
-              <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border border-white"></span>
-            </button>
-            <button className="text-[#1a2b4c] hover:text-brand-primary transition-colors">
-              <Settings size={22} />
-            </button> */}
-            
-            <div className="relative" ref={dropdownRef}>
+          {/* Logo (Centered) */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+            <Link
+              href="/"
+              className="text-[24px] font-bold tracking-tight text-gray-900 transition-colors"
+            >
+              tripsathi
+            </Link>
+          </div>
+
+          {/* Action Buttons / Profile */}
+          <div
+            className="hidden md:flex items-center relative"
+            ref={dropdownRef}
+          >
+            <AnimatePresence>
+              {showSearch && (
+                <motion.button
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  onClick={openSearchModal}
+                  className="mr-5 text-gray-600 hover:text-[#1458df] transition-colors cursor-pointer"
+                >
+                  <Search size={20} />
+                </motion.button>
+              )}
+            </AnimatePresence>
+            {!isAuthenticated ? (
               <button
-                onClick={() => isAuthenticated ? setIsProfileOpen(!isProfileOpen) : openLoginModal()}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors focus:outline-none"
+                onClick={openLoginModal}
+                className={`px-7 py-2.5 cursor-pointer rounded-full text-[16px] font-medium transition-all ${
+                  scrolled
+                    ? "bg-[#1458df] text-white hover:bg-[#1049ba]"
+                    : "bg-[#1458df] text-white hover:bg-[#1049ba]"
+                }`}
               >
-                {isAuthenticated && user?.picture ? (
-                  <img
-                    src={user.picture}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-full object-cover"
-                    width={40}
-                    height={40}
-                    loading="lazy"
-                    decoding="async"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <UserIcon size={18} className="text-gray-400" />
-                )}
+                Sign In
               </button>
+            ) : (
+              <div className="relative">
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full transition-all border overflow-hidden bg-gray-100 border-gray-200"
+                >
+                  {user?.picture ? (
+                    <img
+                      src={user.picture}
+                      alt="Profile"
+                      className="w-full h-full object-cover cursor-pointer"
+                    />
+                  ) : (
+                    <UserIcon size={18} />
+                  )}
+                </button>
 
                 <AnimatePresence>
-                  {isProfileOpen && isAuthenticated && (
+                  {isProfileOpen && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-3 w-56 bg-white rounded-xl shadow-xl border border-sky-100 overflow-hidden"
+                      className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden"
                     >
-                      <div className="p-4 border-b border-gray-100 bg-sky-50/50">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{user?.name}</p>
-                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                      <div className="p-4 border-b border-gray-50 bg-gray-50/30">
+                        <p className="text-[16px] font-medium text-gray-900 truncate">
+                          {user?.name}
+                        </p>
+                        <p className="text-[14px] text-gray-500 truncate mt-0.5">
+                          {user?.email}
+                        </p>
                       </div>
                       <div className="p-2">
-                        {user?.role === 'guide' && (
-                          <Link href="/guide/dashboard" className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-2 transition-colors">
-                            Guide Dashboard
-                          </Link>
-                        )}
-                        <button className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-2 transition-colors">
-                          <UserIcon size={18} />
+                        <button className="w-full text-left px-4 py-2.5 cursor-pointer text-[14px] font-medium text-gray-700 hover:bg-gray-50 hover:text-[#1458df] rounded-lg flex items-center gap-2 transition-colors">
+                          <UserIcon size={18} className="text-gray-400" />
                           My Profile
                         </button>
                         <button
                           onClick={handleLogout}
-                          className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors mt-1"
+                          className="w-full text-left cursor-pointer px-4 py-2.5 text-[14px] font-medium text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-2 transition-colors mt-1"
                         >
-                          <LogOut size={18} />
+                          <LogOut size={18} className="text-red-400" />
                           Log Out
                         </button>
                       </div>
@@ -139,13 +196,26 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
               </div>
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center ml-auto gap-4">
+            <AnimatePresence>
+              {showSearch && (
+                <motion.button
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 10 }}
+                  onClick={openSearchModal}
+                  className="text-gray-600 hover:text-[#1458df] transition-colors cursor-pointer"
+                >
+                  <Search size={22} />
+                </motion.button>
+              )}
+            </AnimatePresence>
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-brand-primary focus:outline-none"
+              className="text-gray-600 hover:opacity-80 focus:outline-none transition-all duration-300"
             >
               {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
@@ -158,69 +228,68 @@ const Navbar = () => {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
+            animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t border-sky-100 overflow-hidden"
+            className="md:hidden bg-white border-t border-gray-100 shadow-2xl overflow-hidden"
           >
             <div className="px-6 pt-4 pb-8 space-y-4">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`block py-2 text-lg font-medium transition-colors ${
-                      isActive
-                        ? 'text-brand-primary underline underline-offset-4'
-                        : 'text-gray-700 hover:text-brand-primary'
-                    }`}
-                    onClick={() => setIsOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                );
-              })}
-              {/* <Link href="/" className="block py-2 text-lg font-medium text-gray-700 hover:text-brand-primary" onClick={() => setIsOpen(false)}>Blog</Link> */}
-              {isAuthenticated && user?.role === 'guide' ? (
-                <Link href="/guide/dashboard" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Guide Dashboard</Link>
-              ) : !isAuthenticated ? (
-                <Link href="/become-a-guide" className="block py-2 text-lg font-bold text-brand-primary hover:text-brand-dark" onClick={() => setIsOpen(false)}>Become a Tour Guide</Link>
-              ) : null}
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`block py-2 text-[14px] font-medium transition-colors ${
+                    pathname === item.href
+                      ? "text-black underline underline-offset-4"
+                      : "text-gray-600 hover:text-black"
+                  }`}
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
               <div className="pt-4 flex flex-col gap-3">
                 {!isAuthenticated ? (
-                  <button onClick={() => { setIsOpen(false); openLoginModal(); }} className="block w-full text-center px-6 py-3 bg-brand-primary text-white rounded-xl font-semibold hover:bg-brand-secondary cursor-pointer">
-                    Log In / Sign Up
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      openLoginModal();
+                    }}
+                    className="block w-full text-center px-6 py-3 bg-black text-white rounded-xl text-[14px] font-semibold hover:bg-zinc-800 cursor-pointer"
+                  >
+                    Sign In
                   </button>
                 ) : (
-                  <div className="border border-sky-100 rounded-xl overflow-hidden bg-sky-50/30">
-                    <div className="p-4 flex items-center gap-3 border-b border-sky-100 bg-white">
+                  <div className="border border-gray-100 rounded-xl overflow-hidden bg-gray-50">
+                    <div className="p-4 flex items-center gap-3 border-b border-gray-100 bg-white">
                       {user?.picture ? (
                         <img
                           src={user.picture}
                           alt="Profile"
-                          className="w-12 h-12 rounded-full object-cover shadow-sm"
-                          width={48}
-                          height={48}
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
+                          className="w-12 h-12 rounded-full object-cover shadow-sm border border-gray-100"
                         />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-brand-primary text-white flex items-center justify-center font-bold text-xl shadow-sm">
-                          {user?.name?.charAt(0) || 'U'}
+                        <div className="w-12 h-12 rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold text-xl">
+                          {user?.name?.charAt(0) || "U"}
                         </div>
                       )}
                       <div className="overflow-hidden">
-                        <p className="font-semibold text-gray-900 truncate">{user?.name}</p>
-                        <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                        <p className="text-[14px] font-medium text-gray-900 truncate">
+                          {user?.name}
+                        </p>
+                        <p className="text-[12px] text-gray-500 truncate">
+                          {user?.email}
+                        </p>
                       </div>
                     </div>
-                    <div className="p-2 space-y-1 bg-white">
-                      <button className="w-full text-left px-4 py-3 font-medium text-gray-700 hover:bg-sky-50 hover:text-brand-primary rounded-lg flex items-center gap-3">
+                    <div className="p-2 space-y-1">
+                      <button className="w-full text-left px-4 py-3 text-[14px] font-medium text-gray-700 hover:bg-gray-100 hover:text-black rounded-lg flex items-center gap-3">
                         <UserIcon size={20} className="text-gray-400" />
                         My Profile
                       </button>
-                      <button onClick={handleLogout} className="w-full text-left px-4 py-3 font-medium text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-3 text-[14px] font-medium text-red-600 hover:bg-red-50 rounded-lg flex items-center gap-3"
+                      >
                         <LogOut size={20} className="text-red-400" />
                         Log Out
                       </button>
@@ -234,6 +303,7 @@ const Navbar = () => {
       </AnimatePresence>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
+      <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
     </nav>
   );
 };

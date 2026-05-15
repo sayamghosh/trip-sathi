@@ -2,11 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin, GoogleOAuthProvider } from '@react-oauth/google';
 import { useAuth } from '../context/AuthContext';
 import { googleLoginAPI } from '../services/auth.service';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Users, Star, ShieldCheck } from 'lucide-react';
+
+const GOOGLE_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -62,6 +64,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             setLoading(true);
             setError(null);
             if (credentialResponse.credential) {
+                // Backend requires the ID Token (credential)
                 const authData = await googleLoginAPI(credentialResponse.credential);
                 login(authData);
                 onClose();
@@ -75,7 +78,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
     const feature = features[activeFeature];
 
-    return ReactDOM.createPortal(
+    const modalContent = (
         <AnimatePresence>
             <motion.div
                 key="modal-backdrop"
@@ -164,26 +167,31 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             )}
 
                             {/* Google button */}
-                            {loading ? (
-                                <div className="flex items-center justify-center gap-3 py-4">
-                                    <div className="h-5 w-5 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
-                                    <span className="text-sm text-gray-400">Signing you in…</span>
-                                </div>
-                            ) : (
-                                <div className="flex justify-center w-full">
-                                    <GoogleLogin
-                                        onSuccess={handleSuccess}
-                                        onError={() => setError('Sign-in failed. Please try again.')}
-                                        useOneTap
-                                        theme="outline"
-                                        shape="pill"
-                                        size="large"
-                                        logo_alignment="center"
-                                        width="340"
-                                        text="continue_with"
-                                    />
-                                </div>
-                            )}
+                            <div className="flex justify-center w-full min-h-[50px]">
+                                {loading ? (
+                                    <div className="flex items-center justify-center gap-3 py-4">
+                                        <div className="h-5 w-5 border-2 border-sky-500 border-t-transparent rounded-full animate-spin" />
+                                        <span className="text-sm text-gray-400">Signing you in…</span>
+                                    </div>
+                                ) : (
+                                    GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your_google_client_id_here' ? (
+                                        <GoogleLogin
+                                            onSuccess={handleSuccess}
+                                            onError={() => setError('Sign-in failed. Please try again.')}
+                                            theme="outline"
+                                            shape="pill"
+                                            size="large"
+                                            logo_alignment="center"
+                                            width="340"
+                                            text="continue_with"
+                                        />
+                                    ) : (
+                                        <div className="text-amber-600 text-xs bg-amber-50 p-3 rounded-lg border border-amber-100">
+                                            Google login is temporarily unavailable. Please check back later.
+                                        </div>
+                                    )
+                                )}
+                            </div>
 
                             {/* Subtle divider */}
                             <div className="flex items-center gap-3">
@@ -232,7 +240,17 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     </div>
                 </motion.div>
             </motion.div>
-        </AnimatePresence>,
+        </AnimatePresence>
+    );
+
+    return ReactDOM.createPortal(
+        GOOGLE_CLIENT_ID && GOOGLE_CLIENT_ID !== 'your_google_client_id_here' ? (
+            <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+                {modalContent}
+            </GoogleOAuthProvider>
+        ) : (
+            modalContent
+        ),
         document.body
     );
 };

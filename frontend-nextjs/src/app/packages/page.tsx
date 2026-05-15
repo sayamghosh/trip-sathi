@@ -102,6 +102,28 @@ export default function PackagesPage() {
   const [realDeals, setRealDeals] = useState<DealCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchVisible, setIsSearchVisible] = useState(true);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // We consider it "hidden" if it's not intersecting and above the viewport
+        const isHidden = !entry.isIntersecting && entry.boundingClientRect.top < 80;
+        window.dispatchEvent(new CustomEvent('packagesSearchVisibility', { 
+          detail: { isVisible: !isHidden } 
+        }));
+      },
+      { 
+        threshold: 0,
+        rootMargin: '-80px 0px 0px 0px' // Adjust based on navbar height
+      }
+    );
+
+    const searchBar = document.getElementById('packages-search-bar');
+    if (searchBar) observer.observe(searchBar);
+
+    return () => observer.disconnect();
+  }, []);
 
   const fetchPlans = async (query = "") => {
     setLoading(true);
@@ -187,7 +209,10 @@ export default function PackagesPage() {
             Best-Value Destination for Your Next Trip
           </h2>
 
-          <div className="group flex flex-1 max-w-[620px] min-h-[64px] items-center rounded-full border border-[#eaedf1] bg-white p-1.5 pl-7 shadow-[0_4px_20px_rgba(15,23,42,0.04)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(15,23,42,0.08)] focus-within:border-[#1458df] focus-within:ring-4 focus-within:ring-[#1458df]/5">
+          <div 
+            id="packages-search-bar"
+            className="group flex flex-1 max-w-[620px] min-h-[64px] items-center rounded-full border border-[#eaedf1] bg-white p-1.5 pl-7 shadow-[0_4px_20px_rgba(15,23,42,0.04)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(15,23,42,0.08)] focus-within:border-[#1458df] focus-within:ring-4 focus-within:ring-[#1458df]/5"
+          >
             <div className="flex flex-1 items-center gap-3.5">
               <MapPin className="h-4.5 w-4.5 text-[#1458df]" />
               <label className="flex flex-1 flex-col justify-center">

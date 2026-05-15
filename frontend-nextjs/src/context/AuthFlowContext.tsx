@@ -13,6 +13,9 @@ interface AuthFlowContextType {
   isLoginModalOpen: boolean;
   openLoginModal: () => void;
   closeLoginModal: () => void;
+  isSearchModalOpen: boolean;
+  openSearchModal: () => void;
+  closeSearchModal: () => void;
 }
 
 const AuthFlowContext = createContext<AuthFlowContextType | undefined>(undefined);
@@ -20,6 +23,7 @@ const AuthFlowContext = createContext<AuthFlowContextType | undefined>(undefined
 export function AuthFlowProvider({ children }: { children: ReactNode }) {
   const [pendingAction, setPendingAction] = useState<AuthPendingAction | null>(null);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const { isAuthenticated } = useAuth();
 
   const openLoginModal = useCallback(() => {
@@ -28,6 +32,14 @@ export function AuthFlowProvider({ children }: { children: ReactNode }) {
 
   const closeLoginModal = useCallback(() => {
     setIsLoginModalOpen(false);
+  }, []);
+
+  const openSearchModal = useCallback(() => {
+    setIsSearchModalOpen(true);
+  }, []);
+
+  const closeSearchModal = useCallback(() => {
+    setIsSearchModalOpen(false);
   }, []);
 
   const requestAuth = useCallback((action: AuthPendingAction) => {
@@ -52,7 +64,10 @@ export function AuthFlowProvider({ children }: { children: ReactNode }) {
     isLoginModalOpen,
     openLoginModal,
     closeLoginModal,
-  }), [pendingAction, requestAuth, clearPendingAction, isLoginModalOpen, openLoginModal, closeLoginModal]);
+    isSearchModalOpen,
+    openSearchModal,
+    closeSearchModal,
+  }), [pendingAction, requestAuth, clearPendingAction, isLoginModalOpen, openLoginModal, closeLoginModal, isSearchModalOpen, openSearchModal, closeSearchModal]);
 
   return (
     <AuthFlowContext.Provider value={value}>

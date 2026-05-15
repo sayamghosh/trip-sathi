@@ -9,38 +9,9 @@ import bannerImg from '../assets/banner-tripsathi.png';
 
 type SlideDirection = 'down' | 'up';
 
-const searchBarVariants: Variants = {
-    enter: (direction: SlideDirection) => ({
-        y: direction === 'down' ? -48 : 48,
-        opacity: 0,
-    }),
-    center: {
-        y: 0,
-        opacity: 1,
-        transition: { type: 'spring', stiffness: 320, damping: 32 },
-    },
-    exit: (direction: SlideDirection) => ({
-        y: direction === 'down' ? -48 : 48,
-        opacity: 0,
-        transition: { duration: 0.2 },
-    }),
-};
-
 const Hero = () => {
     const [destination, setDestination] = useState('');
-    const [isSticky, setIsSticky] = useState(false);
     const router = useRouter();
-
-    useEffect(() => {
-        const handleScroll = () => {
-            // Trigger stickiness slightly before it leaves screen for smoother interpolation
-            setIsSticky(window.scrollY > 350);
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        handleScroll();
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
 
     const handleSearch = () => {
         const trimmed = destination.trim();
@@ -79,42 +50,26 @@ const Hero = () => {
                             Discovery & Beyond
                         </h1>
 
-                        {/* Search Bar Wrapper */}
-                        <div className="h-14 sm:h-16 w-full max-w-xl sm:max-w-2xl mb-8 sm:mb-12 relative z-99999">
-                            <AnimatePresence initial={false} mode="wait">
-                                <motion.div
-                                    key={isSticky ? 'sticky-search' : 'hero-search'}
-                                    custom={isSticky ? 'down' : 'up'}
-                                    variants={searchBarVariants}
-                                    initial="enter"
-                                    animate="center"
-                                    exit="exit"
-                                    layout
-                                    className={`bg-white p-1 sm:p-1.5 rounded-full flex items-center shadow-lg ${
-                                        isSticky
-                                            ? 'fixed top-24 left-1/2 -translate-x-1/2 w-[92vw] max-w-3xl shadow-2xl border border-gray-200 z-99999'
-                                            : 'relative z-50 w-full max-w-xl sm:max-w-2xl'
-                                    }`}
-                                >
-                                    <input
-                                        type="text"
-                                        value={destination}
-                                        onChange={(e) => setDestination(e.target.value)}
-                                        onKeyDown={handleKeyDown}
-                                        placeholder="Where do you want to go?"
-                                        className="flex-1 bg-transparent outline-none text-gray-700 font-medium px-4 sm:px-6 text-sm sm:text-base w-full placeholder-gray-500"
-                                    />
-                                    <button
-                                        onClick={handleSearch}
-                                        className="bg-[#1868D5] hover:bg-blue-700 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-full flex items-center gap-2 font-medium transition-colors cursor-pointer text-xs sm:text-sm"
-                                    >
-                                        <Search size={16} className="sm:hidden" />
-                                        <Search size={18} className="hidden sm:block" />
-                                        <span className="hidden sm:inline">search</span>
-                                    </button>
-                                </motion.div>
-                            </AnimatePresence>
-                        </div>
+        <div className="h-14 sm:h-16 w-full max-w-xl sm:max-w-2xl mb-8 sm:mb-12 relative z-50">
+            <div className="bg-white p-1 sm:p-1.5 rounded-full flex items-center shadow-lg relative z-50 w-full max-w-xl sm:max-w-2xl">
+                <input
+                    type="text"
+                    value={destination}
+                    onChange={(e) => setDestination(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Where do you want to go?"
+                    className="flex-1 bg-transparent outline-none text-gray-700 font-medium px-4 sm:px-6 text-sm sm:text-base w-full placeholder-gray-500"
+                />
+                <button
+                    onClick={handleSearch}
+                    className="bg-[#1868D5] hover:bg-blue-700 text-white px-4 sm:px-8 py-2.5 sm:py-3 rounded-full flex items-center gap-2 font-medium transition-colors cursor-pointer text-xs sm:text-sm"
+                >
+                    <Search size={16} className="sm:hidden" />
+                    <Search size={18} className="hidden sm:block" />
+                    <span className="hidden sm:inline">search</span>
+                </button>
+            </div>
+        </div>
 
                         {/* Stats */}
                         <div className="flex items-center gap-4 sm:gap-8 text-white mt-2 sm:mt-4">

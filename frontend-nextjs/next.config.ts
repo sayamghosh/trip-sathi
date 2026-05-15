@@ -1,12 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  images: {
+    qualities: [75, 85],
+  },
 };
-
-module.exports = {
-  allowedDevOrigins: ['10.58.83.132'],
-}
-
 
 export default nextConfig;

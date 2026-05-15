@@ -240,10 +240,14 @@ export default function GalleryPage() {
       )}
 
       {/* CTA Section (from About page) */}
-      <section className="mx-auto max-w-[1504px] px-2 pb-2 mt-8">
+      <section className="mx-auto max-w-[1511px] px-2 pb-3 mt-8">
         <div className="relative overflow-hidden rounded-[20px] bg-[#333]">
           <div className="absolute inset-0">
-            <ImageTile src={galleryImages[0].image} alt="Travel CTA background" className="opacity-40" />
+            <ImageTile
+              src={galleryImages[0].image}
+              alt="Travel CTA background"
+              className="opacity-40"
+            />
             <div className="absolute inset-0 bg-black/30" />
           </div>
           <div className="relative mx-auto flex min-h-[400px] max-w-[700px] flex-col items-center justify-center px-6 py-20 text-center text-white">
@@ -251,7 +255,8 @@ export default function GalleryPage() {
               Ready to Capture Your Own Moments?
             </h2>
             <p className="mt-6 max-w-[480px] text-[14px] font-normal leading-[1.6] text-white/85 lg:text-[16px]">
-              Start planning your next adventure today and create memories that will last a lifetime.
+              Start planning your next adventure today and create memories that
+              will last a lifetime.
             </p>
             <a
               href="/search"

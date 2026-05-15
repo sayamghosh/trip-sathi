@@ -344,21 +344,27 @@ export default function AboutPage() {
       </section>
 
       {/* Final CTA Section */}
-      <section className="mx-auto max-w-[1512px] px-2 pb-2">
-        <div className="relative overflow-hidden rounded-[20px] bg-[#f5f5f5]">
+      <section className="mx-auto max-w-[1511px] px-2 pb-3 mt-8">
+        <div className="relative overflow-hidden rounded-[20px] bg-[#333]">
           <div className="absolute inset-0">
-            <ImageTile src={destinations[7].image} alt="Travel CTA background" className="opacity-20 grayscale" />
+            <ImageTile
+              src={destinations[0].image}
+              alt="Travel CTA background"
+              className="opacity-40"
+            />
+            <div className="absolute inset-0 bg-black/30" />
           </div>
-          <div className="relative mx-auto flex min-h-[400px] max-w-[800px] flex-col items-center justify-center px-6 py-20 text-center text-[#202124]">
-            <h2 className="text-[32px] font-bold leading-[1.1] tracking-[-0.03em] sm:text-[40px] lg:text-[48px] text-[#1a1c1f]">
-              Ready to Plan Your Next <br /> Trip with Trip Sathi?
+          <div className="relative mx-auto flex min-h-[400px] max-w-[700px] flex-col items-center justify-center px-6 py-20 text-center text-white">
+            <h2 className="text-[28px] font-medium leading-[1.1] tracking-[-0.03em] sm:text-[36px] lg:text-[40px]">
+              Ready to Plan Your Next Trip with <br /> Trip Sathi?
             </h2>
-            <p className="mt-6 max-w-[540px] text-[15px] font-medium leading-[1.6] text-[#565b63] lg:text-[17px]">
-              Explore destinations, compare real prices and reviews, and book everything in one place.
+            <p className="mt-6 max-w-[480px] text-[14px] font-normal leading-[1.6] text-white/85 lg:text-[16px]">
+              Explore destinations, compare real prices and reviews, and book
+              everything in one place.
             </p>
             <a
               href="/search"
-              className="mt-10 rounded-full bg-[#1554F6] px-10 py-4 text-[15px] font-bold text-white transition hover:bg-[#1049ba] shadow-xl shadow-blue-500/20"
+              className="mt-10 rounded-full bg-[#1458df] px-10 py-4 text-[15px] font-bold text-white transition hover:bg-[#1049ba]"
             >
               Get Started Now
             </a>

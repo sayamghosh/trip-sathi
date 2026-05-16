@@ -68,6 +68,7 @@ const Hero = () => {
                         priority
                         placeholder="blur"
                         quality={85}
+                        sizes="100vw"
                         className="object-cover object-center absolute inset-0 z-0"
                     />
                     {/* Dark overlay for better text readability */}

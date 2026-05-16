@@ -7,8 +7,14 @@ import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { useAuthFlow } from '../context/AuthFlowContext';
-import LoginModal from './LoginModal';
+import dynamic from 'next/dynamic';
 import logo from '../assets/logo.svg';
+
+// Lazy load LoginModal to avoid loading Google OAuth script on initial page load
+const LoginModal = dynamic(() => import('./LoginModal'), {
+    ssr: false,
+    loading: () => null,
+});
 
 const navItems = [
   { href: '/about', label: 'About' },
@@ -50,7 +56,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="shrink-0 flex items-center gap-2">
             <Link href="/" className="text-2xl font-bold text-[#1a2b4c] tracking-tight">
-              <img src={logo.src} alt="logo" />
+              <img src={logo.src} alt="TripSathi Logo" width={140} height={40} />
             </Link>
           </div>
 

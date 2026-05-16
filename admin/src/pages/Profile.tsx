@@ -28,7 +28,7 @@ type ProfileUser = {
   bio?: string
 }
 
-const DEFAULT_BIO = "Senior Administrator managing global travel operations. Passionate about ensuring seamless travel experiences."
+const DEFAULT_BIO = ""
 
 export function Profile() {
   const [user, setUser] = useState<ProfileUser | null>(() => {
@@ -50,9 +50,10 @@ export function Profile() {
   }, [])
 
   const getInitials = (name: string) => {
-    if (!name) return "RH"
+    if (!name) return ""
     return name
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
@@ -70,9 +71,9 @@ export function Profile() {
     )
   }
 
-  const name = fullName || user?.name || "Ruben Herwitz"
-  const role = user?.role || "Administrator"
-  const email = user?.email || "admin@tripsathi.com"
+  const name = fullName || user?.name || ""
+  const role = user?.role || "Agent"
+  const email = user?.email || ""
   const displayAddress = address || "Location not added"
   const canSave = isEditing && Boolean(fullName.trim() && phone.trim() && address.trim() && !isSaving)
 
@@ -201,18 +202,18 @@ export function Profile() {
               size="icon"
               onClick={handleEditButtonClick}
               disabled={isSaving || (isEditing && !canSave)}
-              className="h-10 w-10 rounded-full bg-background text-muted-foreground hover:text-primary data-[variant=default]:bg-primary data-[variant=default]:text-white data-[variant=default]:hover:bg-primary/90"
+              className="h-10 w-10 rounded-full cursor-pointer bg-background text-muted-foreground hover:text-primary data-[variant=default]:bg-primary data-[variant=default]:text-white data-[variant=default]:hover:bg-primary/90"
               title={isEditing ? "Save personal information" : "Edit personal information"}
             >
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : isEditing ? <Check className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
             </Button>
           </div>
 
-          {isEditing && (
+          {/* {isEditing && (
             <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-[13px] font-bold text-primary">
               Editing is enabled. Click the check button to keep your updates.
             </div>
-          )}
+          )} */}
 
           {saveError && (
             <div className="mb-6 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-[13px] font-bold text-destructive">

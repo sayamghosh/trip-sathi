@@ -85,9 +85,10 @@ export function TopBar() {
   }, [])
 
   const getInitials = (name: string) => {
-    if (!name) return "RH"
+    if (!name) return ""
     return name
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
@@ -95,6 +96,7 @@ export function TopBar() {
   }
 
   const handleLogout = () => {
+    localStorage.removeItem("token")
     localStorage.removeItem("user")
     window.location.href = "/login"
   }
@@ -195,16 +197,16 @@ export function TopBar() {
               <img src={user.picture} alt={user.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
             ) : (
               <span className="text-[12px] font-bold text-white">
-                {getInitials(user?.name || "Ruben Herwitz")}
+                {getInitials(user?.name || "")}
               </span>
             )}
           </div>
           <div className="flex flex-col text-left leading-tight">
             <span className="text-[12px] font-semibold text-foreground">
-              {user?.name || "Ruben Herwitz"}
+              {user?.name || "User"}
             </span>
             <span className="text-[10px] capitalize text-muted-foreground">
-              {user?.role || "Admin"}
+              {user?.role || "Agent"}
             </span>
           </div>
           <ChevronDown className={`ml-1 h-[14px] w-[14px] text-muted-foreground transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -216,10 +218,10 @@ export function TopBar() {
             {/* User Header */}
             <div className="px-4 py-3 border-b border-border">
               <p className="text-[13px] font-bold text-foreground">
-                {user?.name || "Ruben Herwitz"}
+                {user?.name || "User"}
               </p>
               <p className="text-[11px] font-medium text-muted-foreground truncate">
-                {user?.email || "admin@example.com"}
+                {user?.email || ""}
               </p>
             </div>
             

@@ -11,7 +11,9 @@ export default function ClientShell({ children }: { children: React.ReactNode })
             <PageTransitionLoader />
             <ScrollRestoration />
             <Navbar />
-            {children}
+            <main id="main-content">
+                {children}
+            </main>
             <Footer />
         </>
     );

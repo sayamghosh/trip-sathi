@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
+import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import ClientShell from "./client-shell";
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-sans",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://tripsathi.vercel.app'),
@@ -96,7 +103,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="en" className={`h-full antialiased ${dmSans.variable}`}>
       <head>
         <script
           type="application/ld+json"

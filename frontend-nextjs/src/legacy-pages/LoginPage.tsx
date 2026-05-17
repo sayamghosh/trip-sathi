@@ -5,6 +5,7 @@ import { GoogleLogin } from '@react-oauth/google';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { googleLoginAPI } from '../services/auth.service';
+import { siteConfig } from '../config/site';
 
 const LoginPage: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
@@ -42,7 +43,7 @@ const LoginPage: React.FC = () => {
         <div className="flex flex-col min-h-screen bg-gray-50 items-center justify-center p-4">
             <div className="bg-white rounded-2xl shadow-lg w-full max-w-md p-8 text-center space-y-6">
                 <div className="space-y-2">
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Welcome to Trip Sathi</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Welcome to {siteConfig.projectName}</h1>
                     <p className="text-gray-500">Sign in to find your perfect travel guide</p>
                 </div>
 

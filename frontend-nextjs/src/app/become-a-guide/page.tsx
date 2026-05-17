@@ -7,6 +7,7 @@ import { guideLoginAPI } from '../../services/auth.service';
 import { CheckCircle, Shield, XCircle, Globe, Calendar, DollarSign, TrendingUp, ArrowDown } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { siteConfig } from '../../config/site';
 
 export default function BecomeAGuidePage() {
   const router = useRouter();
@@ -106,7 +107,7 @@ export default function BecomeAGuidePage() {
               Turn Your City Knowledge into a <span className="text-yellow-400">Thriving Business</span>
             </h1>
             <p className="text-xl text-sky-50 mb-10 max-w-xl mx-auto md:mx-0 font-medium opacity-90">
-              Join TripSathi's growing network of local guides. Share your culture, meet travelers from around the world, and earn on your own terms.
+              Join {siteConfig.projectName}'s growing network of local guides. Share your culture, meet travelers from around the world, and earn on your own terms.
             </p>
 
             <div className="flex flex-col items-center md:items-start mb-2">
@@ -186,7 +187,7 @@ export default function BecomeAGuidePage() {
       <section className="bg-white py-24 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-4 font-display">Why Should You Join TripSathi?</h2>
+            <h2 className="text-4xl font-extrabold text-gray-900 mb-4 font-display">Why Should You Join {siteConfig.projectName}?</h2>
             <p className="text-lg text-gray-500 max-w-2xl mx-auto">
               We provide the tools, the audience, and the trust. You provide the unforgettable experiences.
             </p>

@@ -13,6 +13,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const PROJECT_NAME = process.env.PROJECT_NAME || "Joy Trips";
 
 // Middleware
 app.use(cors());
@@ -30,7 +31,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/callbacks', callbackRoutes);
 
 app.get('/', (req, res) => {
-    res.send('Trip Sathi API is running');
+    res.send(`${PROJECT_NAME} API is running`);
 });
 
 // Export app for Vercel serverless runtime.

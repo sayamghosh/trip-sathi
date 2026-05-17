@@ -1,11 +1,11 @@
-# SEO Implementation Plan for TripSathi
+﻿# SEO Implementation Plan for Joy Trips
 
 ## Executive Summary
 
 **Current State:**
 - Lighthouse Performance Score: 53 (Poor)
 - Lighthouse Accessibility Score: 88 (Needs Improvement)
-- Domain: https://tripsathi.vercel.app/
+- Domain: https://Joy Trips.vercel.app/
 
 **Target Goals:**
 - Performance Score: 90+ (Good)
@@ -197,18 +197,18 @@ import Script from 'next/script';
 import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tripsathi.vercel.app'),
+  metadataBase: new URL('https://Joy Trips.vercel.app'),
   
   // Basic SEO
   title: {
-    default: 'TripSathi - Discover Local Guides & Travel Experiences',
-    template: '%s | TripSathi',
+    default: 'Joy Trips - Discover Local Guides & Travel Experiences',
+    template: '%s | Joy Trips',
   },
-  description: 'Find and book local travel guides, curated tour packages, and unique experiences across India. Discover destinations, compare prices, and plan your perfect trip with TripSathi.',
+  description: 'Find and book local travel guides, curated tour packages, and unique experiences across India. Discover destinations, compare prices, and plan your perfect trip with Joy Trips.',
   keywords: ['travel', 'tour', 'guide', 'booking', 'India tourism', 'travel packages', 'local guide'],
-  authors: [{ name: 'TripSathi' }],
-  creator: 'TripSathi',
-  publisher: 'TripSathi',
+  authors: [{ name: 'Joy Trips' }],
+  creator: 'Joy Trips',
+  publisher: 'Joy Trips',
   
   // Robots & Indexing
   robots: {
@@ -227,16 +227,16 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://tripsathi.vercel.app/',
-    siteName: 'TripSathi',
-    title: 'TripSathi - Discover Local Guides & Travel Experiences',
+    url: 'https://Joy Trips.vercel.app/',
+    siteName: 'Joy Trips',
+    title: 'Joy Trips - Discover Local Guides & Travel Experiences',
     description: 'Find and book local travel guides, curated tour packages, and unique experiences across India.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'TripSathi - Travel with Local Guides',
+        alt: 'Joy Trips - Travel with Local Guides',
       },
     ],
   },
@@ -244,16 +244,16 @@ export const metadata: Metadata = {
   // Twitter Cards
   twitter: {
     card: 'summary_large_image',
-    title: 'TripSathi - Discover Local Guides & Travel Experiences',
+    title: 'Joy Trips - Discover Local Guides & Travel Experiences',
     description: 'Find and book local travel guides and curated tour packages across India.',
-    creator: '@tripsathi',
+    creator: '@Joy Trips',
     images: ['/og-image.jpg'],
   },
   
   // Alternate languages (for India)
   alternates: {
     languages: {
-      'en-IN': 'https://tripsathi.vercel.app/',
+      'en-IN': 'https://Joy Trips.vercel.app/',
     },
   },
   
@@ -278,11 +278,11 @@ export const viewport: Viewport = {
 **Homepage (page.tsx):**
 ```tsx
 export const metadata: Metadata = {
-  title: 'TripSathi - Best Travel Packages & Local Guides in India',
-  description: 'Book your dream vacation with TripSathi. Discover 120+ destinations, compare tour packages, find local guides, and get the best deals on hotels and experiences.',
+  title: 'Joy Trips - Best Travel Packages & Local Guides in India',
+  description: 'Book your dream vacation with Joy Trips. Discover 120+ destinations, compare tour packages, find local guides, and get the best deals on hotels and experiences.',
   keywords: ['travel packages India', 'book tour', 'local guide', 'holiday packages', 'best deals travel'],
   openGraph: {
-    title: 'TripSathi - Best Travel Packages & Local Guides in India',
+    title: 'Joy Trips - Best Travel Packages & Local Guides in India',
     description: 'Discover 120+ destinations with trusted local guides. Book your perfect trip today.',
     images: [{ url: '/og-home.jpg' }],
   },
@@ -292,11 +292,11 @@ export const metadata: Metadata = {
 **Packages Page:**
 ```tsx
 export const metadata: Metadata = {
-  title: 'Tour Packages - Best Travel Deals | TripSathi',
+  title: 'Tour Packages - Best Travel Deals | Joy Trips',
   description: 'Browse our curated collection of tour packages. Find the best deals on family trips, adventure tours,honeymoon packages, and more across India.',
   keywords: ['tour packages', 'travel deals', 'holiday packages', 'family tour', 'honeymoon packages'],
   openGraph: {
-    title: 'Tour Packages - Best Travel Deals | TripSathi',
+    title: 'Tour Packages - Best Travel Deals | Joy Trips',
     description: 'Explore 120+ destinations with curated tour packages.',
   },
 };
@@ -305,15 +305,15 @@ export const metadata: Metadata = {
 **About Page:**
 ```tsx
 export const metadata: Metadata = {
-  title: 'About Us - Our Journey | TripSathi',
-  description: 'Learn about TripSathi\'s mission to simplify travel planning. Discover how we connect travelers with trusted local guides and curated experiences.',
+  title: 'About Us - Our Journey | Joy Trips',
+  description: 'Learn about Joy Trips\'s mission to simplify travel planning. Discover how we connect travelers with trusted local guides and curated experiences.',
 };
 ```
 
 **Gallery Page:**
 ```tsx
 export const metadata: Metadata = {
-  title: 'Travel Gallery - Destination Photos | TripSathi',
+  title: 'Travel Gallery - Destination Photos | Joy Trips',
   description: 'Explore stunning destination photos from travelers. Get inspired for your next adventure with beautiful captures from across India.',
   robots: 'noindex, follow', // Gallery often causes duplicate content issues
 };
@@ -329,13 +329,13 @@ export const metadata: Metadata = {
 <script type="application/ld+json" dangerouslySetInnerHTML={{__html: JSON.stringify({
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "TripSathi",
-  "url": "https://tripsathi.vercel.app",
-  "logo": "https://tripsathi.vercel.app/logo.png",
+  "name": "Joy Trips",
+  "url": "https://Joy Trips.vercel.app",
+  "logo": "https://Joy Trips.vercel.app/logo.png",
   "description": "Travel platform connecting travelers with local guides and curated experiences across India.",
   "founder": {
     "@type": "Person",
-    "name": "TripSathi Team"
+    "name": "Joy Trips Team"
   },
   "contactPoint": {
     "@type": "ContactPoint",
@@ -343,10 +343,10 @@ export const metadata: Metadata = {
     "contactType": "Customer Service"
   },
   "sameAs": [
-    "https://www.facebook.com/tripsathi",
-    "https://www.instagram.com/tripsathi",
-    "https://twitter.com/tripsathi",
-    "https://www.youtube.com/tripsathi"
+    "https://www.facebook.com/Joy Trips",
+    "https://www.instagram.com/Joy Trips",
+    "https://twitter.com/Joy Trips",
+    "https://www.youtube.com/Joy Trips"
   ],
   "address": {
     "@type": "PostalAddress",
@@ -364,7 +364,7 @@ const jsonLd = {
   "@type": "TouristTrip",
   "name": tourPlan.title,
   "description": tourPlan.description,
-  "url": `https://tripsathi.vercel.app/packages/${tourPlan.id}`,
+  "url": `https://Joy Trips.vercel.app/packages/${tourPlan.id}`,
   "image": tourPlan.bannerImages,
   "tourDuration": `P${tourPlan.durationDays}D`,
   "tourCoverage": {
@@ -399,13 +399,13 @@ const breadcrumb = {
       "@type": "ListItem",
       "position": 1,
       "name": "Home",
-      "item": "https://tripsathi.vercel.app/"
+      "item": "https://Joy Trips.vercel.app/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "Packages",
-      "item": "https://tripsathi.vercel.app/packages"
+      "item": "https://Joy Trips.vercel.app/packages"
     }
   ]
 };
@@ -424,7 +424,7 @@ Disallow: /guide/dashboard/
 Disallow: /login/
 
 # Sitemap
-Sitemap: https://tripsathi.vercel.app/sitemap.xml
+Sitemap: https://Joy Trips.vercel.app/sitemap.xml
 
 # Crawl-delay (optional, for large sites)
 Crawl-delay: 1
@@ -435,7 +435,7 @@ Crawl-delay: 1
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://tripsathi.vercel.app';
+  const baseUrl = 'https://Joy Trips.vercel.app';
   
   const staticPages = [
     '',
@@ -612,10 +612,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
 **Pillar Page Structure (Example):**
 ```
 /destinations (Pillar Page - Main)
-  ├── /destinations/kashmir
-  ├── /destinations/rajasthan  
-  ├── /destinations/kerala
-  └── /destinations/goa
+  â”œâ”€â”€ /destinations/kashmir
+  â”œâ”€â”€ /destinations/rajasthan  
+  â”œâ”€â”€ /destinations/kerala
+  â””â”€â”€ /destinations/goa
 ```
 
 ### 4.3 Pagination & Infinite Scroll SEO
@@ -708,7 +708,7 @@ export default function Pagination({ totalPages, currentPage }) {
 **City Page Example (Delhi):**
 ```tsx
 export const metadata: Metadata = {
-  title: 'Best Tour Packages from Delhi | TripSathi',
+  title: 'Best Tour Packages from Delhi | Joy Trips',
   description: 'Book Delhi to Shimla, Manali, Rajasthan tours. Best prices on family trips, honeymoon packages from Delhi. Free cancellation available.',
   keywords: ['tour packages from Delhi', 'Delhi to Manali tour', 'Delhi to Rajasthan packages'],
 };

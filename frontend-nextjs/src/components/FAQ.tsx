@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
+import { siteConfig } from '../config/site';
 
 const faqs = [
     {
-        question: "How do I book a trip with Trip Sathi?",
+        question: `How do I book a trip with ${siteConfig.projectName}?`,
         answer: "You can easily browse destinations, select dates, and book your entire trip—including flights, hotels, and activities—directly through our platform."
     },
     {
@@ -14,7 +15,7 @@ const faqs = [
         answer: "Many properties and packages offer free changes or cancellations. Check the policy on each listing before you confirm your booking."
     },
     {
-        question: "Is it safe to pay through Trip Sathi?",
+        question: `Is it safe to pay through ${siteConfig.projectName}?`,
         answer: "Yes, we use bank-level encryption and secure payment gateways to ensure your transactions and personal information are always protected."
     },
     {
@@ -43,7 +44,7 @@ const FAQ = () => {
                         Need Help Before You Book?
                     </h2>
                     <p className="text-gray-500 text-sm sm:text-base max-w-2xl mx-auto">
-                        Learn how Trip Sathi helps you explore options, compare prices, and book with confidence.
+                        Learn how {siteConfig.projectName} helps you explore options, compare prices, and book with confidence.
                     </p>
                 </div>
 

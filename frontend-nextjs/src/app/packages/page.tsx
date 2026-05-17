@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import tourPlanService from "@/services/tourPlan.service";
 import type { TourPlanSummary } from "@/types/tourPlan";
+import { siteConfig } from "@/config/site";
 
 type DealCard = {
   label: string;
@@ -273,7 +274,7 @@ export default function PackagesPage() {
               href="/search"
               className="mt-10 rounded-full bg-[#1458df] px-10 py-4 text-[15px] font-bold text-white transition hover:bg-[#1049ba]"
             >
-              Start Exploring with Tripsathi
+              Start Exploring with {siteConfig.projectName}
             </a>
           </div>
         </div>

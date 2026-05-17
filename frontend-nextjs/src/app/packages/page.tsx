@@ -43,6 +43,8 @@ function ImageTile({
       alt={alt}
       className={`h-full w-full object-cover ${className}`}
       loading="lazy"
+      width={400}
+      height={236}
     />
   );
 }
@@ -175,6 +177,10 @@ export default function PackagesPage() {
                 src={destination.image}
                 alt={destination.name}
                 className="h-full w-full object-cover"
+                width={400}
+                height={236}
+                loading="lazy"
+                decoding="async"
               />
             </div>
           ))}
@@ -287,6 +293,10 @@ function DealCard({ deal }: { deal: DealCard }) {
           src={deal.image}
           alt={deal.name}
           className="h-full w-full object-cover"
+          width={400}
+          height={274}
+          loading="lazy"
+          decoding="async"
         />
         <button
           className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-black/20 text-white"

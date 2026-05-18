@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Menu, X, User as UserIcon, LogOut, Search } from "lucide-react";
+import { Menu, X, User as UserIcon, LogOut, Search, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,7 +9,7 @@ import { useAuth } from "../context/AuthContext";
 import { useAuthFlow } from "../context/AuthFlowContext";
 import dynamic from 'next/dynamic';
 const LoginModal = dynamic(() => import('./LoginModal'), { ssr: false });
-import SearchModal from "./SearchModal";
+import NavbarSearch from "./NavbarSearch";
 
 const navItems = [
   { href: "/about", label: "About" },
@@ -21,7 +21,7 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
-  const { isLoginModalOpen, openLoginModal, closeLoginModal, isSearchModalOpen, openSearchModal, closeSearchModal } = useAuthFlow();
+  const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
   const router = useRouter();
   const pathname = usePathname();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,6 +29,12 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [isPackagesSearchVisible, setIsPackagesSearchVisible] = useState(true);
+  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
+
+  useEffect(() => {
+    setIsSearchExpanded(false);
+    setIsOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     const handleVisibility = (e: any) => {
@@ -80,14 +86,15 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed w-full z-50 transition-all duration-300 ${
-        scrolled ? "bg-white/95 backdrop-blur-md shadow-sm" : "bg-transparent"
+      className={`fixed w-full z-50 transition-all duration-300 bg-white/95 backdrop-blur-md shadow-sm lg:bg-transparent ${
+        scrolled ? "lg:bg-white/95 lg:backdrop-blur-md lg:shadow-sm" : ""
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-4 lg:px-4">
-        <div className="flex justify-between h-15 items-center">
+      {/* Desktop Navbar Wrapper */}
+      <div className="hidden lg:block max-w-7xl mx-auto px-4">
+        <div className="flex justify-between h-15 items-center relative">
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center">
+          <div className="flex items-center">
             {navItems.map((item, index) => (
               <div key={item.href} className="flex items-center">
                 <Link
@@ -118,31 +125,23 @@ const Navbar = () => {
           </div>
 
           {/* Action Buttons / Profile */}
-          <div
-            className="hidden md:flex items-center relative"
-            ref={dropdownRef}
-          >
+          <div className="flex items-center relative" ref={dropdownRef}>
             <AnimatePresence>
               {showSearch && (
-                <motion.button
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  onClick={openSearchModal}
-                  className="mr-5 text-gray-600 hover:text-[#1458df] transition-colors cursor-pointer"
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
                 >
-                  <Search size={20} />
-                </motion.button>
+                  <NavbarSearch isMobile={false} />
+                </motion.div>
               )}
             </AnimatePresence>
             {!isAuthenticated ? (
               <button
                 onClick={openLoginModal}
-                className={`px-7 py-2.5 cursor-pointer rounded-full text-[16px] font-medium transition-all ${
-                  scrolled
-                    ? "bg-[#1458df] text-white hover:bg-[#1049ba]"
-                    : "bg-[#1458df] text-white hover:bg-[#1049ba]"
-                }`}
+                className="px-7 py-2.5 cursor-pointer rounded-full text-[16px] font-medium bg-[#1458df] text-white hover:bg-[#1049ba] transition-all"
               >
                 Sign In
               </button>
@@ -150,13 +149,13 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full transition-all border overflow-hidden bg-gray-100 border-gray-200"
+                  className="flex items-center justify-center w-10 h-10 rounded-full transition-all border overflow-hidden bg-gray-100 border-gray-200 cursor-pointer"
                 >
                   {user?.picture ? (
                     <img
                       src={user.picture}
                       alt="Profile"
-                      className="w-full h-full object-cover cursor-pointer"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <UserIcon size={18} />
@@ -169,7 +168,7 @@ const Navbar = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden"
+                      className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50"
                     >
                       <div className="p-4 border-b border-gray-50 bg-gray-50/30">
                         <p className="text-[16px] font-medium text-gray-900 truncate">
@@ -198,29 +197,102 @@ const Navbar = () => {
               </div>
             )}
           </div>
-
-          <div className="md:hidden flex items-center ml-auto gap-4">
-            <AnimatePresence>
-              {showSearch && (
-                <motion.button
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 10 }}
-                  onClick={openSearchModal}
-                  className="text-gray-600 hover:text-[#1458df] transition-colors cursor-pointer"
-                >
-                  <Search size={22} />
-                </motion.button>
-              )}
-            </AnimatePresence>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:opacity-80 focus:outline-none transition-all duration-300"
-            >
-              {isOpen ? <X size={28} /> : <Menu size={28} />}
-            </button>
-          </div>
         </div>
+      </div>
+
+      {/* Mobile/Tablet Navbar Wrapper */}
+      <div className="lg:hidden w-full px-4">
+        <AnimatePresence mode="wait">
+          {isSearchExpanded ? (
+            /* Active Full-width Search Bar Row */
+            <motion.div
+              key="mobile-search-active"
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.15 }}
+              className="flex items-center h-15 w-full gap-3 py-2"
+            >
+              <button
+                onClick={() => setIsSearchExpanded(false)}
+                className="p-2 -ml-2 text-gray-600 hover:text-black focus:outline-none transition-colors cursor-pointer"
+              >
+                <ArrowLeft size={22} />
+              </button>
+              <div className="flex-1">
+                <NavbarSearch isMobile={true} autoFocus={true} onClose={() => setIsSearchExpanded(false)} />
+              </div>
+            </motion.div>
+          ) : (
+            /* Normal Layout: Logo row + Search row */
+            <motion.div
+              key="mobile-normal"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="flex flex-col w-full pb-3"
+            >
+              {/* Row 1: Logo & Hamburgers */}
+              <div className="flex justify-between h-15 items-center relative w-full">
+                <div className="flex items-center">
+                  <Link
+                    href="/"
+                    className="text-[24px] font-bold tracking-tight text-gray-900 transition-colors"
+                  >
+                    tripsathi
+                  </Link>
+                </div>
+
+                <div className="flex items-center ml-auto">
+                  {isAuthenticated ? (
+                    <button
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="focus:outline-none cursor-pointer p-1"
+                      aria-label="Toggle profile menu"
+                    >
+                      {isOpen ? (
+                        <X size={26} className="text-gray-600 hover:text-black transition-colors" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full border overflow-hidden bg-gray-100 border-gray-200 hover:border-gray-400 transition-all duration-200 flex items-center justify-center">
+                          {user?.picture ? (
+                            <img src={user.picture} alt="Profile" className="w-full h-full object-cover" />
+                          ) : (
+                            <UserIcon size={14} className="text-gray-500" />
+                          )}
+                        </div>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setIsOpen(!isOpen)}
+                      className="text-gray-600 hover:text-black p-2 focus:outline-none transition-colors cursor-pointer"
+                      aria-label="Toggle menu"
+                    >
+                      {isOpen ? <X size={26} /> : <Menu size={26} />}
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Row 2: Amazon Style Search Bar */}
+              <div className="w-full mt-0.5">
+                <div 
+                  onClick={() => setIsOpen(false) /* Close drawer if open */}
+                  className="w-full"
+                >
+                  <div
+                    onClick={() => setIsSearchExpanded(true)}
+                    className="w-full relative flex items-center bg-gray-50/80 hover:bg-white hover:border-[#1458df]/30 border border-gray-200 rounded-full py-2 px-3.5 cursor-pointer transition-all duration-200"
+                  >
+                    <Search size={16} className="text-gray-400 mr-2 shrink-0" />
+                    <span className="text-[13px] font-medium text-gray-400">Search destinations...</span>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Mobile Menu Dropdown */}
@@ -230,7 +302,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-t border-gray-100 shadow-2xl overflow-hidden"
+            className="lg:hidden bg-white border-t border-gray-100 shadow-2xl overflow-hidden"
           >
             <div className="px-6 pt-4 pb-8 space-y-4">
               {navItems.map((item) => (
@@ -303,7 +375,6 @@ const Navbar = () => {
       </AnimatePresence>
 
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
-      <SearchModal isOpen={isSearchModalOpen} onClose={closeSearchModal} />
     </nav>
   );
 };

@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 // ─── Update guide profile ────────────────────────────────────────────────────
 export const updateGuideProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { name, phone, address, bio } = req.body;
+        const { name, phone, address, bio, isProfilePublic } = req.body;
 
         // The user ID comes from the JWT middleware (set as req.user in middleware)
         const userInReq = (req as any).user;
@@ -15,12 +15,18 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
             return;
         }
 
+        const existingUser = await User.findById(userId);
+        if (!existingUser) {
+            res.status(404).json({ message: 'User not found' });
+            return;
+        }
+
         if (!phone || !address) {
             res.status(400).json({ message: 'Phone and address are required' });
             return;
         }
 
-        const updates: { name?: string; phone: string; address: string; bio?: string } = {
+        const updates: { name?: string; phone: string; address: string; bio?: string; isProfilePublic?: boolean } = {
             phone,
             address,
         };
@@ -31,6 +37,14 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
 
         if (typeof bio === 'string') {
             updates.bio = bio.trim();
+        }
+
+        if (typeof isProfilePublic === 'boolean') {
+            if (isProfilePublic && existingUser.verificationStatus !== 'approved') {
+                res.status(403).json({ message: 'Only verified guides can make their profile public' });
+                return;
+            }
+            updates.isProfilePublic = isProfilePublic;
         }
 
         const user = await User.findByIdAndUpdate(
@@ -55,6 +69,9 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
                 phone: user.phone,
                 address: user.address,
                 bio: user.bio,
+                verificationStatus: user.verificationStatus,
+                isActive: user.isActive,
+                isProfilePublic: user.isProfilePublic,
             },
         });
     } catch (error: any) {

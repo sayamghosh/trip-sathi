@@ -10,31 +10,87 @@ Currently, agents (guides) who sign up via the `admin/` panel using Google OAuth
 
 ### 1.1 Dependencies
 - Add `bcryptjs` to `backend/package.json` for password hashing
+- Add `@types/bcryptjs` as dev dependency
 
 ### 1.2 User Model Changes (`backend/src/models/user.model.ts`)
 Add fields to support verification and agent management:
 
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
-| `password` | String | optional | Used only for super admin (email/password auth); null for Google-auth agents |
+| `password` | String | optional | Used only for super admin (email/password auth); `null` for Google-auth agents |
 | `verificationStatus` | String | `'pending'` | `'pending'` / `'approved'` / `'rejected'` |
 | `isActive` | Boolean | `true` | Super admin can set to `false` to deactivate an agent |
 | `isProfilePublic` | Boolean | `false` | Agent's public profile visibility |
 
 Update `role` enum to: `['traveller', 'guide', 'admin']` (keep as-is, `admin` = super admin)
 
-### 1.3 Super Admin Auth Endpoints (`backend/src/controllers/superAdmin.controller.ts`)
-Create email/password-based auth for super admins:
+### 1.3 Super Admin Auth (`backend/src/controllers/superAdmin.controller.ts`)
+Create email/password-based auth for super admins.
+
+**Credentials (seeded):**
+| Field | Value |
+|-------|-------|
+| Email | `admin` |
+| Password | `admin@ts.com` (hashed with bcryptjs) |
+
+**Auth endpoints:**
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| `POST` | `/api/super-admin/signup` | Create super admin account (email + password) |
 | `POST` | `/api/super-admin/login` | Login with email + password, returns JWT |
 | `GET` | `/api/super-admin/me` | Get current super admin profile |
 
-- JWT payload for super admin: `{ id, role: 'admin' }`
+- JWT payload: `{ id, role: 'admin' }`
 - `authMiddleware` already accepts `admin` role alongside `guide`
 - Add `isAdmin` middleware guard (similar to `isGuide`)
+- **No signup endpoint** — the account is created via a seed script (see 1.9)
+
+### 1.9 Seed Script (`backend/src/seed.ts`)
+Create a one-time seed script to bootstrap the super admin:
+
+```typescript
+// src/seed.ts
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import User from './models/user.model.js';
+import { connectDB } from './config/db.js';
+
+async function seed() {
+  await connectDB();
+  
+  const existing = await User.findOne({ email: 'admin' });
+  if (existing) {
+    console.log('Super admin already exists. Skipping seed.');
+    await mongoose.disconnect();
+    return;
+  }
+  
+  const hashedPassword = await bcrypt.hash('admin@ts.com', 10);
+  await User.create({
+    googleId: 'super-admin',  // placeholder, not used for Google auth
+    email: 'admin',
+    name: 'Super Admin',
+    password: hashedPassword,
+    role: 'admin',
+    verificationStatus: 'approved',
+    isActive: true,
+  });
+  
+  console.log('Super admin created: email=admin, password=admin@ts.com');
+  await mongoose.disconnect();
+}
+
+seed();
+```
+
+Add to `backend/package.json`:
+```json
+"scripts": {
+  "seed": "tsx src/seed.ts"
+}
+```
+
+Run once: `npm run seed`
 
 ### 1.4 Super Admin Agent Management Endpoints
 
@@ -196,11 +252,12 @@ Guard: Only allowed if guide's verificationStatus === 'approved'
 | `models/tourPlan.model.ts` | Modify: add `isPublic` |
 | `controllers/auth.controller.ts` | Modify: set `verificationStatus: 'pending'` on guide signup |
 | `controllers/tourPlan.controller.ts` | Modify: enforce `isPublic` + verification checks |
-| `controllers/superAdmin.controller.ts` | **New** — super admin auth + agent management |
+| `controllers/superAdmin.controller.ts` | **New** — super admin login + agent management |
 | `middleware/auth.middleware.ts` | Modify: add `isAdmin` guard |
 | `routes/auth.routes.ts` | No changes needed |
 | `routes/tourPlan.routes.ts` | Modify: add publish endpoint |
 | `routes/superAdmin.routes.ts` | **New** |
+| `seed.ts` | **New** — one-time script to create super admin `admin` / `admin@ts.com` |
 | `index.ts` | Modify: register super admin routes |
 
 ### Super Admin (`super-admin/src/`)
@@ -233,13 +290,16 @@ Guard: Only allowed if guide's verificationStatus === 'approved'
 
 ```
 Phase 1 (Backend foundation)
-  └─ 1.1 Add bcryptjs dependency
+  └─ 1.1 Add bcryptjs + @types/bcryptjs dependency
   └─ 1.2 Update User model (new fields)
   └─ 1.3 Create super admin auth controller + routes
   └─ 1.4 Create agent management endpoints
   └─ 1.5 Update TourPlan model (isPublic)
   └─ 1.6 Update TourPlan controller (visibility logic)
   └─ 1.7 Update agent signup flow
+  └─ 1.8 Register routes in index.ts
+  └─ 1.9 Create seed script & run `npm run seed`
+  └─ 1.9.1 Super admin created: email=`admin`, password=`admin@ts.com`
 
 Phase 2 (Super Admin Panel)
   └─ 2.1 Create API client + update auth store

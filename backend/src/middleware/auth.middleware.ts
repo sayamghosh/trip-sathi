@@ -31,3 +31,12 @@ export const isGuide = (req: Request, res: Response, next: NextFunction): void =
     }
     next();
 };
+
+export const isAdmin = (req: Request, res: Response, next: NextFunction): void => {
+    const user = (req as any).user;
+    if (!user || user.role !== 'admin') {
+        res.status(403).json({ message: 'Access denied: Requires admin role' });
+        return;
+    }
+    next();
+};

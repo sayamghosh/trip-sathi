@@ -1,19 +1,37 @@
 import type { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import TourPlan from '../models/tourPlan.model.js';
+import User from '../models/user.model.js';
 
+// Get all public tour plans from verified and active guides
 export const getAllTourPlans = async (req: Request, res: Response): Promise<void> => {
     try {
         const limit = parseInt(req.query.limit as string) || 0;
-        const plans = await TourPlan.find()
-            .populate('guideId', 'name profileImage phone address')
+
+        // Fetch verified and active guides
+        const activeApprovedGuides = await User.find({
+            role: 'guide',
+            verificationStatus: 'approved',
+            isActive: true
+        }).select('_id');
+        
+        const guideIds = activeApprovedGuides.map(guide => guide._id);
+
+        const plans = await TourPlan.find({
+            isPublic: true,
+            guideId: { $in: guideIds }
+        })
+            .populate('guideId', 'name picture phone address')
             .sort({ createdAt: -1 })
             .limit(limit);
+
         res.status(200).json(plans);
     } catch (error: any) {
         res.status(500).json({ message: 'Error retrieving tour plans', error: error.message });
     }
 };
 
+// Create a new tour plan - sets isPublic to false by default
 export const createTourPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const guideId = (req as any).user.id;
@@ -21,16 +39,18 @@ export const createTourPlan = async (req: Request, res: Response): Promise<void>
 
         const newPlan = new TourPlan({
             ...planData,
-            guideId
+            guideId,
+            isPublic: false // Enforce draft status by default on creation
         });
 
         await newPlan.save();
-        res.status(201).json({ message: 'Tour plan created successfully', tourPlan: newPlan });
+        res.status(201).json({ message: 'Tour plan created successfully as draft', tourPlan: newPlan });
     } catch (error: any) {
         res.status(500).json({ message: 'Error creating tour plan', error: error.message });
     }
 };
 
+// Retrieve guide's own plans (draft and public)
 export const getTourPlansByGuide = async (req: Request, res: Response): Promise<void> => {
     try {
         const guideId = (req as any).user.id;
@@ -41,40 +61,86 @@ export const getTourPlansByGuide = async (req: Request, res: Response): Promise<
     }
 };
 
+// Get single tour plan details with owner and verification checks
 export const getTourPlanById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
         const plan = await TourPlan.findById(id)
-            .populate('guideId', 'name profileImage phone address')
+            .populate('guideId', 'name picture phone address role verificationStatus isActive')
             .populate('days.activities.hotelRef');
+
         if (!plan) {
             res.status(404).json({ message: 'Tour plan not found' });
             return;
         }
+
+        // Determine if requesting user is the owner or an admin
+        let isOwnerOrAdmin = false;
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+            const token = authHeader.split(' ')[1];
+            const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
+            try {
+                const decoded = jwt.verify(token, jwtSecret) as any;
+                if (decoded.id === plan.guideId._id.toString() || decoded.role === 'admin') {
+                    isOwnerOrAdmin = true;
+                }
+            } catch {
+                // Token verification failed, treat as guest
+            }
+        }
+
+        const guide = plan.guideId as any;
+        const isGuideActiveApproved = guide && guide.role === 'guide' && guide.verificationStatus === 'approved' && guide.isActive !== false;
+
+        // Block access if it's draft or the guide is unverified/inactive, unless it's the owner or admin
+        if (!isOwnerOrAdmin && (!plan.isPublic || !isGuideActiveApproved)) {
+            res.status(403).json({ message: 'Access denied: This tour plan is not available to the public' });
+            return;
+        }
+
         res.status(200).json(plan);
     } catch (error: any) {
         res.status(500).json({ message: 'Error retrieving tour plan', error: error.message });
     }
 };
 
+// Search public tour plans from verified and active guides
 export const searchTourPlans = async (req: Request, res: Response): Promise<void> => {
     try {
         const { destination } = req.query;
-        let query = {};
+
+        // Fetch verified and active guides
+        const activeApprovedGuides = await User.find({
+            role: 'guide',
+            verificationStatus: 'approved',
+            isActive: true
+        }).select('_id');
+        
+        const guideIds = activeApprovedGuides.map(guide => guide._id);
+
+        let query: any = {
+            isPublic: true,
+            guideId: { $in: guideIds }
+        };
         
         if (destination && typeof destination === 'string' && destination.trim() !== '') {
             const searchRegex = new RegExp(destination.trim(), 'i');
-            query = { 
-                $or: [
-                    { locations: { $regex: searchRegex } },
-                    { title: { $regex: searchRegex } },
-                    { description: { $regex: searchRegex } }
-                ]
-            };
+            query.$and = [
+                { isPublic: true },
+                { guideId: { $in: guideIds } },
+                {
+                    $or: [
+                        { locations: { $regex: searchRegex } },
+                        { title: { $regex: searchRegex } },
+                        { description: { $regex: searchRegex } }
+                    ]
+                }
+            ];
         }
 
         const plans = await TourPlan.find(query)
-            .populate('guideId', 'name profileImage phone address')
+            .populate('guideId', 'name picture phone address')
             .sort({ createdAt: -1 });
             
         res.status(200).json(plans);
@@ -83,6 +149,7 @@ export const searchTourPlans = async (req: Request, res: Response): Promise<void
     }
 };
 
+// Update an existing tour plan
 export const updateTourPlan = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
@@ -107,5 +174,57 @@ export const updateTourPlan = async (req: Request, res: Response): Promise<void>
         res.status(200).json({ message: 'Tour plan updated successfully', tourPlan: updatedPlan });
     } catch (error: any) {
         res.status(500).json({ message: 'Error updating tour plan', error: error.message });
+    }
+};
+
+// Publish or unpublish a tour plan (only allowed for verified guides)
+export const publishTourPlan = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { isPublic } = req.body;
+        const guideId = (req as any).user.id;
+
+        if (typeof isPublic !== 'boolean') {
+            res.status(400).json({ message: 'isPublic must be a boolean value' });
+            return;
+        }
+
+        // Fetch guide profile to check verification status
+        const guide = await User.findById(guideId);
+        if (!guide || guide.role !== 'guide') {
+            res.status(403).json({ message: 'Access denied: Only guides can publish/unpublish packages' });
+            return;
+        }
+
+        if (guide.verificationStatus !== 'approved') {
+            res.status(403).json({ 
+                message: 'Access denied: You must be verified by the admin before you can publish packages.',
+                verificationStatus: guide.verificationStatus
+            });
+            return;
+        }
+
+        if (!guide.isActive) {
+            res.status(403).json({ message: 'Access denied: Your guide account is currently inactive' });
+            return;
+        }
+
+        const plan = await TourPlan.findOneAndUpdate(
+            { _id: id, guideId },
+            { isPublic },
+            { new: true }
+        );
+
+        if (!plan) {
+            res.status(404).json({ message: 'Tour plan not found or you are not authorized' });
+            return;
+        }
+
+        res.status(200).json({
+            message: `Tour plan ${isPublic ? 'published' : 'unpublished'} successfully`,
+            tourPlan: plan
+        });
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error updating publication status', error: error.message });
     }
 };

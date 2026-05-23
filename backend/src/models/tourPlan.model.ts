@@ -25,6 +25,7 @@ export interface ITourPlan extends Document {
     locations: string[]; // e.g. ["Port Blair", "Havelock"]
     bannerImages?: string[]; // Images for the landing page banner
     days: IDayPlan[];
+    isPublic: boolean;
 }
 
 const ActivityItemSchema = new Schema<IActivityItem>({
@@ -51,7 +52,8 @@ const TourPlanSchema: Schema = new Schema({
     durationNights: { type: Number, required: true },
     locations: [{ type: String }],
     bannerImages: [{ type: String }],
-    days: [DayPlanSchema]
+    days: [DayPlanSchema],
+    isPublic: { type: Boolean, default: false }
 }, { timestamps: true });
 
 export default mongoose.model<ITourPlan>('TourPlan', TourPlanSchema);

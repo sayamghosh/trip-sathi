@@ -49,6 +49,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
                 phone: user.phone,
                 address: user.address,
                 bio: user.bio,
+                verificationStatus: user.verificationStatus,
+                isActive: user.isActive,
+                isProfilePublic: user.isProfilePublic,
             }
         });
     } catch (error: any) {
@@ -91,6 +94,8 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 role: 'guide',
                 phone: trimmedPhone,
                 address: trimmedAddress,
+                verificationStatus: 'pending',
+                isProfilePublic: false,
             });
             await user.save();
         } else {
@@ -98,6 +103,8 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
             user.role = 'guide';
             user.picture = picture || user.picture;
             user.name = user.name || name || '';
+            user.verificationStatus = 'pending';
+            user.isProfilePublic = false;
 
             if (needsContact) {
                 user.phone = trimmedPhone;
@@ -121,6 +128,9 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 phone: user.phone,
                 address: user.address,
                 bio: user.bio,
+                verificationStatus: user.verificationStatus,
+                isActive: user.isActive,
+                isProfilePublic: user.isProfilePublic,
             }
         });
     } catch (error: any) {

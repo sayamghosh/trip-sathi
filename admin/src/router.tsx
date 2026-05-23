@@ -69,12 +69,34 @@ const bookingsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/bookings",
   component: Bookings,
+  beforeLoad: () => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (user.verificationStatus === "pending" || user.verificationStatus === "rejected") {
+        throw redirect({
+          to: "/",
+        })
+      }
+    }
+  },
 })
 
 const calendarRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/calendar",
   component: Calendar,
+  beforeLoad: () => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (user.verificationStatus === "pending" || user.verificationStatus === "rejected") {
+        throw redirect({
+          to: "/",
+        })
+      }
+    }
+  },
 })
 
 const profileRoute = createRoute({
@@ -87,6 +109,17 @@ const travelersRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/travelers",
   component: Travelers,
+  beforeLoad: () => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (user.verificationStatus === "pending" || user.verificationStatus === "rejected") {
+        throw redirect({
+          to: "/",
+        })
+      }
+    }
+  },
 })
 
 

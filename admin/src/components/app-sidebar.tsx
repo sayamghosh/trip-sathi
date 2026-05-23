@@ -10,6 +10,7 @@ import {
   Percent,
   ThumbsUp,
   LogOut,
+  Lock,
 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import api from "@/lib/axios"
@@ -80,6 +81,11 @@ export function AppSidebar() {
     window.location.href = "/login"
   }
 
+  const userStr = localStorage.getItem("user")
+  const user = userStr ? JSON.parse(userStr) : null
+  const isUnverified = user?.verificationStatus === "pending" || user?.verificationStatus === "rejected"
+  const restrictedLabels = ["Bookings", "Calendar", "Travelers"]
+
   return (
     <Sidebar collapsible="icon" className="border-r-0 border-sidebar-border transition-all duration-300 ease-in-out">
       <SidebarHeader className={cn("bg-sidebar px-6 py-8 transition-all duration-300", isCollapsed ? "p-0 py-8 flex items-center justify-center" : "items-start")}>
@@ -100,38 +106,67 @@ export function AppSidebar() {
         <SidebarGroup className="flex-1">
           <SidebarGroupContent className={cn("flex flex-col flex-1", isCollapsed ? "items-center gap-1" : "gap-1")}>
             <SidebarMenu className={cn("gap-1 w-full", isCollapsed && "flex flex-col items-center")}>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.label}>
-                  <SidebarMenuButton
-                    asChild
-                    className="h-11 px-4 transition-all duration-200 group group-data-[collapsible=icon]:size-11!"
-                  >
-                    <Link
-                      to={item.to as any}
+              {items.map((item) => {
+                const isLocked = isUnverified && restrictedLabels.includes(item.label)
+                return (
+                  <SidebarMenuItem key={item.label}>
+                    <SidebarMenuButton
+                      asChild={!isLocked}
                       className={cn(
-                        "flex w-full items-center justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:bg-sidebar-accent focus-visible:text-sidebar-accent-foreground",
-                        isCollapsed && "justify-center px-0",
-                        (item.matchPaths ?? [item.to]).some(isActivePath)
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                          : "text-sidebar-foreground/70"
+                        "h-11 px-4 transition-all duration-200 group group-data-[collapsible=icon]:size-11!",
+                        isLocked && "cursor-not-allowed opacity-50 hover:bg-transparent text-sidebar-foreground/45"
                       )}
                     >
-                      <item.icon className="shrink-0 size-5!" />
-                      <span className={cn(
-                        "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
-                        isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
-                      )}>
-                        {item.label}
-                      </span>
-                    </Link>
-                  </SidebarMenuButton>
-                  {!isCollapsed && item.badge && (
-                    <SidebarMenuBadge className="right-4 bg-sidebar-primary text-sidebar-primary-foreground">
-                      {item.badge}
-                    </SidebarMenuBadge>
-                  )}
-                </SidebarMenuItem>
-              ))}
+                      {isLocked ? (
+                        <div
+                          className={cn(
+                            "flex w-full items-center justify-start text-sidebar-foreground/45 cursor-not-allowed",
+                            isCollapsed && "justify-center px-0"
+                          )}
+                          title={user?.verificationStatus === "rejected" ? "Account rejected: access denied" : "Verification pending: this feature is restricted"}
+                        >
+                          <item.icon className="shrink-0 size-5!" />
+                          <span className={cn(
+                            "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                            isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+                          )}>
+                            {item.label}
+                          </span>
+                        </div>
+                      ) : (
+                        <Link
+                          to={item.to as any}
+                          className={cn(
+                            "flex w-full items-center justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:bg-sidebar-accent focus-visible:text-sidebar-accent-foreground",
+                            isCollapsed && "justify-center px-0",
+                            (item.matchPaths ?? [item.to]).some(isActivePath)
+                              ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                              : "text-sidebar-foreground/70"
+                          )}
+                        >
+                          <item.icon className="shrink-0 size-5!" />
+                          <span className={cn(
+                            "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                            isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+                          )}>
+                            {item.label}
+                          </span>
+                        </Link>
+                      )}
+                    </SidebarMenuButton>
+                    {!isCollapsed && isLocked && (
+                      <SidebarMenuBadge className="right-4 bg-transparent text-sidebar-foreground/40 flex items-center justify-center shadow-none">
+                        <Lock className="h-3.5 w-3.5" />
+                      </SidebarMenuBadge>
+                    )}
+                    {!isCollapsed && !isLocked && item.badge && (
+                      <SidebarMenuBadge className="right-4 bg-sidebar-primary text-sidebar-primary-foreground">
+                        {item.badge}
+                      </SidebarMenuBadge>
+                    )}
+                  </SidebarMenuItem>
+                )
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

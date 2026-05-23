@@ -43,6 +43,7 @@ type TourPlan = {
   includes?: string[]
   excludes?: string[]
   createdAt?: string
+  isPublic?: boolean
 }
 
 const fallbackPhotos = [
@@ -91,6 +92,10 @@ export default function PackageDetailPage() {
   const [plan, setPlan] = useState<TourPlan | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedDay, setExpandedDay] = useState<number | null>(1)
+
+  const userStr = localStorage.getItem("user")
+  const user = userStr ? JSON.parse(userStr) : null
+  const isApproved = user?.verificationStatus === "approved"
 
   const [lightbox, setLightbox] = useState<{
     open: boolean
@@ -203,6 +208,23 @@ export default function PackageDetailPage() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {isApproved && (
+            <Button
+              onClick={async () => {
+                try {
+                  const res = await api.patch(`/api/tour-plans/${plan._id}/publish`, { isPublic: !plan.isPublic })
+                  setPlan(res.data.tourPlan)
+                  alert(`Plan ${!plan.isPublic ? "published" : "unpublished"} successfully!`)
+                } catch (e) {
+                  alert("Failed to toggle publication status")
+                }
+              }}
+              variant="outline"
+              className="border-primary/20 text-primary hover:bg-primary/10 h-9 rounded-lg text-[13px] font-bold px-4"
+            >
+              {plan.isPublic ? "Move to Draft" : "Publish Now"}
+            </Button>
+          )}
           <Button 
             onClick={async () => {
               if (window.confirm("Are you sure you want to delete this package?")) {
@@ -257,7 +279,17 @@ export default function PackageDetailPage() {
             {/* Header: Title & Price */}
             <div className="flex items-start justify-between">
               <div className="space-y-3">
-                <h1 className="text-[32px] font-extrabold text-foreground tracking-tight">{plan.title || "Safari Adventure"}</h1>
+                <div className="flex flex-wrap items-center gap-3">
+                  <h1 className="text-[32px] font-extrabold text-foreground tracking-tight">{plan.title || "Safari Adventure"}</h1>
+                  <span className={cn(
+                    "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset",
+                    plan.isPublic 
+                      ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20" 
+                      : "bg-slate-500/10 text-slate-600 ring-slate-500/20"
+                  )}>
+                    {plan.isPublic ? "Published" : "Draft"}
+                  </span>
+                </div>
                 <div className="flex flex-wrap items-center gap-6">
                   <div className="flex items-center gap-2 text-[14px] font-semibold text-foreground/70">
                     <MapPin className="h-[15px] w-[15px] text-primary" />

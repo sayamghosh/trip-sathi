@@ -1,13 +1,15 @@
 import { create } from 'zustand'
 import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
 
-const ACCESS_TOKEN = 'thisisjustarandomstring'
+const ACCESS_TOKEN = 'super_admin_access_token'
 
 interface AuthUser {
-  accountNo: string
+  id: string
   email: string
-  role: string[]
-  exp: number
+  name: string
+  role: string
+  verificationStatus?: string
+  isActive?: boolean
 }
 
 interface AuthState {

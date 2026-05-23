@@ -58,6 +58,11 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
+          title: 'Agents',
+          url: '/agents',
+          icon: UserCog,
+        },
+        {
           title: 'Tasks',
           url: '/tasks',
           icon: ListTodo,

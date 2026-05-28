@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Search, Bell, ChevronDown, Moon, Sun, User, Settings, CreditCard, LogOut } from "lucide-react"
+import { Search, Bell, ChevronDown, Moon, Sun, User, Settings, CreditCard, LogOut, Coins } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet"
 
 export function TopBar() {
-  const [user, setUser] = useState<{ name: string; picture: string; role: string; email?: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; picture: string; role: string; email?: string; credits?: number; planExpiresAt?: string } | null>(null)
   const { theme, setTheme } = useTheme()
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -65,15 +65,21 @@ export function TopBar() {
   const recentCallbacks = callbacks.slice(0, 10)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user")
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser))
-      } catch (e) {
-        console.error("Failed to parse user from localStorage", e)
+    const handleUserUpdate = () => {
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        try {
+          setUser(JSON.parse(storedUser))
+        } catch (e) {
+          console.error("Failed to parse user from localStorage", e)
+        }
       }
     }
+
+    handleUserUpdate()
     
+    window.addEventListener("user-updated", handleUserUpdate)
+
     // Click outside handler
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -81,13 +87,17 @@ export function TopBar() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
+    return () => {
+      window.removeEventListener("user-updated", handleUserUpdate)
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
   }, [])
 
   const getInitials = (name: string) => {
-    if (!name) return "RH"
+    if (!name) return ""
     return name
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
@@ -95,6 +105,7 @@ export function TopBar() {
   }
 
   const handleLogout = () => {
+    localStorage.removeItem("token")
     localStorage.removeItem("user")
     window.location.href = "/login"
   }
@@ -110,6 +121,15 @@ export function TopBar() {
           className="w-[130px] border-none bg-transparent text-[12px] text-secondary-foreground placeholder-muted-foreground outline-none"
         />
       </div>
+
+      {user?.role === "guide" && (
+        <Link to="/billing">
+          <button className="flex items-center gap-1.5 h-[34px] px-3 rounded-[10px] border border-border bg-card hover:bg-accent text-xs font-bold text-foreground transition cursor-pointer select-none">
+            <Coins className="h-[14px] w-[14px] text-primary" strokeWidth={2.2} />
+            <span>{user.credits ?? 0}</span>
+          </button>
+        </Link>
+      )}
 
       {/* Theme Toggle */}
       <button
@@ -195,16 +215,16 @@ export function TopBar() {
               <img src={user.picture} alt={user.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
             ) : (
               <span className="text-[12px] font-bold text-white">
-                {getInitials(user?.name || "Ruben Herwitz")}
+                {getInitials(user?.name || "")}
               </span>
             )}
           </div>
           <div className="flex flex-col text-left leading-tight">
             <span className="text-[12px] font-semibold text-foreground">
-              {user?.name || "Ruben Herwitz"}
+              {user?.name || "User"}
             </span>
             <span className="text-[10px] capitalize text-muted-foreground">
-              {user?.role || "Admin"}
+              {user?.role || "Agent"}
             </span>
           </div>
           <ChevronDown className={`ml-1 h-[14px] w-[14px] text-muted-foreground transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -216,10 +236,10 @@ export function TopBar() {
             {/* User Header */}
             <div className="px-4 py-3 border-b border-border">
               <p className="text-[13px] font-bold text-foreground">
-                {user?.name || "Ruben Herwitz"}
+                {user?.name || "User"}
               </p>
               <p className="text-[11px] font-medium text-muted-foreground truncate">
-                {user?.email || "admin@example.com"}
+                {user?.email || ""}
               </p>
             </div>
             
@@ -240,13 +260,14 @@ export function TopBar() {
                 <Settings className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                 Account Settings
               </button>
-              <button 
+              <Link 
+                to="/billing"
                 onClick={() => setIsDropdownOpen(false)}
                 className="group flex w-full items-center gap-2 px-4 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
               >
                 <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                 Billing
-              </button>
+              </Link>
             </div>
             
             <div className="border-t border-border py-1">

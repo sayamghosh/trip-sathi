@@ -1,5 +1,5 @@
 import express from 'express';
-import { createTourPlan, getAllTourPlans, getTourPlansByGuide, getTourPlanById, updateTourPlan, searchTourPlans } from '../controllers/tourPlan.controller.js';
+import { createTourPlan, getAllTourPlans, getTourPlansByGuide, getTourPlanById, updateTourPlan, searchTourPlans, publishTourPlan } from '../controllers/tourPlan.controller.js';
 import { authMiddleware, isGuide } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -10,5 +10,6 @@ router.post('/', authMiddleware, isGuide, createTourPlan);
 router.get('/', authMiddleware, isGuide, getTourPlansByGuide);
 router.get('/:id', getTourPlanById);
 router.put('/:id', authMiddleware, isGuide, updateTourPlan);
+router.patch('/:id/publish', authMiddleware, isGuide, publishTourPlan);
 
 export default router;

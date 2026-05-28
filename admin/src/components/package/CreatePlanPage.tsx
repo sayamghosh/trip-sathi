@@ -350,7 +350,13 @@ export function CreatePlanPage() {
         alert("Plan updated successfully!")
       } else {
         await api.post("/api/tour-plans", payload)
-        alert("Plan published successfully!")
+        const userStr = localStorage.getItem("user")
+        const user = userStr ? JSON.parse(userStr) : null
+        if (user?.verificationStatus === "approved") {
+          alert("Plan saved as draft! You can publish it using the toggle from the package list or details page.")
+        } else {
+          alert("Saved as draft! Once your agent account is verified by administration, you will be able to publish this package.")
+        }
       }
       setIsPublished(true)
       navigate({ to: "/packages" })

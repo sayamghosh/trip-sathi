@@ -16,6 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 
 type ProfileUser = {
   id?: string
@@ -26,9 +27,12 @@ type ProfileUser = {
   phone?: string
   address?: string
   bio?: string
+  verificationStatus?: string
+  isActive?: boolean
+  isProfilePublic?: boolean
 }
 
-const DEFAULT_BIO = "Senior Administrator managing global travel operations. Passionate about ensuring seamless travel experiences."
+const DEFAULT_BIO = ""
 
 export function Profile() {
   const [user, setUser] = useState<ProfileUser | null>(() => {
@@ -43,16 +47,37 @@ export function Profile() {
   const [phone, setPhone] = useState(() => user?.phone || "")
   const [address, setAddress] = useState(() => user?.address || "")
   const [bio, setBio] = useState(() => user?.bio || DEFAULT_BIO)
+  const [isProfilePublic, setIsProfilePublic] = useState(() => Boolean(user?.isProfilePublic))
+
+  useEffect(() => {
+    if (user) {
+      setIsProfilePublic(Boolean(user.isProfilePublic))
+    }
+  }, [user])
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsLoading(false), 600)
     return () => window.clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        const updatedUser = JSON.parse(storedUser)
+        setUser(updatedUser)
+      }
+    }
+    window.addEventListener("user-updated", handleUpdate)
+    return () => window.removeEventListener("user-updated", handleUpdate)
+  }, [])
+
+
   const getInitials = (name: string) => {
-    if (!name) return "RH"
+    if (!name) return ""
     return name
       .split(" ")
+      .filter(Boolean)
       .map((n) => n[0])
       .join("")
       .substring(0, 2)
@@ -70,9 +95,9 @@ export function Profile() {
     )
   }
 
-  const name = fullName || user?.name || "Ruben Herwitz"
-  const role = user?.role || "Administrator"
-  const email = user?.email || "admin@tripsathi.com"
+  const name = fullName || user?.name || ""
+  const role = user?.role || "Agent"
+  const email = user?.email || ""
   const displayAddress = address || "Location not added"
   const canSave = isEditing && Boolean(fullName.trim() && phone.trim() && address.trim() && !isSaving)
 
@@ -87,6 +112,7 @@ export function Profile() {
         phone: phone.trim(),
         address: address.trim(),
         bio: bio.trim(),
+        isProfilePublic,
       })
       const updatedUser = response.data.user as ProfileUser
       setUser(updatedUser)
@@ -94,6 +120,7 @@ export function Profile() {
       setPhone(updatedUser.phone || "")
       setAddress(updatedUser.address || "")
       setBio(updatedUser.bio || DEFAULT_BIO)
+      setIsProfilePublic(Boolean(updatedUser.isProfilePublic))
       localStorage.setItem("user", JSON.stringify(updatedUser))
       setIsEditing(false)
     } catch (error) {
@@ -161,10 +188,24 @@ export function Profile() {
                   <Shield className="h-4 w-4" />
                   {role}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
-                  <BadgeCheck className="h-4 w-4" />
-                  Verified
-                </span>
+                {user?.verificationStatus === "approved" && (
+                  <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/20 px-3 py-1.5 backdrop-blur-md text-emerald-300 font-bold border border-emerald-500/30">
+                    <BadgeCheck className="h-4 w-4 text-emerald-400" />
+                    Verified Agent
+                  </span>
+                )}
+                {(user?.verificationStatus === "pending" || !user?.verificationStatus) && (
+                  <span className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-3 py-1.5 backdrop-blur-md text-amber-300 font-bold border border-amber-500/30 animate-pulse">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Under Review
+                  </span>
+                )}
+                {user?.verificationStatus === "rejected" && (
+                  <span className="inline-flex items-center gap-2 rounded-full bg-red-500/20 px-3 py-1.5 backdrop-blur-md text-red-300 font-bold border border-red-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-red-400"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    Not Approved
+                  </span>
+                )}
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
                   <MapPin className="h-4 w-4" />
                   {displayAddress}
@@ -201,18 +242,18 @@ export function Profile() {
               size="icon"
               onClick={handleEditButtonClick}
               disabled={isSaving || (isEditing && !canSave)}
-              className="h-10 w-10 rounded-full bg-background text-muted-foreground hover:text-primary data-[variant=default]:bg-primary data-[variant=default]:text-white data-[variant=default]:hover:bg-primary/90"
+              className="h-10 w-10 rounded-full cursor-pointer bg-background text-muted-foreground hover:text-primary data-[variant=default]:bg-primary data-[variant=default]:text-white data-[variant=default]:hover:bg-primary/90"
               title={isEditing ? "Save personal information" : "Edit personal information"}
             >
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : isEditing ? <Check className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
             </Button>
           </div>
 
-          {isEditing && (
+          {/* {isEditing && (
             <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-[13px] font-bold text-primary">
               Editing is enabled. Click the check button to keep your updates.
             </div>
-          )}
+          )} */}
 
           {saveError && (
             <div className="mb-6 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-[13px] font-bold text-destructive">
@@ -288,6 +329,38 @@ export function Profile() {
                 className={`min-h-32 w-full resize-none rounded-2xl border p-4 text-[14px] font-bold leading-6 outline-none transition-all ${editableInputClass}`}
               />
             </div>
+
+            {user?.verificationStatus === "approved" && (
+              <div className="mt-6 border-t border-border pt-6">
+                <div className="flex items-center justify-between rounded-2xl border border-primary/10 bg-primary/5 p-4 animate-in fade-in duration-300">
+                  <div className="space-y-1 pr-4">
+                    <h4 className="text-[14px] font-bold text-foreground">Public Profile Visibility</h4>
+                    <p className="text-[12px] font-medium text-muted-foreground leading-normal">
+                      When enabled, travellers will be able to search and view your agent profile and all your published packages on the main marketplace portal.
+                    </p>
+                  </div>
+                  <div className="shrink-0 flex items-center">
+                    <button
+                      type="button"
+                      disabled={!isEditing}
+                      onClick={() => setIsProfilePublic(prev => !prev)}
+                      className={cn(
+                        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none",
+                        !isEditing && "opacity-50 cursor-not-allowed",
+                        isProfilePublic ? "bg-primary" : "bg-muted"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
+                          isProfilePublic ? "translate-x-5" : "translate-x-0"
+                        )}
+                      />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

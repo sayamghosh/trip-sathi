@@ -15,6 +15,8 @@ import Bookings from "./pages/Bookings"
 import Calendar from "./pages/Calendar"
 import { Profile } from "./pages/Profile"
 import Travelers from "./pages/Travelers"
+import { Billing } from "./pages/Billing"
+
 
 
 const rootRoute = createRootRoute({
@@ -69,12 +71,34 @@ const bookingsRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/bookings",
   component: Bookings,
+  beforeLoad: () => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (user.verificationStatus === "pending" || user.verificationStatus === "rejected") {
+        throw redirect({
+          to: "/",
+        })
+      }
+    }
+  },
 })
 
 const calendarRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/calendar",
   component: Calendar,
+  beforeLoad: () => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (user.verificationStatus === "pending" || user.verificationStatus === "rejected") {
+        throw redirect({
+          to: "/",
+        })
+      }
+    }
+  },
 })
 
 const profileRoute = createRoute({
@@ -87,6 +111,23 @@ const travelersRoute = createRoute({
   getParentRoute: () => layoutRoute,
   path: "/travelers",
   component: Travelers,
+  beforeLoad: () => {
+    const userStr = localStorage.getItem("user")
+    if (userStr) {
+      const user = JSON.parse(userStr)
+      if (user.verificationStatus === "pending" || user.verificationStatus === "rejected") {
+        throw redirect({
+          to: "/",
+        })
+      }
+    }
+  },
+})
+
+const billingRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "/billing",
+  component: Billing,
 })
 
 
@@ -115,6 +156,7 @@ const routeTree = rootRoute.addChildren([
     calendarRoute,
     profileRoute,
     travelersRoute,
+    billingRoute,
   ]),
 
   loginRoute,

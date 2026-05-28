@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Link } from "@tanstack/react-router"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 
 const featureList = [
   {
@@ -43,6 +44,10 @@ const popularPackages = [
 export function PackagePage() {
   const [packages, setPackages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  const userStr = localStorage.getItem("user")
+  const user = userStr ? JSON.parse(userStr) : null
+  const isApproved = user?.verificationStatus === "approved"
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -110,9 +115,19 @@ export function PackagePage() {
 
                     {/* Middle Column - Details */}
                     <div className="flex flex-col">
-                      <h3 className="text-[26px] font-bold text-foreground leading-tight mb-2">
-                        {heroPackage?.title || "Tropical Paradise Retreat"}
-                      </h3>
+                      <div className="flex flex-wrap items-center gap-3 mb-2">
+                        <h3 className="text-[26px] font-bold text-foreground leading-tight">
+                          {heroPackage?.title || "Tropical Paradise Retreat"}
+                        </h3>
+                        <span className={cn(
+                          "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ring-1 ring-inset",
+                          heroPackage?.isPublic 
+                            ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20" 
+                            : "bg-slate-500/10 text-slate-600 ring-slate-500/20"
+                        )}>
+                          {heroPackage?.isPublic ? "Published" : "Draft"}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1.5 text-[12px] font-medium text-secondary-foreground mb-5">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span>{heroPackage?.locations?.[0] || "Maldives"}</span>
@@ -137,12 +152,29 @@ export function PackagePage() {
                         </div>
                       </div>
  
-                      <div className="mt-auto relative z-20">
-                        <Link to="/packages/$packageId/edit" params={{ packageId: heroPackage._id }}>
+                      <div className="mt-auto relative z-20 flex gap-2">
+                        <Link to="/packages/$packageId/edit" params={{ packageId: heroPackage._id }} className="flex-1">
                           <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-[10px] h-12 shadow-none text-[15px] font-bold">
                             Edit Detail
                           </Button>
                         </Link>
+                        {isApproved && (
+                          <Button
+                            onClick={async (e) => {
+                              e.preventDefault()
+                              try {
+                                await api.patch(`/api/tour-plans/${heroPackage._id}/publish`, { isPublic: !heroPackage.isPublic })
+                                window.location.reload()
+                              } catch (err) {
+                                alert("Failed to toggle publication status")
+                              }
+                            }}
+                            variant="outline"
+                            className="h-12 px-4 rounded-[10px] font-bold border-border"
+                          >
+                            {heroPackage.isPublic ? "Unpublish" : "Publish"}
+                          </Button>
+                        )}
                       </div>
                     </div>
 
@@ -231,8 +263,18 @@ export function PackagePage() {
                       <div className="flex-1 p-5 flex flex-col">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h4 className="text-[17px] font-bold text-foreground">{pkg.title}</h4>
-                            <div className="flex items-center gap-4 mt-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <h4 className="text-[17px] font-bold text-foreground">{pkg.title}</h4>
+                              <span className={cn(
+                                "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ring-inset",
+                                pkg.isPublic 
+                                  ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20" 
+                                  : "bg-slate-500/10 text-slate-600 ring-slate-500/20"
+                              )}>
+                                {pkg.isPublic ? "Published" : "Draft"}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-4 mt-2">
                               <div className="flex items-center gap-1.5 text-[11px] font-medium text-secondary-foreground">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                 <span>{pkg.durationDays} Days / {pkg.durationNights} Nights</span>
@@ -286,6 +328,24 @@ export function PackagePage() {
                            </div>
                          </div>
                         <div className="mt-4 pt-4 border-t border-border flex justify-end gap-2 relative z-20">
+                           {isApproved && (
+                             <Button
+                               onClick={async (e) => {
+                                 e.stopPropagation()
+                                 try {
+                                   await api.patch(`/api/tour-plans/${pkg._id}/publish`, { isPublic: !pkg.isPublic })
+                                   window.location.reload()
+                                 } catch (err) {
+                                   alert("Failed to toggle publication status")
+                                 }
+                               }}
+                               variant="outline"
+                               size="sm"
+                               className="h-8 text-[11px] font-bold text-foreground"
+                             >
+                               {pkg.isPublic ? "Unpublish" : "Publish"}
+                             </Button>
+                           )}
                            <Link to="/packages/$packageId/edit" params={{ packageId: pkg._id }}>
                              <Button variant="outline" size="sm" className="h-8 text-[11px] text-[#2E7CF6]">Edit</Button>
                            </Link>
@@ -338,7 +398,17 @@ export function PackagePage() {
                         {!pkg.bannerImages?.[0] && <PlaneTakeoff className="h-8 w-8" />}
                       </div>
                       <div className="p-2.5 flex flex-col flex-1">
-                        <h4 className="text-[14px] font-bold text-foreground truncate">{pkg.title}</h4>
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-[14px] font-bold text-foreground truncate">{pkg.title}</h4>
+                          <span className={cn(
+                            "shrink-0 inline-flex items-center rounded-full px-1.5 py-0.2 text-[9px] font-bold ring-1 ring-inset",
+                            pkg.isPublic 
+                              ? "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20" 
+                              : "bg-slate-500/10 text-slate-600 ring-slate-500/20"
+                          )}>
+                            {pkg.isPublic ? "Pub" : "Draft"}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mt-1.5 mb-3">
                           <MapPin className="h-3 w-3" />
                           <span className="truncate">{pkg.locations?.[0] || "Location"}</span>

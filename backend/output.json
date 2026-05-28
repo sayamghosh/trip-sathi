@@ -10,21 +10,6 @@
     {
       "v": 2,
       "key": {
-        "phone": 1
-      },
-      "name": "phone_1",
-      "unique": true
-    },
-    {
-      "v": 2,
-      "key": {
-        "role": 1
-      },
-      "name": "role_1"
-    },
-    {
-      "v": 2,
-      "key": {
         "googleId": 1
       },
       "name": "googleId_1",
@@ -41,14 +26,200 @@
   ],
   "allUsers": [
     {
-      "_id": "69995aa20f66efd6f39c3182",
+      "_id": "699d3a9b4842bcbd61dca84c",
+      "googleId": "115505551793798833297",
+      "email": "sayamspeaks@gmail.com",
+      "name": "Sayam Speaks",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKzSCkJjibdtzzZ9FiT0H6JiH2RIKDcEGGM0JySzwyQOVwSUqM=s96-c",
+      "role": "guide",
+      "createdAt": "2026-02-24T05:43:55.240Z",
+      "updatedAt": "2026-03-07T19:44:07.292Z",
+      "__v": 0,
+      "address": "Kolkata, Airport gate no 1. Pin-700132.",
+      "phone": "9051688945"
+    },
+    {
+      "_id": "699d52c469cae4bc4e1bdbeb",
+      "googleId": "108514554067689456303",
+      "email": "mmrigankalive@gmail.com",
+      "name": "Mrigaka Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocInCO-xA5rxKpewGcFEy37AYJxWCHsMzfpfxovMFyCbKMIA2fQ=s96-c",
+      "role": "guide",
+      "createdAt": "2026-02-24T07:27:00.544Z",
+      "updatedAt": "2026-05-28T13:52:11.636Z",
+      "__v": 0,
+      "address": "Madhyamgram, Kolkata, WestBengal, India, Asis, Earth",
+      "phone": "4455668899",
+      "bio": "Senior Administrator managing global travel operations. Passionate about ensuring seamless travel experiences.",
+      "isActive": true,
+      "isProfilePublic": false,
+      "verificationStatus": "pending"
+    },
+    {
+      "_id": "699d6fce69cae4bc4e1bdf4a",
+      "googleId": "112977875480719001725",
+      "email": "mriganka.web@gmail.com",
+      "name": "Mriganka",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocJgDSAdXY4tDIdu8nXSEFrE63Tw7hA4ZagmetbHugZUO05hcgQ=s96-c",
+      "role": "guide",
+      "createdAt": "2026-02-24T09:30:54.541Z",
+      "updatedAt": "2026-02-25T14:46:34.699Z",
+      "__v": 0,
+      "address": "Ganganagar, Madhyamgram, Kolkata, West Bengal, India, Asia, Earth",
+      "phone": "9165859676"
+    },
+    {
+      "_id": "699f5295876f2621852441a8",
+      "googleId": "101259696243452284917",
+      "email": "fusicbeats@gmail.com",
+      "name": "Fusic Beats",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocLM90zfHwOwglRkmHsxL0Awggjmiuj1eF3sr8CFfTf1SHOGVA=s96-c",
+      "role": "traveller",
+      "createdAt": "2026-02-25T19:50:45.480Z",
+      "updatedAt": "2026-03-16T09:25:30.537Z",
+      "__v": 0,
+      "phone": "9051688945"
+    },
+    {
+      "_id": "699fdc7c38f7647e082a8b48",
       "googleId": "101661044348488317895",
       "email": "ssayamghosh@gmail.com",
       "name": "Sayam Ghosh",
       "picture": "https://lh3.googleusercontent.com/a/ACg8ocKLnHfmCWWVKHWD7SQ4elDrsHcPSBbdWvSFCG9_nj8U2i8WRe3H=s96-c",
       "role": "traveller",
-      "createdAt": "2026-02-21T07:11:30.482Z",
-      "updatedAt": "2026-02-21T07:11:30.482Z",
+      "createdAt": "2026-02-26T05:39:08.879Z",
+      "updatedAt": "2026-02-26T05:39:33.710Z",
+      "__v": 0,
+      "phone": "9051688945"
+    },
+    {
+      "_id": "69a3e4733f76076e278f4881",
+      "googleId": "107622736539456002997",
+      "email": "a.amitghosh007@gmail.com",
+      "name": "Amit Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKP_Dm6bvRChLG-Mo8yWKl_KoSG9K-u9B0Db4NB3jjQE8XNSLOGPw=s96-c",
+      "role": "guide",
+      "createdAt": "2026-03-01T07:02:11.457Z",
+      "updatedAt": "2026-03-03T11:31:22.384Z",
+      "__v": 0,
+      "address": "kolkata",
+      "phone": "9007340710"
+    },
+    {
+      "_id": "69b3e944ed215de3f3857865",
+      "googleId": "100984314319371627199",
+      "email": "chiefhiranmaypore@gmail.com",
+      "name": "Hiranmay Pore",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocJrvqO4saW16X4y4Q4hy-ur9n7subZbM-9T-6rKgp3PAxKYmzUYVQ=s96-c",
+      "role": "guide",
+      "createdAt": "2026-03-13T10:39:00.908Z",
+      "updatedAt": "2026-04-26T14:19:19.595Z",
+      "__v": 0,
+      "address": "A/90, Krishnakalo Appartment, Dr Meghnad Saha Road, Lakshmi Nagar, South Dum Dumdum",
+      "phone": "7047499265"
+    },
+    {
+      "_id": "69eb308f79e2d4eb85925cb4",
+      "googleId": "105245221855049087782",
+      "email": "beingsayam07@gmail.com",
+      "name": "Being Sayam",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocJdoC9htxyZJhIrxE-jGH_zUHMs3dS6GWkJePXdwprZvGMlvw=s96-c",
+      "role": "guide",
+      "phone": "9051688945",
+      "address": "Madhyamgram , Kolkata",
+      "createdAt": "2026-04-24T08:57:51.598Z",
+      "updatedAt": "2026-04-24T08:57:51.598Z",
+      "__v": 0
+    },
+    {
+      "_id": "69eb5150e99838e20d05e6a3",
+      "googleId": "111017778203421877580",
+      "email": "cars.inteam@gmail.com",
+      "name": "Mriganka Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKbNIqM6vNh67be6DtU0Vr5WGNJ_BoQ52UR9JKKmx846-aDeQ=s96-c",
+      "role": "guide",
+      "phone": "7439829103",
+      "address": "Nandankanan, Ganganagar",
+      "createdAt": "2026-04-24T11:17:36.452Z",
+      "updatedAt": "2026-04-24T11:17:36.452Z",
+      "__v": 0
+    },
+    {
+      "_id": "69f9c0f58a3ab9eb7c9c9119",
+      "googleId": "109669440505887397551",
+      "email": "parthib.devs@gmail.com",
+      "name": "Parthib Panja",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocIGFXijzdaUW38BkTIQbf5IkZ-M4atRNZXEZTo6MHMM5xGspSU=s96-c",
+      "role": "traveller",
+      "createdAt": "2026-05-05T10:05:41.059Z",
+      "updatedAt": "2026-05-05T10:05:41.059Z",
+      "__v": 0
+    },
+    {
+      "_id": "69fa172dfe96a42e2568f4b5",
+      "googleId": "104002950899191121545",
+      "email": "gpampa138@gmail.com",
+      "name": "Parambrata Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKTjjASwfMdsPwFGiiXrq87ZHvvFyEh05LZtOz7G2VcxDdkII1F=s96-c",
+      "role": "traveller",
+      "createdAt": "2026-05-05T16:13:33.742Z",
+      "updatedAt": "2026-05-05T16:13:33.742Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a0d93e08a26abe9a7d0892a",
+      "googleId": "104921664627867266864",
+      "email": "mrigankalive.in@gmail.com",
+      "name": "Mriganka Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocI28GLESpbsTPUi4om59tMlSBWQ1COG7OQx82_TkEbfPYiQlBc=s96-c",
+      "role": "guide",
+      "phone": "7439829103",
+      "address": "Kolkata",
+      "createdAt": "2026-05-20T10:58:40.803Z",
+      "updatedAt": "2026-05-23T20:05:06.925Z",
+      "__v": 0,
+      "isActive": true,
+      "isProfilePublic": false,
+      "verificationStatus": "pending"
+    },
+    {
+      "_id": "6a11c7f9abf9806153413beb",
+      "googleId": "super-admin",
+      "email": "admin",
+      "name": "Super Admin",
+      "role": "admin",
+      "password": "$2b$10$SZRypMi1pQaC0W7b/CA5Y.SoThD9biVwST5/si/Lsnva.RGQeRgQ6",
+      "verificationStatus": "approved",
+      "isActive": true,
+      "isProfilePublic": false,
+      "createdAt": "2026-05-23T15:30:01.522Z",
+      "updatedAt": "2026-05-28T13:31:55.720Z",
+      "__v": 0
+    },
+    {
+      "_id": "6a11f25840e71240aca2816c",
+      "googleId": "108857859252543277161",
+      "email": "c.codecafe@gmail.com",
+      "name": "code cafe",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocIh6tGL43XLjFITs5F9PZF0hF41h7XDdBeavgs396R--4YsyII=s96-c",
+      "role": "guide",
+      "phone": "09830859120",
+      "address": "Kolkata",
+      "createdAt": "2026-05-23T18:30:48.324Z",
+      "updatedAt": "2026-05-23T19:28:28.346Z",
+      "__v": 0,
+      "verificationStatus": "rejected",
+      "isActive": true
+    },
+    {
+      "_id": "6a11f28e253833a84e6f7c0c",
+      "googleId": "110004836485179529818",
+      "email": "ghosh29jhuma@gmail.com",
+      "name": "Jhuma Ghosh",
+      "picture": "https://lh3.googleusercontent.com/a/ACg8ocKb3mQV8jJk_8doncGIGlHI_Br8X3oZ4217xwrvQusEp9nKOA=s96-c",
+      "role": "traveller",
+      "createdAt": "2026-05-23T18:31:42.639Z",
+      "updatedAt": "2026-05-23T18:31:42.639Z",
       "__v": 0
     }
   ]

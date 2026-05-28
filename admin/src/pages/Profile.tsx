@@ -60,6 +60,19 @@ export function Profile() {
     return () => window.clearTimeout(timer)
   }, [])
 
+  useEffect(() => {
+    const handleUpdate = () => {
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        const updatedUser = JSON.parse(storedUser)
+        setUser(updatedUser)
+      }
+    }
+    window.addEventListener("user-updated", handleUpdate)
+    return () => window.removeEventListener("user-updated", handleUpdate)
+  }, [])
+
+
   const getInitials = (name: string) => {
     if (!name) return ""
     return name

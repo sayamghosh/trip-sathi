@@ -16,6 +16,10 @@ import { TopBar } from "@/components/TopBar"
 import { Outlet, useLocation } from "@tanstack/react-router"
 import { Link } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
+import { useState, useEffect } from "react"
+import api from "@/lib/axios"
+import { Toaster } from "sonner"
+
 
 export function App() {
   const location = useLocation()
@@ -30,6 +34,8 @@ export function App() {
     if (pathname.startsWith("/packages/")) return "Package Details"
     if (pathname === "/bookings") return "Bookings"
     if (pathname === "/calendar") return "Calendar"
+    if (pathname === "/billing") return "Billing & Subscription"
+    if (pathname === "/travelers") return "Traveler Requests"
     return "Dashboard"
 
   }
@@ -47,6 +53,8 @@ export function App() {
       edit: "Edit",
       bookings: "Bookings",
       calendar: "Calendar",
+      billing: "Billing",
+      travelers: "Travelers",
     }
 
 
@@ -66,6 +74,16 @@ export function App() {
       }
 
       if (segment === "calendar") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
+      if (segment === "billing") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
+      if (segment === "travelers") {
         crumbs.push({ label: labelMap[segment], to: currentPath })
         return
       }
@@ -92,15 +110,62 @@ export function App() {
 
   const breadcrumbs = buildBreadcrumbs()
 
-  const userStr = localStorage.getItem("user")
-  const user = userStr ? JSON.parse(userStr) : null
+  const [user, setUser] = useState<{ id?: string; verificationStatus?: string; credits?: number; planExpiresAt?: string } | null>(() => {
+    const userStr = localStorage.getItem("user")
+    return userStr ? JSON.parse(userStr) : null
+  })
   const status = user?.verificationStatus
+  const credits = user?.credits ?? 0
+  const planExpiresAt = user?.planExpiresAt
+  const getDaysRemaining = () => {
+    if (!planExpiresAt) return 0
+    const diff = new Date(planExpiresAt).getTime() - new Date().getTime()
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24))
+    return days > 0 ? days : 0
+  }
+  const daysRemaining = getDaysRemaining()
+  const hasAccess = credits > 0 || daysRemaining > 0
 
   const handleLogout = () => {
     localStorage.removeItem("token")
     localStorage.removeItem("user")
     window.location.href = "/login"
   }
+
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (!token) return
+
+    const fetchLatestProfile = async () => {
+      try {
+        const response = await api.get("/api/profile/me")
+        const updatedUser = response.data.user
+        if (updatedUser) {
+          const currentStr = localStorage.getItem("user")
+          const updatedStr = JSON.stringify(updatedUser)
+          if (currentStr !== updatedStr) {
+            localStorage.setItem("user", updatedStr)
+            setUser(updatedUser)
+            // Dispatch dynamic update event to synchronize other components instantly
+            window.dispatchEvent(new Event("user-updated"))
+          }
+        }
+      } catch (err: any) {
+        console.error("Error fetching latest profile:", err)
+        if (err.response?.status === 401 || err.response?.status === 404) {
+          handleLogout()
+        }
+      }
+    }
+
+    // Initial fetch
+    void fetchLatestProfile()
+
+    // Poll every 3 seconds for instant updates
+    const interval = setInterval(fetchLatestProfile, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
 
   if (status === "rejected") {
     return (
@@ -186,6 +251,29 @@ export function App() {
         </header>
 
         <main className="flex-1 overflow-y-auto px-5 pt-4 pb-6 bg-background">
+          {status === "approved" && !hasAccess && (
+            <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-red-500/10 bg-red-500/5 p-4 text-red-500 backdrop-blur-md animate-in slide-in-from-top duration-300">
+              <div className="flex items-start sm:items-center gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-red-500/10 text-red-500 shadow-sm ring-1 ring-red-500/20">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </div>
+                <div>
+                  <h4 className="text-[14px] font-bold text-foreground">Display Visibility Suspended</h4>
+                  <p className="text-[12.5px] font-medium text-muted-foreground/80 mt-0.5 leading-snug">
+                    Your credits are exhausted and subscription validity is inactive. All your published tour plans are currently offline. Please recharge to display them publicly again.
+                  </p>
+                </div>
+              </div>
+              <div className="shrink-0 flex items-center gap-2">
+                <Link to="/billing">
+                  <button className="h-8.5 px-4 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 font-bold text-[12px] transition-colors cursor-pointer border border-red-500/20">
+                    Recharge Visibility
+                  </button>
+                </Link>
+              </div>
+            </div>
+          )}
+
           {status === "pending" && (
             <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-amber-500/10 bg-amber-500/5 p-4 text-amber-500 backdrop-blur-md animate-in slide-in-from-top duration-300">
               <div className="flex items-start sm:items-center gap-3">
@@ -211,6 +299,7 @@ export function App() {
           <Outlet />
         </main>
       </SidebarInset>
+      <Toaster richColors position="top-right" />
     </SidebarProvider>
   )
 }

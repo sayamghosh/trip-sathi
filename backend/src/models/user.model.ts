@@ -13,6 +13,8 @@ export interface IUser extends Document {
     verificationStatus: 'pending' | 'approved' | 'rejected';
     isActive: boolean;
     isProfilePublic: boolean;
+    credits: number;
+    planExpiresAt?: Date;
 }
 
 const UserSchema: Schema = new Schema({
@@ -28,6 +30,8 @@ const UserSchema: Schema = new Schema({
     verificationStatus: { type: String, default: 'pending', enum: ['pending', 'approved', 'rejected'] },
     isActive: { type: Boolean, default: true },
     isProfilePublic: { type: Boolean, default: false },
+    credits: { type: Number, default: 0 },
+    planExpiresAt: { type: Date }
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

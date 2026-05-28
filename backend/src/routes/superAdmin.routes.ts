@@ -7,7 +7,8 @@ import {
     verifyAgent,
     toggleAgentStatus,
     getAgentMetrics,
-    getAgentPackages
+    getAgentPackages,
+    adjustAgentBilling
 } from '../controllers/superAdmin.controller.js';
 import { authMiddleware, isAdmin } from '../middleware/auth.middleware.js';
 
@@ -22,6 +23,7 @@ router.get('/agents', authMiddleware, isAdmin, listAgents);
 router.get('/agents/:id', authMiddleware, isAdmin, getAgentById);
 router.patch('/agents/:id/verify', authMiddleware, isAdmin, verifyAgent);
 router.patch('/agents/:id/status', authMiddleware, isAdmin, toggleAgentStatus);
+router.patch('/agents/:id/billing', authMiddleware, isAdmin, adjustAgentBilling);
 router.get('/agents/:id/metrics', authMiddleware, isAdmin, getAgentMetrics);
 router.get('/agents/:id/packages', authMiddleware, isAdmin, getAgentPackages);
 

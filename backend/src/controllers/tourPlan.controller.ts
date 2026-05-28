@@ -8,11 +8,15 @@ export const getAllTourPlans = async (req: Request, res: Response): Promise<void
     try {
         const limit = parseInt(req.query.limit as string) || 0;
 
-        // Fetch verified and active guides
+        // Fetch verified and active guides with active credits or subscription validity
         const activeApprovedGuides = await User.find({
             role: 'guide',
             verificationStatus: 'approved',
-            isActive: true
+            isActive: true,
+            $or: [
+                { planExpiresAt: { $gt: new Date() } },
+                { credits: { $gt: 0 } }
+            ]
         }).select('_id');
         
         const guideIds = activeApprovedGuides.map(guide => guide._id);
@@ -66,7 +70,7 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
     try {
         const { id } = req.params;
         const plan = await TourPlan.findById(id)
-            .populate('guideId', 'name picture phone address role verificationStatus isActive')
+            .populate('guideId', 'name picture phone address role verificationStatus isActive credits planExpiresAt')
             .populate('days.activities.hotelRef');
 
         if (!plan) {
@@ -79,23 +83,29 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.split(' ')[1];
-            const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
-            try {
-                const decoded = jwt.verify(token, jwtSecret) as any;
-                if (decoded.id === plan.guideId._id.toString() || decoded.role === 'admin') {
-                    isOwnerOrAdmin = true;
+            if (token) {
+                const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
+                try {
+                    const decoded = jwt.verify(token, jwtSecret) as any;
+                    if (decoded.id === plan.guideId._id.toString() || decoded.role === 'admin') {
+                        isOwnerOrAdmin = true;
+                    }
+                } catch {
+                    // Token verification failed, treat as guest
                 }
-            } catch {
-                // Token verification failed, treat as guest
             }
         }
 
         const guide = plan.guideId as any;
         const isGuideActiveApproved = guide && guide.role === 'guide' && guide.verificationStatus === 'approved' && guide.isActive !== false;
+        
+        const hasValidPlan = guide && guide.planExpiresAt ? new Date(guide.planExpiresAt) > new Date() : false;
+        const hasCredits = guide && (guide.credits || 0) > 0;
+        const isSubscriptionValid = hasValidPlan || hasCredits;
 
-        // Block access if it's draft or the guide is unverified/inactive, unless it's the owner or admin
-        if (!isOwnerOrAdmin && (!plan.isPublic || !isGuideActiveApproved)) {
-            res.status(403).json({ message: 'Access denied: This tour plan is not available to the public' });
+        // Block access if it's draft or the guide is unverified/inactive or has no active subscription/credits, unless it's the owner or admin
+        if (!isOwnerOrAdmin && (!plan.isPublic || !isGuideActiveApproved || !isSubscriptionValid)) {
+            res.status(403).json({ message: 'Access denied: This tour plan is not available to the public due to inactive subscription' });
             return;
         }
 
@@ -110,11 +120,15 @@ export const searchTourPlans = async (req: Request, res: Response): Promise<void
     try {
         const { destination } = req.query;
 
-        // Fetch verified and active guides
+        // Fetch verified and active guides with active credits or subscription validity
         const activeApprovedGuides = await User.find({
             role: 'guide',
             verificationStatus: 'approved',
-            isActive: true
+            isActive: true,
+            $or: [
+                { planExpiresAt: { $gt: new Date() } },
+                { credits: { $gt: 0 } }
+            ]
         }).select('_id');
         
         const guideIds = activeApprovedGuides.map(guide => guide._id);
@@ -210,7 +224,7 @@ export const publishTourPlan = async (req: Request, res: Response): Promise<void
         }
 
         const plan = await TourPlan.findOneAndUpdate(
-            { _id: id, guideId },
+            { _id: id, guideId } as any,
             { isPublic },
             { new: true }
         );

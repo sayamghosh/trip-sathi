@@ -131,7 +131,7 @@ export const listAgents = async (req: Request, res: Response): Promise<void> => 
 export const getAgentById = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const agent = await User.findOne({ _id: id, role: 'guide' }).select('-password');
+        const agent = await User.findOne({ _id: id, role: 'guide' } as any).select('-password');
         if (!agent) {
             res.status(404).json({ message: 'Agent not found' });
             return;
@@ -154,7 +154,7 @@ export const verifyAgent = async (req: Request, res: Response): Promise<void> =>
         }
 
         const agent = await User.findOneAndUpdate(
-            { _id: id, role: 'guide' },
+            { _id: id, role: 'guide' } as any,
             { verificationStatus: status },
             { new: true }
         ).select('-password');
@@ -182,7 +182,7 @@ export const toggleAgentStatus = async (req: Request, res: Response): Promise<vo
         }
 
         const agent = await User.findOneAndUpdate(
-            { _id: id, role: 'guide' },
+            { _id: id, role: 'guide' } as any,
             { isActive },
             { new: true }
         ).select('-password');
@@ -202,14 +202,14 @@ export const toggleAgentStatus = async (req: Request, res: Response): Promise<vo
 export const getAgentMetrics = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const agentExists = await User.exists({ _id: id, role: 'guide' });
+        const agentExists = await User.exists({ _id: id, role: 'guide' } as any);
         if (!agentExists) {
             res.status(404).json({ message: 'Agent not found' });
             return;
         }
 
-        const totalPackages = await TourPlan.countDocuments({ guideId: id });
-        const activePackages = await TourPlan.countDocuments({ guideId: id, isPublic: true });
+        const totalPackages = await TourPlan.countDocuments({ guideId: id } as any);
+        const activePackages = await TourPlan.countDocuments({ guideId: id, isPublic: true } as any);
 
         res.status(200).json({
             totalPackages,
@@ -226,15 +226,48 @@ export const getAgentMetrics = async (req: Request, res: Response): Promise<void
 export const getAgentPackages = async (req: Request, res: Response): Promise<void> => {
     try {
         const { id } = req.params;
-        const agentExists = await User.exists({ _id: id, role: 'guide' });
+        const agentExists = await User.exists({ _id: id, role: 'guide' } as any);
         if (!agentExists) {
             res.status(404).json({ message: 'Agent not found' });
             return;
         }
 
-        const packages = await TourPlan.find({ guideId: id }).sort({ createdAt: -1 });
+        const packages = await TourPlan.find({ guideId: id } as any).sort({ createdAt: -1 });
         res.status(200).json(packages);
     } catch (error: any) {
         res.status(500).json({ message: 'Error retrieving agent packages', error: error.message });
     }
 };
+
+// Adjust agent billing credentials (credits & validity)
+export const adjustAgentBilling = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const { credits, planExpiresAt } = req.body;
+
+        const updates: any = {};
+        if (typeof credits === 'number') {
+            updates.credits = credits;
+        }
+
+        if (planExpiresAt !== undefined) {
+            updates.planExpiresAt = planExpiresAt ? new Date(planExpiresAt) : null;
+        }
+
+        const agent = await User.findOneAndUpdate(
+            { _id: id, role: 'guide' } as any,
+            updates,
+            { new: true }
+        ).select('-password');
+
+        if (!agent) {
+            res.status(404).json({ message: 'Agent not found' });
+            return;
+        }
+
+        res.status(200).json({ message: 'Agent billing parameters updated successfully', agent });
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error adjusting billing parameters', error: error.message });
+    }
+};
+

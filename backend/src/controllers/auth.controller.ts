@@ -52,6 +52,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
                 verificationStatus: user.verificationStatus,
                 isActive: user.isActive,
                 isProfilePublic: user.isProfilePublic,
+                credits: user.credits,
+                planExpiresAt: user.planExpiresAt,
+                createdAt: (user as any).createdAt,
             }
         });
     } catch (error: any) {
@@ -100,11 +103,13 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
             await user.save();
         } else {
             // Existing user — upgrade to guide and sync profile/contact info if missing
-            user.role = 'guide';
-            user.picture = picture || user.picture;
+            if (user.role !== 'guide') {
+                user.role = 'guide';
+                user.verificationStatus = 'pending';
+                user.isProfilePublic = false;
+            }
+            user.picture = picture || user.picture || '';
             user.name = user.name || name || '';
-            user.verificationStatus = 'pending';
-            user.isProfilePublic = false;
 
             if (needsContact) {
                 user.phone = trimmedPhone;
@@ -131,6 +136,9 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 verificationStatus: user.verificationStatus,
                 isActive: user.isActive,
                 isProfilePublic: user.isProfilePublic,
+                credits: user.credits,
+                planExpiresAt: user.planExpiresAt,
+                createdAt: (user as any).createdAt,
             }
         });
     } catch (error: any) {

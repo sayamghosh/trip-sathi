@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from '@tanstack/react-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
@@ -14,7 +15,9 @@ import {
   Layers,
   Award,
   CircleDollarSign,
-  UserCheck
+  UserCheck,
+  Coins,
+  CalendarDays
 } from 'lucide-react'
 import { toast } from 'sonner'
 import api from '@/lib/api'
@@ -90,6 +93,47 @@ export function AgentDetailPage() {
       toast.error(error.response?.data?.message || 'Failed to update account status.')
     }
   })
+
+  const [customCredits, setCustomCredits] = useState(agent?.credits?.toString() || '0')
+  const [customExpiry, setCustomExpiry] = useState(
+    agent?.planExpiresAt ? new Date(agent.planExpiresAt).toISOString().split('T')[0] : ''
+  )
+
+  // Sync state when agent data loads
+  useEffect(() => {
+    if (agent) {
+      setCustomCredits(agent.credits?.toString() || '0')
+      setCustomExpiry(agent.planExpiresAt ? new Date(agent.planExpiresAt).toISOString().split('T')[0] : '')
+    }
+  }, [agent])
+
+  const adjustBillingMutation = useMutation({
+    mutationFn: async (updates: { credits?: number; planExpiresAt?: string | null }) => {
+      return await api.patch(`/super-admin/agents/${agentId}/billing`, updates)
+    },
+    onSuccess: () => {
+      toast.success('Agent billing updated successfully!')
+      queryClient.invalidateQueries({ queryKey: ['agent-detail', agentId] })
+      queryClient.invalidateQueries({ queryKey: ['agents'] })
+    },
+    onError: (error: any) => {
+      console.error(error)
+      toast.error(error.response?.data?.message || 'Failed to update billing details.')
+    }
+  })
+
+  const handleSaveCredits = () => {
+    const creditsNum = parseInt(customCredits)
+    if (isNaN(creditsNum) || creditsNum < 0) {
+      toast.error('Please enter a valid credit number.')
+      return
+    }
+    adjustBillingMutation.mutate({ credits: creditsNum })
+  }
+
+  const handleSaveExpiry = () => {
+    adjustBillingMutation.mutate({ planExpiresAt: customExpiry || null })
+  }
 
   const renderStatusBadge = (status: string) => {
     switch (status) {
@@ -211,6 +255,16 @@ export function AgentDetailPage() {
                   <Calendar className='h-4 w-4 text-muted-foreground/60 shrink-0' />
                   <span>Joined {new Date(agent.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}</span>
                 </div>
+
+                <div className='flex items-center gap-3 text-sm text-muted-foreground border-t pt-3.5'>
+                  <Coins className='h-4 w-4 text-muted-foreground/60 shrink-0' />
+                  <span>Credits: <strong className="text-foreground">{agent.credits ?? 0}</strong></span>
+                </div>
+
+                <div className='flex items-center gap-3 text-sm text-muted-foreground'>
+                  <CalendarDays className='h-4 w-4 text-muted-foreground/60 shrink-0' />
+                  <span>Plan Pass Expiry: <strong className="text-foreground">{agent.planExpiresAt ? new Date(agent.planExpiresAt).toLocaleDateString() : 'None'}</strong></span>
+                </div>
               </CardContent>
             </Card>
 
@@ -256,6 +310,60 @@ export function AgentDetailPage() {
                     >
                       <X className='h-4 w-4' />
                       Reject
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Billing Adjustments Card */}
+            <Card className='shadow-sm rounded-xl overflow-hidden border-primary/10 mt-6'>
+              <CardHeader className='bg-primary/5 border-b pb-4'>
+                <CardTitle className='text-base font-semibold flex items-center gap-1.5 text-primary'>
+                  <Coins className='h-4 w-4' /> Billing Adjustments
+                </CardTitle>
+                <CardDescription>Manually override agent credits or plan validity.</CardDescription>
+              </CardHeader>
+              <CardContent className='pt-5 flex flex-col gap-4.5'>
+                {/* Credits adjust */}
+                <div className='flex flex-col gap-2'>
+                  <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>Adjust Credits</label>
+                  <div className='flex gap-2'>
+                    <input
+                      type='number'
+                      value={customCredits}
+                      onChange={(e) => setCustomCredits(e.target.value)}
+                      className='h-9 w-full rounded-lg border border-border px-3 text-xs outline-none bg-background focus:ring-1 focus:ring-primary'
+                      placeholder='Set credits'
+                    />
+                    <Button
+                      size='sm'
+                      onClick={handleSaveCredits}
+                      disabled={adjustBillingMutation.isPending}
+                      className='h-9 px-4 rounded-lg bg-primary hover:bg-primary/95 text-white font-medium text-xs shadow-sm cursor-pointer'
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Expiration adjust */}
+                <div className='flex flex-col gap-2 border-t pt-4'>
+                  <label className='text-xs font-bold text-muted-foreground uppercase tracking-wider'>Extend Expiration Date</label>
+                  <div className='flex gap-2'>
+                    <input
+                      type='date'
+                      value={customExpiry}
+                      onChange={(e) => setCustomExpiry(e.target.value)}
+                      className='h-9 w-full rounded-lg border border-border px-3 text-xs outline-none bg-background focus:ring-1 focus:ring-primary'
+                    />
+                    <Button
+                      size='sm'
+                      onClick={handleSaveExpiry}
+                      disabled={adjustBillingMutation.isPending}
+                      className='h-9 px-4 rounded-lg bg-primary hover:bg-primary/95 text-white font-medium text-xs shadow-sm cursor-pointer'
+                    >
+                      Save
                     </Button>
                   </div>
                 </div>

@@ -10,7 +10,9 @@ import {
   ChevronLeft, 
   ChevronRight, 
   ShieldAlert,
-  Loader2
+  Loader2,
+  ChevronDown,
+  RefreshCw
 } from 'lucide-react'
 import { toast } from 'sonner'
 import api from '@/lib/api'
@@ -20,7 +22,6 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
 import { Switch } from '@/components/ui/switch'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -38,6 +39,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 
 export function AgentsListPage() {
   const navigate = useNavigate()
@@ -72,11 +79,11 @@ export function AgentsListPage() {
 
   // Mutation to verify/approve/reject guide
   const verifyMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string; status: 'approved' | 'rejected' }) => {
+    mutationFn: async ({ id, status }: { id: string; status: 'approved' | 'rejected' | 'pending' }) => {
       return await api.patch(`/super-admin/agents/${id}/verify`, { status })
     },
     onSuccess: (_, variables) => {
-      toast.success(`Agent successfully ${variables.status === 'approved' ? 'approved' : 'rejected'}!`)
+      toast.success(`Agent successfully ${variables.status === 'approved' ? 'approved' : variables.status === 'rejected' ? 'rejected' : 'set to pending'}!`)
       queryClient.invalidateQueries({ queryKey: ['agents'] })
       queryClient.invalidateQueries({ queryKey: ['pending-agents-count'] })
     },
@@ -116,16 +123,79 @@ export function AgentsListPage() {
     setPage(1)
   }
 
-  const renderStatusBadge = (status: string) => {
+  const renderStatusBadge = (status: string, agentId: string) => {
+    const triggerClass = 'flex items-center gap-1.5 px-3 py-1 rounded-full font-semibold text-xs cursor-pointer border select-none transition-all duration-200 outline-none hover:scale-105 active:scale-95'
+    
+    let badgeContent;
     switch (status) {
       case 'approved':
-        return <Badge variant='outline' className='bg-green-500/10 text-green-500 hover:bg-green-500/15 border-green-500/20 px-2.5 py-0.5 rounded-full font-medium text-xs'>Approved</Badge>
+        badgeContent = (
+          <span className={`${triggerClass} bg-green-500/10 text-green-500 border-green-500/20 hover:bg-green-500/15`}>
+            Approved
+            <ChevronDown className='h-3 w-3 opacity-60' />
+          </span>
+        )
+        break
       case 'rejected':
-        return <Badge variant='outline' className='bg-destructive/10 text-destructive hover:bg-destructive/15 border-destructive/20 px-2.5 py-0.5 rounded-full font-medium text-xs'>Rejected</Badge>
+        badgeContent = (
+          <span className={`${triggerClass} bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/15`}>
+            Rejected
+            <ChevronDown className='h-3 w-3 opacity-60' />
+          </span>
+        )
+        break
       default:
-        return <Badge variant='outline' className='bg-amber-500/10 text-amber-500 hover:bg-amber-500/15 border-amber-500/20 px-2.5 py-0.5 rounded-full font-medium text-xs animate-pulse'>Pending</Badge>
+        badgeContent = (
+          <span className={`${triggerClass} bg-amber-500/10 text-amber-500 border-amber-500/20 hover:bg-amber-500/15 animate-pulse`}>
+            Pending
+            <ChevronDown className='h-3 w-3 opacity-60' />
+          </span>
+        )
     }
+
+    return (
+      <div className="flex items-center justify-center">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            {badgeContent}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align='center' className='w-40 rounded-xl shadow-lg border border-border bg-card/95 backdrop-blur-md p-1.5 animate-in fade-in slide-in-from-top-2 duration-200 z-50'>
+            {status !== 'pending' && (
+              <DropdownMenuItem 
+                onClick={() => verifyMutation.mutate({ id: agentId, status: 'pending' as any })}
+                disabled={verifyMutation.isPending}
+                className='flex items-center gap-2 px-2.5 py-1.5 text-xs font-semibold text-amber-500 hover:bg-amber-500/10 focus:bg-amber-500/10 rounded-lg cursor-pointer transition-colors outline-none'
+              >
+                <RefreshCw className='h-3.5 w-3.5' />
+                Set to Pending
+              </DropdownMenuItem>
+            )}
+            {status !== 'approved' && (
+              <DropdownMenuItem 
+                onClick={() => verifyMutation.mutate({ id: agentId, status: 'approved' })}
+                disabled={verifyMutation.isPending}
+                className='flex items-center gap-2 px-2.5 py-1.5 text-xs font-semibold text-green-500 hover:bg-green-500/10 focus:bg-green-500/10 rounded-lg cursor-pointer transition-colors outline-none'
+              >
+                <Check className='h-3.5 w-3.5' />
+                Approve Agent
+              </DropdownMenuItem>
+            )}
+            {status !== 'rejected' && (
+              <DropdownMenuItem 
+                onClick={() => verifyMutation.mutate({ id: agentId, status: 'rejected' })}
+                disabled={verifyMutation.isPending}
+                className='flex items-center gap-2 px-2.5 py-1.5 text-xs font-semibold text-destructive hover:bg-destructive/10 focus:bg-destructive/10 rounded-lg cursor-pointer transition-colors outline-none'
+              >
+                <X className='h-3.5 w-3.5' />
+                Reject Agent
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    )
   }
+
 
   return (
     <div className='flex flex-col min-h-screen w-full'>
@@ -218,6 +288,8 @@ export function AgentsListPage() {
                     <TableHead>Phone Number</TableHead>
                     <TableHead>Address</TableHead>
                     <TableHead className='text-center'>Verification Status</TableHead>
+                    <TableHead className='text-center'>Credits</TableHead>
+                    <TableHead className='text-center'>Plan Expiration</TableHead>
                     <TableHead className='text-center'>Active Status</TableHead>
                     <TableHead className='text-right pr-6'>Actions</TableHead>
                   </TableRow>
@@ -253,7 +325,17 @@ export function AgentsListPage() {
 
                       {/* Verification Status */}
                       <TableCell className='text-center'>
-                        {renderStatusBadge(agent.verificationStatus)}
+                        {renderStatusBadge(agent.verificationStatus, agent._id)}
+                      </TableCell>
+
+                      {/* Credits */}
+                      <TableCell className='text-center font-bold text-foreground'>
+                        {agent.credits ?? 0}
+                      </TableCell>
+
+                      {/* Plan Expiration */}
+                      <TableCell className='text-center text-xs text-muted-foreground'>
+                        {agent.planExpiresAt ? new Date(agent.planExpiresAt).toLocaleDateString() : 'None'}
                       </TableCell>
 
                       {/* Active Status Switch */}
@@ -272,30 +354,6 @@ export function AgentsListPage() {
                       {/* Actions */}
                       <TableCell className='text-right pr-6'>
                         <div className='flex items-center justify-end gap-2.5'>
-                          {agent.verificationStatus === 'pending' && (
-                            <>
-                              <Button
-                                size='icon'
-                                variant='outline'
-                                className='h-8 w-8 border-green-500/20 hover:bg-green-500/10 text-green-500 hover:text-green-600 rounded-lg'
-                                onClick={() => verifyMutation.mutate({ id: agent._id, status: 'approved' })}
-                                disabled={verifyMutation.isPending}
-                                title='Approve Verification'
-                              >
-                                <Check className='h-4 w-4' />
-                              </Button>
-                              <Button
-                                size='icon'
-                                variant='outline'
-                                className='h-8 w-8 border-destructive/20 hover:bg-destructive/10 text-destructive rounded-lg'
-                                onClick={() => verifyMutation.mutate({ id: agent._id, status: 'rejected' })}
-                                disabled={verifyMutation.isPending}
-                                title='Reject Verification'
-                              >
-                                <X className='h-4 w-4' />
-                              </Button>
-                            </>
-                          )}
                           <Button
                             size='sm'
                             variant='secondary'

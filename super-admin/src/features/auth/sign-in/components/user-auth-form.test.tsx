@@ -22,6 +22,24 @@ vi.mock('@/stores/auth-store', () => ({
   }),
 }))
 
+vi.mock('@/lib/api', () => ({
+  default: {
+    post: vi.fn(() => Promise.resolve({
+      data: {
+        token: 'mock-access-token',
+        user: {
+          id: 'ACC001',
+          accountNo: 'ACC001',
+          email: 'a@b.com',
+          name: 'Admin',
+          role: ['user'],
+          exp: 1700000000
+        }
+      }
+    }))
+  }
+}))
+
 vi.mock('@tanstack/react-router', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@tanstack/react-router')>()
   return {

@@ -50,14 +50,14 @@ export function SignUpForm({
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(_data: z.infer<typeof formSchema>) {
     setIsLoading(true)
 
     toast.promise(sleep(2000), {
       loading: 'Creating account...',
       success: () => {
         setIsLoading(false)
-        return `Account created for ${data.email}.`
+        return 'Registration is disabled. Please use the seeded Super Admin credentials to Sign In.'
       },
       error: 'Error',
     })

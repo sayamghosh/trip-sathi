@@ -2,7 +2,7 @@
 
 ## Overview
 
-Currently, agents (guides) who sign up via the `admin/` panel using Google OAuth get immediate, unrestricted access. The `super-admin/` panel is a disconnected template with mock auth. This plan adds a verification workflow and a real super admin backend.
+Currently, agents (guides) who sign up via the `admin/` panel using Google OAuth get immediate, unrestricted access. The `super-admin/` panel is a disconnected template with mock auth. This plan adds an authorization toggle system and a real super admin backend. The super admin can flip a switch to authorize or deauthorize any agent at any time.
 
 ---
 
@@ -13,16 +13,17 @@ Currently, agents (guides) who sign up via the `admin/` panel using Google OAuth
 - Add `@types/bcryptjs` as dev dependency
 
 ### 1.2 User Model Changes (`backend/src/models/user.model.ts`)
-Add fields to support verification and agent management:
+Add fields to support authorization toggle and agent management:
 
 | Field | Type | Default | Notes |
 |-------|------|---------|-------|
 | `password` | String | optional | Used only for super admin (email/password auth); `null` for Google-auth agents |
-| `verificationStatus` | String | `'pending'` | `'pending'` / `'approved'` / `'rejected'` |
+| `isAuthorized` | Boolean | `false` | Super admin can toggle this on/off at any time to authorize or deauthorize an agent |
 | `isActive` | Boolean | `true` | Super admin can set to `false` to deactivate an agent |
 | `isProfilePublic` | Boolean | `false` | Agent's public profile visibility |
 
-Update `role` enum to: `['traveller', 'guide', 'admin']` (keep as-is, `admin` = super admin)
+- **`isAuthorized` replaces `verificationStatus`** — no more pending/approved/rejected workflow. It's a simple on/off switch the super admin controls freely.
+- Update `role` enum to: `['traveller', 'guide', 'admin']` (keep as-is, `admin` = super admin)
 
 ### 1.3 Super Admin Auth (`backend/src/controllers/superAdmin.controller.ts`)
 Create email/password-based auth for super admins.
@@ -72,7 +73,7 @@ async function seed() {
     name: 'Super Admin',
     password: hashedPassword,
     role: 'admin',
-    verificationStatus: 'approved',
+    isAuthorized: true,
     isActive: true,
   });
   
@@ -96,9 +97,9 @@ Run once: `npm run seed`
 
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
-| `GET` | `/api/super-admin/agents` | List all agents (with pagination, search, filter by status) |
+| `GET` | `/api/super-admin/agents` | List all agents (with pagination, search, filter by authorization status) |
 | `GET` | `/api/super-admin/agents/:id` | Get single agent details |
-| `PATCH` | `/api/super-admin/agents/:id/verify` | Approve/reject agent (`{ status: 'approved'|'rejected' }`) |
+| `PATCH` | `/api/super-admin/agents/:id/authorize` | Toggle agent authorization (`{ isAuthorized: boolean }`) — super admin can flip this on/off at any time |
 | `PATCH` | `/api/super-admin/agents/:id/status` | Activate/deactivate agent (`{ isActive: boolean }`) |
 | `GET` | `/api/super-admin/agents/:id/metrics` | Get agent metrics (total packages, bookings, revenue etc.) |
 | `GET` | `/api/super-admin/agents/:id/packages` | List all packages by an agent (public + private) |
@@ -115,16 +116,16 @@ Add field:
 | Change | Detail |
 |--------|--------|
 | `createTourPlan` | Sets `isPublic: false` always |
-| `getAllTourPlans` (public) | Only return plans where `isPublic: true` AND the guide is `verificationStatus: 'approved'` AND `isActive: true` |
+| `getAllTourPlans` (public) | Only return plans where `isPublic: true` AND the guide is `isAuthorized: true` AND `isActive: true` |
 | `searchTourPlans` | Same filter as above |
-| New endpoint | `PATCH /api/tour-plans/:id/publish` — Agent can toggle `isPublic` (only if they are verified) |
+| New endpoint | `PATCH /api/tour-plans/:id/publish` — Agent can toggle `isPublic` (only if `isAuthorized: true`) |
 | `getTourPlansByGuide` | Agent's own view — returns ALL their plans regardless of `isPublic` |
 
 ### 1.7 Agent Signup Flow Changes (`backend/src/controllers/auth.controller.ts`)
 - When `googleGuideLogin` creates/upgrades a user to `'guide'` role:
-  - Set `verificationStatus: 'pending'`
+  - Set `isAuthorized: false` (agent starts unauthorized — super admin must flip the switch)
   - Set `isProfilePublic: false`
-- JWT still issued, but admin panel will check verification status client-side
+- JWT still issued, but admin panel will check authorization status client-side
 
 ### 1.8 Backend Routes Registration
 - Create `backend/src/routes/superAdmin.routes.ts`
@@ -151,12 +152,12 @@ Add field:
 Create a new feature module at `super-admin/src/features/agents/`:
 
 - **AgentsListPage** — Table of all agents with columns:
-  - Name, Email, Phone, Signup Date, Verification Status (Pending/Approved/Rejected), Account Status (Active/Inactive)
-  - Filters: by verification status, by account status
-  - Actions: Approve, Reject, View Details
+  - Name, Email, Phone, Signup Date, Authorization Status (Authorized/Unauthorized), Account Status (Active/Inactive)
+  - Filters: by authorization status, by account status
+  - Actions: Toggle authorization switch, View Details
 - **AgentDetailPage** — Full agent profile showing:
   - Personal info, contact details
-  - Verification status + Approve/Reject buttons
+  - **Authorization toggle switch** — super admin can flip at any time to authorize/deauthorize
   - Account status toggle (Active/Inactive)
   - Tour Packages section (list all packages by this agent)
   - Metrics: Total packages, public packages, bookings, revenue (if any)
@@ -165,7 +166,7 @@ Create a new feature module at `super-admin/src/features/agents/`:
 ### 2.4 Sidebar & Route Updates (`super-admin`)
 
 Add sidebar navigation items:
-- **Agents** (icon: `UserCog`) → `/agents` (with badge showing pending count)
+- **Agents** (icon: `UserCog`) → `/agents` (with badge showing unauthorized count)
 
 New routes:
 | Path | Component |
@@ -176,44 +177,43 @@ New routes:
 ### 2.5 Dashboard Updates
 - Replace mock data in Dashboard with real metrics:
   - Total agents
-  - Pending verifications
+  - Unauthorized agents (count of agents where `isAuthorized: false`)
   - Active packages
   - Total bookings (placeholder for now)
 
 ---
 
-## Phase 3: Admin Panel — Verification-Aware Agent Experience
+## Phase 3: Admin Panel — Authorization-Aware Agent Experience
 
 ### 3.1 Onboarding Status UI (`admin/src/`)
-- After login, check user's `verificationStatus` from stored user object
-- Show a banner/modal based on status:
-  - **Pending**: "Your account is under review. You can browse but packages won't be public."
-  - **Approved**: Full access granted
-  - **Rejected**: "Your account was not approved. Contact support."
+- After login, check user's `isAuthorized` from stored user object
+- Show a banner based on status:
+  - **`isAuthorized === false`**: "Your account is awaiting authorization. You can browse but packages won't be public until the super admin authorizes your account."
+  - **`isAuthorized === true`**: Full access granted
 
 ### 3.2 Dashboard Changes (`admin/src/pages/Dashboard.tsx`)
-- If `verificationStatus === 'pending'`:
-  - Show verification pending card instead of (or alongside) normal dashboard
+- If `isAuthorized === false`:
+  - Show "awaiting authorization" card instead of (or alongside) normal dashboard
   - Restrict navigation — allow dashboard, profile, package creation (draft only)
-  - Show message: "You can create draft packages. They will be published once your account is verified."
-- If `verificationStatus === 'approved'`:
+  - Show message: "You can create draft packages. They will be published once your account is authorized."
+- If `isAuthorized === true`:
   - Full dashboard as before
   - Publish toggle on packages
 
 ### 3.3 Package Creation Changes (`admin/src/components/package/CreatePlanPage.tsx`)
 - All created packages have `isPublic: false` by default (backend enforced)
 - After creation, show status: "Saved as draft"
-- Only when `verificationStatus === 'approved'`:
+- Only when `isAuthorized === true`:
   - Show "Publish" button on package detail page
   - Show visibility toggle
 
 ### 3.4 Package List Changes (`admin/src/components/package/PackagePage.tsx`)
 - Add a badge/indicator showing "Draft" vs "Published" status
-- Add publish/unpublish toggle action (only if verified)
+- Add publish/unpublish toggle action (only if authorized)
 
 ### 3.5 Profile Page Changes
-- Show verification status
-- Show profile public/private toggle (only if verified)
+- Show authorization status ("Authorized" / "Unauthorized")
+- Show profile public/private toggle (only if authorized)
 
 ---
 
@@ -224,10 +224,10 @@ New routes:
   ```
   TourPlan.find({ 
     isPublic: true,
-    guideId: { $in: verifiedActiveGuides } 
+    guideId: { $in: authorizedActiveGuides } 
   })
   ```
-  Where `verifiedActiveGuides` = list of user IDs where `role: 'guide'`, `verificationStatus: 'approved'`, `isActive: true`
+  Where `authorizedActiveGuides` = list of user IDs where `role: 'guide'`, `isAuthorized: true`, `isActive: true`
 
 - `GET /api/tour-plans/search` — Same filter
 
@@ -238,7 +238,7 @@ New routes:
 PATCH /api/tour-plans/:id/publish
 Body: { isPublic: boolean }
 Auth: guide
-Guard: Only allowed if guide's verificationStatus === 'approved'
+Guard: Only allowed if guide's isAuthorized === true
 ```
 
 ---
@@ -248,10 +248,10 @@ Guard: Only allowed if guide's verificationStatus === 'approved'
 ### Backend (`backend/src/`)
 | File | Action |
 |------|--------|
-| `models/user.model.ts` | Modify: add `password`, `verificationStatus`, `isActive`, `isProfilePublic` |
+| `models/user.model.ts` | Modify: add `password`, `isAuthorized`, `isActive`, `isProfilePublic` |
 | `models/tourPlan.model.ts` | Modify: add `isPublic` |
-| `controllers/auth.controller.ts` | Modify: set `verificationStatus: 'pending'` on guide signup |
-| `controllers/tourPlan.controller.ts` | Modify: enforce `isPublic` + verification checks |
+| `controllers/auth.controller.ts` | Modify: set `isAuthorized: false` on guide signup |
+| `controllers/tourPlan.controller.ts` | Modify: enforce `isPublic` + authorization checks |
 | `controllers/superAdmin.controller.ts` | **New** — super admin login + agent management |
 | `middleware/auth.middleware.ts` | Modify: add `isAdmin` guard |
 | `routes/auth.routes.ts` | No changes needed |
@@ -278,11 +278,11 @@ Guard: Only allowed if guide's verificationStatus === 'approved'
 |------|--------|
 | `lib/axios.ts` | No changes needed |
 | `router.tsx` | Modify: pass user data for route guards |
-| `App.tsx` | Modify: show verification status banner |
-| `pages/Dashboard.tsx` | Modify: show pending/rejected state |
+| `App.tsx` | Modify: show authorization status banner |
+| `pages/Dashboard.tsx` | Modify: show unauthorized/authorized state |
 | `components/package/PackagePage.tsx` | Modify: show draft/published indicators, publish action |
-| `components/package/PackageDetailPage.tsx` | Modify: show publish toggle if verified |
-| `pages/Login.tsx` | Modify: pass verificationStatus on login response |
+| `components/package/PackageDetailPage.tsx` | Modify: show publish toggle if authorized |
+| `pages/Login.tsx` | Modify: pass `isAuthorized` on login response |
 
 ---
 
@@ -309,13 +309,13 @@ Phase 2 (Super Admin Panel)
   └─ 2.5 Wire dashboard to real data
 
 Phase 3 (Admin Panel)
-  └─ 3.1 Show onboarding/verification status
-  └─ 3.2 Update dashboard for pending state
+  └─ 3.1 Show onboarding/authorization status
+  └─ 3.2 Update dashboard for unauthorized state
   └─ 3.3 Update package creation (draft flow)
   └─ 3.4 Add publish/draft indicators to package list
   └─ 3.5 Profile page status display
 
 Phase 4 (Backend enforcement)
-  └─ 4.1 Filter public APIs by verification + isPublic
-  └─ 4.2 Publish endpoint with verification guard
+  └─ 4.1 Filter public APIs by authorization + isPublic
+  └─ 4.2 Publish endpoint with authorization guard
 ```

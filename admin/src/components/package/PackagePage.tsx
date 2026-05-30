@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Link } from "@tanstack/react-router"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 
 const featureList = [
   {
@@ -43,6 +44,13 @@ const popularPackages = [
 export function PackagePage() {
   const [packages, setPackages] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+
+  const [user] = useState<any>(() => {
+    const storedUser = localStorage.getItem("user")
+    return storedUser ? JSON.parse(storedUser) : null
+  })
+  const isAuthorized = user?.isAuthorized === true
+
   useEffect(() => {
     const fetchPackages = async () => {
       try {
@@ -110,9 +118,19 @@ export function PackagePage() {
 
                     {/* Middle Column - Details */}
                     <div className="flex flex-col">
-                      <h3 className="text-[26px] font-bold text-foreground leading-tight mb-2">
-                        {heroPackage?.title || "Tropical Paradise Retreat"}
-                      </h3>
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
+                        <h3 className="text-[26px] font-bold text-foreground leading-tight">
+                          {heroPackage?.title || "Tropical Paradise Retreat"}
+                        </h3>
+                        <span className={cn(
+                          "rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider border shrink-0",
+                          heroPackage?.isPublic 
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300 border-emerald-200/40" 
+                            : "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-300 border-amber-200/40"
+                        )}>
+                          {heroPackage?.isPublic ? "Published" : "Draft"}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-1.5 text-[12px] font-medium text-secondary-foreground mb-5">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
                         <span>{heroPackage?.locations?.[0] || "Maldives"}</span>
@@ -137,12 +155,36 @@ export function PackagePage() {
                         </div>
                       </div>
  
-                      <div className="mt-auto relative z-20">
-                        <Link to="/packages/$packageId/edit" params={{ packageId: heroPackage._id }}>
-                          <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-[10px] h-12 shadow-none text-[15px] font-bold">
+                      <div className="mt-auto relative z-20 flex gap-2 w-full">
+                        <Link to="/packages/$packageId/edit" params={{ packageId: heroPackage._id }} className="flex-1">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-[10px] h-11 shadow-none text-[14px] font-bold">
                             Edit Detail
                           </Button>
                         </Link>
+                        {isAuthorized && (
+                          <Button
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                const targetState = !heroPackage.isPublic
+                                await api.patch(`/api/tour-plans/${heroPackage._id}/publish`, { isPublic: targetState })
+                                setPackages(prev => prev.map(p => p._id === heroPackage._id ? { ...p, isPublic: targetState } : p))
+                                alert(`Package ${targetState ? "published" : "unpublished"} successfully!`)
+                              } catch (err: any) {
+                                alert(err.response?.data?.message || "Failed to update publication status")
+                              }
+                            }}
+                            variant="outline"
+                            className={cn(
+                              "rounded-[10px] h-11 px-4 text-[13px] font-bold border shrink-0 transition-all",
+                              heroPackage?.isPublic 
+                                ? "border-amber-200 text-amber-700 hover:bg-amber-50" 
+                                : "border-emerald-200 text-emerald-700 hover:bg-emerald-50 bg-emerald-50/10"
+                            )}
+                          >
+                            {heroPackage?.isPublic ? "Unpublish" : "Publish"}
+                          </Button>
+                        )}
                       </div>
                     </div>
 
@@ -231,7 +273,17 @@ export function PackagePage() {
                       <div className="flex-1 p-5 flex flex-col">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <h4 className="text-[17px] font-bold text-foreground">{pkg.title}</h4>
+                            <div className="flex items-center gap-2 mb-1 flex-wrap">
+                              <h4 className="text-[17px] font-bold text-foreground">{pkg.title}</h4>
+                              <span className={cn(
+                                "rounded-full px-1.5 py-0.5 text-[8.5px] font-bold uppercase tracking-wider border shrink-0",
+                                pkg.isPublic 
+                                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-300 border-emerald-200/40" 
+                                  : "bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-300 border-amber-200/40"
+                              )}>
+                                {pkg.isPublic ? "Published" : "Draft"}
+                              </span>
+                            </div>
                             <div className="flex items-center gap-4 mt-1">
                               <div className="flex items-center gap-1.5 text-[11px] font-medium text-secondary-foreground">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -286,6 +338,31 @@ export function PackagePage() {
                            </div>
                          </div>
                         <div className="mt-4 pt-4 border-t border-border flex justify-end gap-2 relative z-20">
+                           {isAuthorized && (
+                             <Button
+                               onClick={async (e) => {
+                                 e.stopPropagation()
+                                 try {
+                                   const targetState = !pkg.isPublic
+                                   await api.patch(`/api/tour-plans/${pkg._id}/publish`, { isPublic: targetState })
+                                   setPackages(prev => prev.map(p => p._id === pkg._id ? { ...p, isPublic: targetState } : p))
+                                   alert(`Package ${targetState ? "published" : "unpublished"} successfully!`)
+                                 } catch (err: any) {
+                                   alert(err.response?.data?.message || "Failed to update publication status")
+                                 }
+                               }}
+                               variant="outline"
+                               size="sm"
+                               className={cn(
+                                 "h-8 text-[11px] font-bold border",
+                                 pkg.isPublic 
+                                   ? "border-amber-200 text-amber-700 hover:bg-amber-50" 
+                                   : "border-emerald-200 text-emerald-700 hover:bg-emerald-50 bg-emerald-50/10"
+                               )}
+                             >
+                               {pkg.isPublic ? "Unpublish" : "Publish"}
+                             </Button>
+                           )}
                            <Link to="/packages/$packageId/edit" params={{ packageId: pkg._id }}>
                              <Button variant="outline" size="sm" className="h-8 text-[11px] text-[#2E7CF6]">Edit</Button>
                            </Link>
@@ -338,7 +415,17 @@ export function PackagePage() {
                         {!pkg.bannerImages?.[0] && <PlaneTakeoff className="h-8 w-8" />}
                       </div>
                       <div className="p-2.5 flex flex-col flex-1">
-                        <h4 className="text-[14px] font-bold text-foreground truncate">{pkg.title}</h4>
+                        <div className="flex items-center justify-between gap-2 overflow-hidden mb-1">
+                          <h4 className="text-[14px] font-bold text-foreground truncate flex-1">{pkg.title}</h4>
+                          <span className={cn(
+                            "rounded-full px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider border shrink-0",
+                            pkg.isPublic 
+                              ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-300 border-emerald-200/40" 
+                              : "bg-amber-50 text-amber-700 dark:bg-amber-300 border-amber-200/40"
+                          )}>
+                            {pkg.isPublic ? "Pub" : "Draft"}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground mt-1.5 mb-3">
                           <MapPin className="h-3 w-3" />
                           <span className="truncate">{pkg.locations?.[0] || "Location"}</span>

@@ -8,14 +8,14 @@ export const getAllTourPlans = async (req: Request, res: Response): Promise<void
     try {
         const limit = parseInt(req.query.limit as string) || 0;
 
-        // Fetch verified and active guides
-        const activeApprovedGuides = await User.find({
+        // Fetch authorized and active guides
+        const activeAuthorizedGuides = await User.find({
             role: 'guide',
-            verificationStatus: 'approved',
+            isAuthorized: true,
             isActive: true
         }).select('_id');
         
-        const guideIds = activeApprovedGuides.map(guide => guide._id);
+        const guideIds = activeAuthorizedGuides.map(guide => guide._id);
 
         const plans = await TourPlan.find({
             isPublic: true,
@@ -64,9 +64,9 @@ export const getTourPlansByGuide = async (req: Request, res: Response): Promise<
 // Get single tour plan details with owner and verification checks
 export const getTourPlanById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.params as any;
         const plan = await TourPlan.findById(id)
-            .populate('guideId', 'name picture phone address role verificationStatus isActive')
+            .populate('guideId', 'name picture phone address role isAuthorized isActive')
             .populate('days.activities.hotelRef');
 
         if (!plan) {
@@ -78,7 +78,7 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
         let isOwnerOrAdmin = false;
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.startsWith('Bearer ')) {
-            const token = authHeader.split(' ')[1];
+            const token = authHeader.split(' ')[1] as string;
             const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
             try {
                 const decoded = jwt.verify(token, jwtSecret) as any;
@@ -91,10 +91,10 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
         }
 
         const guide = plan.guideId as any;
-        const isGuideActiveApproved = guide && guide.role === 'guide' && guide.verificationStatus === 'approved' && guide.isActive !== false;
+        const isGuideActiveAuthorized = guide && guide.role === 'guide' && guide.isAuthorized === true && guide.isActive !== false;
 
-        // Block access if it's draft or the guide is unverified/inactive, unless it's the owner or admin
-        if (!isOwnerOrAdmin && (!plan.isPublic || !isGuideActiveApproved)) {
+        // Block access if it's draft or the guide is unauthorized/inactive, unless it's the owner or admin
+        if (!isOwnerOrAdmin && (!plan.isPublic || !isGuideActiveAuthorized)) {
             res.status(403).json({ message: 'Access denied: This tour plan is not available to the public' });
             return;
         }
@@ -110,14 +110,14 @@ export const searchTourPlans = async (req: Request, res: Response): Promise<void
     try {
         const { destination } = req.query;
 
-        // Fetch verified and active guides
-        const activeApprovedGuides = await User.find({
+        // Fetch authorized and active guides
+        const activeAuthorizedGuides = await User.find({
             role: 'guide',
-            verificationStatus: 'approved',
+            isAuthorized: true,
             isActive: true
         }).select('_id');
         
-        const guideIds = activeApprovedGuides.map(guide => guide._id);
+        const guideIds = activeAuthorizedGuides.map(guide => guide._id);
 
         let query: any = {
             isPublic: true,
@@ -156,7 +156,7 @@ export const updateTourPlan = async (req: Request, res: Response): Promise<void>
         const guideId = (req as any).user.id;
         const updateData = req.body;
 
-        const plan = await TourPlan.findOne({ _id: id as string, guideId });
+        const plan = await TourPlan.findOne({ _id: id as any, guideId: guideId as any });
 
         if (!plan) {
             res.status(404).json({ message: 'Tour plan not found or you are not authorized' });
@@ -180,7 +180,7 @@ export const updateTourPlan = async (req: Request, res: Response): Promise<void>
 // Publish or unpublish a tour plan (only allowed for verified guides)
 export const publishTourPlan = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.params as any;
         const { isPublic } = req.body;
         const guideId = (req as any).user.id;
 
@@ -196,10 +196,10 @@ export const publishTourPlan = async (req: Request, res: Response): Promise<void
             return;
         }
 
-        if (guide.verificationStatus !== 'approved') {
+        if (!guide.isAuthorized) {
             res.status(403).json({ 
-                message: 'Access denied: You must be verified by the admin before you can publish packages.',
-                verificationStatus: guide.verificationStatus
+                message: 'Access denied: You must be authorized by the admin before you can publish packages.',
+                isAuthorized: guide.isAuthorized
             });
             return;
         }
@@ -210,7 +210,7 @@ export const publishTourPlan = async (req: Request, res: Response): Promise<void
         }
 
         const plan = await TourPlan.findOneAndUpdate(
-            { _id: id, guideId },
+            { _id: id as any, guideId: guideId as any },
             { isPublic },
             { new: true }
         );

@@ -11,7 +11,11 @@ async function seed() {
         console.log('Checking for existing super admin user...');
         const existing = await User.findOne({ email: 'admin' });
         if (existing) {
-            console.log('Super admin already exists. Skipping seed.');
+            console.log('Super admin already exists. Updating schema fields...');
+            existing.isAuthorized = true;
+            existing.isActive = true;
+            await existing.save();
+            console.log('Super admin updated successfully.');
             await mongoose.disconnect();
             console.log('Disconnected from MongoDB.');
             process.exit(0);
@@ -27,7 +31,7 @@ async function seed() {
             name: 'Super Admin',
             password: hashedPassword,
             role: 'admin',
-            verificationStatus: 'approved',
+            isAuthorized: true,
             isActive: true,
         });
         

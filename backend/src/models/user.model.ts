@@ -10,7 +10,7 @@ export interface IUser extends Document {
     address?: string;
     bio?: string;
     password?: string;
-    verificationStatus: 'pending' | 'approved' | 'rejected';
+    isAuthorized: boolean;
     isActive: boolean;
     isProfilePublic: boolean;
 }
@@ -25,7 +25,7 @@ const UserSchema: Schema = new Schema({
     address: { type: String },
     bio: { type: String },
     password: { type: String },
-    verificationStatus: { type: String, default: 'pending', enum: ['pending', 'approved', 'rejected'] },
+    isAuthorized: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
     isProfilePublic: { type: Boolean, default: false },
 }, { timestamps: true });

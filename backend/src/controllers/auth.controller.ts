@@ -49,7 +49,7 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
                 phone: user.phone,
                 address: user.address,
                 bio: user.bio,
-                verificationStatus: user.verificationStatus,
+                isAuthorized: user.isAuthorized,
                 isActive: user.isActive,
                 isProfilePublic: user.isProfilePublic,
             }
@@ -94,16 +94,16 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 role: 'guide',
                 phone: trimmedPhone,
                 address: trimmedAddress,
-                verificationStatus: 'pending',
+                isAuthorized: false,
                 isProfilePublic: false,
             });
             await user.save();
         } else {
             // Existing user — upgrade to guide and sync profile/contact info if missing
             user.role = 'guide';
-            user.picture = picture || user.picture;
+            user.picture = picture || user.picture || '';
             user.name = user.name || name || '';
-            user.verificationStatus = 'pending';
+            user.isAuthorized = false;
             user.isProfilePublic = false;
 
             if (needsContact) {
@@ -128,7 +128,7 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 phone: user.phone,
                 address: user.address,
                 bio: user.bio,
-                verificationStatus: user.verificationStatus,
+                isAuthorized: user.isAuthorized,
                 isActive: user.isActive,
                 isProfilePublic: user.isProfilePublic,
             }

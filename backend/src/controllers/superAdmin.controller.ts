@@ -50,7 +50,7 @@ export const superAdminLogin = async (req: Request, res: Response): Promise<void
                 name: user.name,
                 picture: user.picture,
                 role: user.role,
-                verificationStatus: user.verificationStatus,
+                isAuthorized: user.isAuthorized,
                 isActive: user.isActive,
             }
         });
@@ -81,7 +81,7 @@ export const listAgents = async (req: Request, res: Response): Promise<void> => 
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
         const search = req.query.search as string;
-        const status = req.query.status as string;
+        const isAuthorizedStr = req.query.isAuthorized as string;
         const isActiveStr = req.query.isActive as string;
 
         const query: any = { role: 'guide' };
@@ -95,9 +95,9 @@ export const listAgents = async (req: Request, res: Response): Promise<void> => 
             ];
         }
 
-        // Filter by verificationStatus
-        if (status && ['pending', 'approved', 'rejected'].includes(status)) {
-            query.verificationStatus = status;
+        // Filter by authorization status
+        if (isAuthorizedStr === 'true' || isAuthorizedStr === 'false') {
+            query.isAuthorized = isAuthorizedStr === 'true';
         }
 
         // Filter by active status
@@ -130,7 +130,7 @@ export const listAgents = async (req: Request, res: Response): Promise<void> => 
 // Get single agent details
 export const getAgentById = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.params as any;
         const agent = await User.findOne({ _id: id, role: 'guide' }).select('-password');
         if (!agent) {
             res.status(404).json({ message: 'Agent not found' });
@@ -142,20 +142,20 @@ export const getAgentById = async (req: Request, res: Response): Promise<void> =
     }
 };
 
-// Approve or reject agent
-export const verifyAgent = async (req: Request, res: Response): Promise<void> => {
+// Authorize or deauthorize agent
+export const authorizeAgent = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
-        const { status } = req.body;
+        const { id } = req.params as any;
+        const { isAuthorized } = req.body;
 
-        if (!status || !['approved', 'rejected', 'pending'].includes(status)) {
-            res.status(400).json({ message: 'Invalid verification status' });
+        if (typeof isAuthorized !== 'boolean') {
+            res.status(400).json({ message: 'isAuthorized must be a boolean value' });
             return;
         }
 
         const agent = await User.findOneAndUpdate(
             { _id: id, role: 'guide' },
-            { verificationStatus: status },
+            { isAuthorized },
             { new: true }
         ).select('-password');
 
@@ -164,16 +164,16 @@ export const verifyAgent = async (req: Request, res: Response): Promise<void> =>
             return;
         }
 
-        res.status(200).json({ message: `Agent verification status updated to ${status}`, agent });
+        res.status(200).json({ message: `Agent authorization status updated to ${isAuthorized}`, agent });
     } catch (error: any) {
-        res.status(500).json({ message: 'Error verifying agent', error: error.message });
+        res.status(500).json({ message: 'Error authorizing agent', error: error.message });
     }
 };
 
 // Activate or deactivate agent
 export const toggleAgentStatus = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.params as any;
         const { isActive } = req.body;
 
         if (typeof isActive !== 'boolean') {
@@ -201,7 +201,7 @@ export const toggleAgentStatus = async (req: Request, res: Response): Promise<vo
 // Get agent metrics
 export const getAgentMetrics = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.params as any;
         const agentExists = await User.exists({ _id: id, role: 'guide' });
         if (!agentExists) {
             res.status(404).json({ message: 'Agent not found' });
@@ -225,7 +225,7 @@ export const getAgentMetrics = async (req: Request, res: Response): Promise<void
 // List all packages by guide (public and private)
 export const getAgentPackages = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { id } = req.params;
+        const { id } = req.params as any;
         const agentExists = await User.exists({ _id: id, role: 'guide' });
         if (!agentExists) {
             res.status(404).json({ message: 'Agent not found' });

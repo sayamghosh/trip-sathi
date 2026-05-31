@@ -82,7 +82,7 @@ export const getTourPlanById = async (req: Request, res: Response): Promise<void
             const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
             try {
                 const decoded = jwt.verify(token, jwtSecret) as any;
-                if (decoded.id === plan.guideId._id.toString() || decoded.role === 'admin') {
+                if (plan.guideId && (decoded.id === plan.guideId._id.toString() || decoded.role === 'admin')) {
                     isOwnerOrAdmin = true;
                 }
             } catch {
@@ -126,16 +126,10 @@ export const searchTourPlans = async (req: Request, res: Response): Promise<void
         
         if (destination && typeof destination === 'string' && destination.trim() !== '') {
             const searchRegex = new RegExp(destination.trim(), 'i');
-            query.$and = [
-                { isPublic: true },
-                { guideId: { $in: guideIds } },
-                {
-                    $or: [
-                        { locations: { $regex: searchRegex } },
-                        { title: { $regex: searchRegex } },
-                        { description: { $regex: searchRegex } }
-                    ]
-                }
+            query.$or = [
+                { locations: { $regex: searchRegex } },
+                { title: { $regex: searchRegex } },
+                { description: { $regex: searchRegex } }
             ];
         }
 

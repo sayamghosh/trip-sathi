@@ -11,12 +11,6 @@ const dmSans = DM_Sans({
   variable: "--font-dm-sans",
 });
 
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-dm-sans",
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL('https://tripsathi.vercel.app'),
 

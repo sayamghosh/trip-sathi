@@ -17,6 +17,12 @@ const LoginModal = dynamic(() => import('./LoginModal'), {
     loading: () => null,
 });
 
+// Lazy load LoginModal to avoid loading Google OAuth script on initial page load
+const LoginModal = dynamic(() => import('./LoginModal'), {
+    ssr: false,
+    loading: () => null,
+});
+
 const navItems = [
   { href: '/about', label: 'About' },
   { href: '/gallery', label: 'Gallery' },

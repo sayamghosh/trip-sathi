@@ -16,6 +16,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import api from "@/lib/axios"
+import { cn } from "@/lib/utils"
 
 type ProfileUser = {
   id?: string
@@ -26,6 +27,9 @@ type ProfileUser = {
   phone?: string
   address?: string
   bio?: string
+  isAuthorized?: boolean
+  isActive?: boolean
+  isProfilePublic?: boolean
 }
 
 const DEFAULT_BIO = ""
@@ -45,8 +49,22 @@ export function Profile() {
   const [bio, setBio] = useState(() => user?.bio || DEFAULT_BIO)
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setIsLoading(false), 600)
-    return () => window.clearTimeout(timer)
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get("/api/profile/me")
+        setUser(response.data)
+        setFullName(response.data.name || "")
+        setPhone(response.data.phone || "")
+        setAddress(response.data.address || "")
+        setBio(response.data.bio || DEFAULT_BIO)
+        localStorage.setItem("user", JSON.stringify(response.data))
+      } catch (error) {
+        console.error("Failed to fetch fresh user profile:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchProfile()
   }, [])
 
   const getInitials = (name: string) => {
@@ -120,9 +138,9 @@ export function Profile() {
     : "cursor-default border-border/80 bg-background/40 text-foreground"
 
   const profileStats = [
-    { label: "Profile health", value: "96%", detail: "Ready for review" },
-    { label: "Response time", value: "8m", detail: "Top performer" },
-    { label: "Trust score", value: "4.9", detail: "Verified admin" },
+    { label: "Profile health", value: user?.phone && user?.address ? "100%" : "50%", detail: user?.phone && user?.address ? "Complete" : "Needs Update" },
+    { label: "Account type", value: role.toUpperCase(), detail: "Guide Level" },
+    { label: "Guide Status", value: user?.isAuthorized ? "ACTIVE" : "PENDING", detail: user?.isAuthorized ? "Approved Agent" : "In Verification" },
   ]
 
   return (
@@ -154,7 +172,7 @@ export function Profile() {
             <div className="min-w-0 text-center text-white lg:text-left">
               <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-[12px] font-extrabold uppercase tracking-[0.22em] text-white/90 backdrop-blur-md">
                 <Sparkles className="h-3.5 w-3.5" />
-                Admin Agent Profile
+                Travel Partner Profile
               </div>
               <h1 className="text-[36px] font-black leading-tight tracking-tight sm:text-[44px]">{name}</h1>
               <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-[14px] font-bold text-white/85 lg:justify-start">
@@ -162,9 +180,23 @@ export function Profile() {
                   <Shield className="h-4 w-4" />
                   {role}
                 </span>
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
-                  <BadgeCheck className="h-4 w-4" />
-                  Verified
+                <span className={cn(
+                  "inline-flex items-center gap-2 rounded-full px-3 py-1.5 backdrop-blur-md",
+                  user?.isAuthorized 
+                    ? "bg-emerald-500/20 text-emerald-200 border border-emerald-500/30" 
+                    : "bg-amber-500/20 text-amber-200 border border-amber-500/30"
+                )}>
+                  {user?.isAuthorized ? (
+                    <>
+                      <BadgeCheck className="h-4 w-4 text-emerald-300" />
+                      Authorized Guide
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="h-4 w-4 text-amber-300 animate-pulse" />
+                      Awaiting Approval
+                    </>
+                  )}
                 </span>
                 <span className="inline-flex items-center gap-2 rounded-full bg-white/14 px-3 py-1.5 backdrop-blur-md">
                   <MapPin className="h-4 w-4" />
@@ -208,12 +240,6 @@ export function Profile() {
               {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : isEditing ? <Check className="h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
             </Button>
           </div>
-
-          {/* {isEditing && (
-            <div className="mb-6 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-[13px] font-bold text-primary">
-              Editing is enabled. Click the check button to keep your updates.
-            </div>
-          )} */}
 
           {saveError && (
             <div className="mb-6 rounded-2xl border border-destructive/20 bg-destructive/10 px-4 py-3 text-[13px] font-bold text-destructive">
@@ -289,6 +315,62 @@ export function Profile() {
                 className={`min-h-32 w-full resize-none rounded-2xl border p-4 text-[14px] font-bold leading-6 outline-none transition-all ${editableInputClass}`}
               />
             </div>
+
+            {/* Profile Visibility Toggle */}
+            <div className="mt-6 border-t border-border pt-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-border bg-background/30 p-5 gap-4">
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-foreground">Public Profile Listing</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed max-w-[600px]">
+                    Display your professional business profile in the traveller agent directory. When disabled, travellers can only find your profile through direct links on your tour plan detail pages.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 self-end sm:self-center">
+                  {!user?.isAuthorized && (
+                    <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0">
+                      <Shield className="h-3.5 w-3.5" /> Requires Authorization
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    disabled={!user?.isAuthorized || isSaving}
+                    onClick={async () => {
+                      if (!user?.isAuthorized) return
+                      try {
+                        setIsSaving(true)
+                        const response = await api.patch("/api/profile/guide", {
+                          name: fullName.trim(),
+                          phone: phone.trim(),
+                          address: address.trim(),
+                          bio: bio.trim(),
+                          isProfilePublic: !user.isProfilePublic,
+                        })
+                        const updatedUser = response.data.user
+                        setUser(updatedUser)
+                        localStorage.setItem("user", JSON.stringify(updatedUser))
+                      } catch (error) {
+                        console.error("Failed to toggle profile visibility:", error)
+                        setSaveError("Could not update profile visibility.")
+                      } finally {
+                        setIsSaving(false)
+                      }
+                    }}
+                    className={cn(
+                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0",
+                      user?.isProfilePublic ? "bg-primary" : "bg-muted",
+                      (!user?.isAuthorized || isSaving) && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <span
+                      className={cn(
+                        "inline-block h-5 w-5 transform rounded-full bg-background shadow transition duration-200",
+                        user?.isProfilePublic ? "translate-x-5" : "translate-x-1"
+                      )}
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -304,3 +386,5 @@ function ProfileField({ label, children }: { label: string; children: ReactNode 
     </div>
   )
 }
+
+export default Profile

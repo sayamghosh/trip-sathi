@@ -7,7 +7,8 @@ import { TopDestinations } from "@/components/dashboard/TopDestinations"
 
 export function Dashboard() {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 animate-in fade-in duration-500">
+
       {/* Metrics Section */}
       <MetricCards />
 

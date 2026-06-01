@@ -43,6 +43,7 @@ type TourPlan = {
   includes?: string[]
   excludes?: string[]
   createdAt?: string
+  isPublic?: boolean
 }
 
 const fallbackPhotos = [
@@ -91,6 +92,12 @@ export default function PackageDetailPage() {
   const [plan, setPlan] = useState<TourPlan | null>(null)
   const [loading, setLoading] = useState(true)
   const [expandedDay, setExpandedDay] = useState<number | null>(1)
+
+  const [user] = useState<any>(() => {
+    const storedUser = localStorage.getItem("user")
+    return storedUser ? JSON.parse(storedUser) : null
+  })
+  const isAuthorized = user?.isAuthorized === true
 
   const [lightbox, setLightbox] = useState<{
     open: boolean
@@ -203,6 +210,29 @@ export default function PackageDetailPage() {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          {isAuthorized && (
+            <Button 
+              onClick={async () => {
+                try {
+                  const targetState = !plan.isPublic
+                  await api.patch(`/api/tour-plans/${plan._id}/publish`, { isPublic: targetState })
+                  setPlan(prev => prev ? { ...prev, isPublic: targetState } : null)
+                  alert(`Plan ${targetState ? "published" : "unpublished"} successfully!`)
+                } catch (err: any) {
+                  alert(err.response?.data?.message || "Failed to update publication status")
+                }
+              }}
+              variant="outline" 
+              className={cn(
+                "h-9 rounded-lg text-[13px] font-bold px-5 transition-all",
+                plan.isPublic 
+                  ? "border-amber-200 text-amber-700 hover:bg-amber-50" 
+                  : "border-emerald-200 text-emerald-700 hover:bg-emerald-50 bg-emerald-50/20"
+              )}
+            >
+              {plan.isPublic ? "Unpublish" : "Publish"}
+            </Button>
+          )}
           <Button 
             onClick={async () => {
               if (window.confirm("Are you sure you want to delete this package?")) {
@@ -257,7 +287,17 @@ export default function PackageDetailPage() {
             {/* Header: Title & Price */}
             <div className="flex items-start justify-between">
               <div className="space-y-3">
-                <h1 className="text-[32px] font-extrabold text-foreground tracking-tight">{plan.title || "Safari Adventure"}</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-[32px] font-extrabold text-foreground tracking-tight">{plan.title || "Safari Adventure"}</h1>
+                  <span className={cn(
+                    "rounded-full px-2.5 py-0.75 text-[10px] font-bold uppercase tracking-wider border shrink-0",
+                    plan.isPublic 
+                      ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300 border-emerald-200/40" 
+                      : "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-300 border-amber-200/40"
+                  )}>
+                    {plan.isPublic ? "Published" : "Draft"}
+                  </span>
+                </div>
                 <div className="flex flex-wrap items-center gap-6">
                   <div className="flex items-center gap-2 text-[14px] font-semibold text-foreground/70">
                     <MapPin className="h-[15px] w-[15px] text-primary" />

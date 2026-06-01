@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import { googleLoginAPI } from '../services/auth.service';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, MapPin, Users, Star, ShieldCheck } from 'lucide-react';
+import { siteConfig } from '../config/site';
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -29,7 +30,7 @@ const features = [
     {
         icon: <Star className="w-8 h-8 text-amber-500" />,
         title: 'Trusted by 10,000+ Travellers',
-        description: 'Real reviews, real experiences. Every guide on Trip Sathi is rated by travellers just like you.',
+        description: `Real reviews, real experiences. Every guide on ${siteConfig.projectName} is rated by travellers just like you.`,
         bg: 'from-amber-50 to-orange-50',
     },
     {
@@ -113,7 +114,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             {/* Brand */}
                             <div>
                                 <p className="text-white text-3xl font-bold drop-shadow-lg" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-                                    Trip Sathi
+                                    {siteConfig.projectName}
                                 </p>
                                 <p className="text-white/75 text-xs mt-2 leading-relaxed max-w-45">
                                     "Travel is the only purchase that enriches you beyond material wealth."
@@ -188,7 +189,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             {/* Subtle divider */}
                             <div className="flex items-center gap-3">
                                 <div className="grow border-t border-gray-100" />
-                                <span className="text-xs text-gray-300 uppercase tracking-widest font-medium">Why Trip Sathi?</span>
+                                <span className="text-xs text-gray-300 uppercase tracking-widest font-medium">Why {siteConfig.projectName}?</span>
                                 <div className="grow border-t border-gray-100" />
                             </div>
 

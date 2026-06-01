@@ -89,6 +89,19 @@ const travelersRoute = createRoute({
   component: Travelers,
 })
 
+const fallbackRoute = createRoute({
+  getParentRoute: () => layoutRoute,
+  path: "$",
+  beforeLoad: () => {
+    const fallbackPath = sessionStorage.getItem("lastValidAdminPath") || "/"
+
+    throw redirect({
+      to: fallbackPath,
+      replace: true,
+    })
+  },
+})
+
 
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -115,6 +128,7 @@ const routeTree = rootRoute.addChildren([
     calendarRoute,
     profileRoute,
     travelersRoute,
+    fallbackRoute,
   ]),
 
   loginRoute,

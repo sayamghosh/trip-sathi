@@ -19,6 +19,22 @@ import { Link } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
 import api from "@/lib/axios"
 
+const VALID_ADMIN_PATHS = [
+  /^\/$/,
+  /^\/packages$/,
+  /^\/packages\/new$/,
+  /^\/packages\/[^/]+$/,
+  /^\/packages\/[^/]+\/edit$/,
+  /^\/bookings$/,
+  /^\/calendar$/,
+  /^\/profile$/,
+  /^\/travelers$/,
+]
+
+const isValidAdminPath = (path: string) => {
+  return VALID_ADMIN_PATHS.some((pattern) => pattern.test(path))
+}
+
 export function App() {
   const location = useLocation()
   const pathname = location.pathname
@@ -39,6 +55,12 @@ export function App() {
       }
     }
     fetchFreshProfile()
+  }, [pathname])
+
+  useEffect(() => {
+    if (isValidAdminPath(pathname)) {
+      sessionStorage.setItem("lastValidAdminPath", pathname)
+    }
   }, [pathname])
   
   // Get title based on current path

@@ -3,6 +3,7 @@ import { DM_Sans } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import ClientShell from "./client-shell";
+import { siteConfig } from "../config/site";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -14,14 +15,14 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://tripsathi.vercel.app'),
 
   title: {
-    default: 'TripSathi - Discover Local Guides & Travel Experiences',
-    template: '%s | TripSathi',
+    default: `${siteConfig.projectName} - Discover Local Guides & Travel Experiences`,
+    template: `%s | ${siteConfig.projectName}`,
   },
-  description: 'Find and book local travel guides, curated tour packages, and unique experiences across India. Discover destinations, compare prices, and plan your perfect trip with TripSathi.',
+  description: `Find and book local travel guides, curated tour packages, and unique experiences across India. Discover destinations, compare prices, and plan your perfect trip with ${siteConfig.projectName}.`,
   keywords: ['travel', 'tour', 'guide', 'booking', 'India tourism', 'travel packages', 'local guide', 'holiday packages', 'trip planning'],
-  authors: [{ name: 'TripSathi' }],
-  creator: 'TripSathi',
-  publisher: 'TripSathi',
+  authors: [{ name: siteConfig.projectName }],
+  creator: siteConfig.projectName,
+  publisher: siteConfig.projectName,
 
   robots: {
     index: true,
@@ -39,22 +40,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: 'https://tripsathi.vercel.app/',
-    siteName: 'TripSathi',
-    title: 'TripSathi - Discover Local Guides & Travel Experiences',
+    siteName: siteConfig.projectName,
+    title: `${siteConfig.projectName} - Discover Local Guides & Travel Experiences`,
     description: 'Find and book local travel guides, curated tour packages, and unique experiences across India.',
     images: [
       {
         url: '/og-image.jpg',
         width: 1200,
         height: 630,
-        alt: 'TripSathi - Travel with Local Guides',
+        alt: `${siteConfig.projectName} - Travel with Local Guides`,
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'TripSathi - Discover Local Guides & Travel Experiences',
+    title: `${siteConfig.projectName} - Discover Local Guides & Travel Experiences`,
     description: 'Find and book local travel guides and curated tour packages across India.',
     creator: '@tripsathi',
     images: ['/og-image.jpg'],
@@ -82,7 +83,7 @@ export const viewport: Viewport = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "TripSathi",
+  "name": siteConfig.projectName,
   "url": "https://tripsathi.vercel.app",
   "description": "Travel platform connecting travelers with local guides and curated experiences across India.",
   "sameAs": [

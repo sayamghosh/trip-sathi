@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion, type Variants } from 'framer-motion';
 import Image from 'next/image';
 import bannerImg from '../assets/banner-tripsathi.png';
+import { siteConfig } from '../config/site';
 
 type SlideDirection = 'down' | 'up';
 
@@ -63,7 +64,7 @@ const Hero = () => {
                 >
                     <Image
                         src={bannerImg}
-                        alt="Trip Sathi Hero Banner"
+                        alt={`${siteConfig.projectName} Hero Banner`}
                         fill
                         priority
                         placeholder="blur"

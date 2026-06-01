@@ -1,17 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 import { Quote } from 'lucide-react';
 import type { Metadata } from 'next';
+import { siteConfig } from '../../config/site';
 
 export const metadata: Metadata = {
-  title: 'About Us - Our Journey | TripSathi',
-  description: "Learn about TripSathi's mission to simplify travel planning. Discover how we connect travelers with trusted local guides and curated experiences across India.",
-  keywords: ['about TripSathi', 'travel platform', 'local guides', 'mission', 'travel planning'],
+  title: `About Us - Our Journey | ${siteConfig.projectName}`,
+  description: `Learn about ${siteConfig.projectName}'s mission to simplify travel planning. Discover how we connect travelers with trusted local guides and curated experiences across India.`,
+  keywords: [`about ${siteConfig.projectName}`, 'travel platform', 'local guides', 'mission', 'travel planning'],
 };
 
 const testimonials = [
   {
     id: 1,
-    text: "Tripsathi made our family trip to Munnar absolutely seamless. The direct booking with local guides saved us so much time and money.",
+    text: `${siteConfig.projectName} made our family trip to Munnar absolutely seamless. The direct booking with local guides saved us so much time and money.`,
     name: "Aarav Mehta",
     title: "Family Traveler, Mumbai",
     image: "https://plus.unsplash.com/premium_photo-1754431018954-034d17a415df?w=1000&auto=format&fit=crop&q=80",
@@ -39,7 +40,7 @@ const testimonials = [
   },
   {
     id: 5,
-    text: "Booked a heritage tour in Jaipur through Tripsathi. The guide was knowledgeable and the experience was truly authentic.",
+    text: `Booked a heritage tour in Jaipur through ${siteConfig.projectName}. The guide was knowledgeable and the experience was truly authentic.`,
     name: "Mohammad Rehan",
     title: "History Buff, Lucknow",
     image: "https://images.unsplash.com/photo-1619633058818-704df86428cd?w=1000&auto=format&fit=crop&q=80",
@@ -171,10 +172,10 @@ export default function AboutPage() {
                 </h2>
                 <div className="mt-12 max-w-[580px] space-y-6 text-[14px] font-medium leading-[1.65] text-[#565b63]">
                   <p>
-                    Tripsathi started with a simple belief: planning a trip shouldn&apos;t feel complicated. Our founders were tired of switching between tabs, unclear prices, and reviews they couldn&apos;t trust, and imagined one place to explore, compare, and book with ease.
+                    {siteConfig.projectName} started with a simple belief: planning a trip shouldn&apos;t feel complicated. Our founders were tired of switching between tabs, unclear prices, and reviews they couldn&apos;t trust, and imagined one place to explore, compare, and book with ease.
                   </p>
                   <p>
-                    Today, Tripsathi brings that idea to life by connecting travelers with trusted stays and experiences worldwide. With transparent pricing and real reviews, we help you plan anything from quick getaways to once-in-a-lifetime trips without the stress.
+                    Today, {siteConfig.projectName} brings that idea to life by connecting travelers with trusted stays and experiences worldwide. With transparent pricing and real reviews, we help you plan anything from quick getaways to once-in-a-lifetime trips without the stress.
                   </p>
                 </div>
 
@@ -250,7 +251,7 @@ export default function AboutPage() {
           Follow Our Journeys Around the World
         </h2>
         <p className="mx-auto mt-6 max-w-[520px] text-[14px] font-normal text-[#73777f] lg:text-[16px]">
-          Discover travel inspiration, behind-the-scenes moments, and real Tripsathi traveler stories.
+          Discover travel inspiration, behind-the-scenes moments, and real {siteConfig.projectName} traveler stories.
         </p>
 
         {/* Socaial Links */}
@@ -363,7 +364,7 @@ export default function AboutPage() {
           </div>
           <div className="relative mx-auto flex min-h-[400px] max-w-[700px] flex-col items-center justify-center px-6 py-20 text-center text-white">
             <h2 className="text-[28px] font-medium leading-[1.1] tracking-[-0.03em] sm:text-[36px] lg:text-[40px]">
-              Ready to Plan Your Next Trip with <br /> Trip Sathi?
+              Ready to Plan Your Next Trip with <br /> {siteConfig.projectName}?
             </h2>
             <p className="mt-6 max-w-[480px] text-[14px] font-normal leading-[1.6] text-white/85 lg:text-[16px]">
               Explore destinations, compare real prices and reviews, and book

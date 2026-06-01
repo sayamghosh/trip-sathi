@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { siteConfig } from "../config/site";
 
 const BECOME_TRAVEL_AGENT_URL =
   process.env.NEXT_PUBLIC_ADMIN_APP_URL || "http://localhost:3001/login";
@@ -14,7 +15,7 @@ const Footer = () => {
             <div className="lg:col-span-5 flex flex-col justify-between">
               <div>
                 <h2 className="text-[20px] font-semibold tracking-tight mb-12">
-                  tripsathi
+                  {siteConfig.projectNameLower}
                 </h2>
 
                 <h3 className="text-[22px] sm:text-[30px] lg:text-[40px] leading-[1.1] font-medium max-w-130">
@@ -41,7 +42,7 @@ const Footer = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-8 sm:gap-10">
                 {/* COLUMN 1 */}
                 <div>
-                  <h4 className="text-white font-medium mb-6">TripSathi</h4>
+                  <h4 className="text-white font-medium mb-6">{siteConfig.projectName}</h4>
 
                   <ul className="space-y-4 text-white/75 text-sm">
                     <li>

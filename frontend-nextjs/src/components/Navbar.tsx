@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAuthFlow } from '../context/AuthFlowContext';
 import dynamic from 'next/dynamic';
 import logo from '../assets/logo.svg';
+import { siteConfig } from '../config/site';
 
 // Lazy load LoginModal to avoid loading Google OAuth script on initial page load
 const LoginModal = dynamic(() => import('./LoginModal'), {
@@ -56,7 +57,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="shrink-0 flex items-center gap-2">
             <Link href="/" className="text-2xl font-bold text-[#1a2b4c] tracking-tight">
-              <img src={logo.src} alt="TripSathi Logo" width={140} height={40} />
+              <img src={logo.src} alt={`${siteConfig.projectName} Logo`} width={140} height={40} />
             </Link>
           </div>
 

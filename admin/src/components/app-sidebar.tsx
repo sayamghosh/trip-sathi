@@ -34,16 +34,16 @@ import { siteConfig } from "@/config/site"
 
 // Base menu items
 const baseItems = [
-  { icon: LayoutDashboard, label: "Dashboard", to: "/" },
-  { icon: Package, label: "Packages", to: "/packages", matchPaths: ["/packages"] },
-  { icon: BookCheck, label: "Bookings", to: "/bookings" },
-  { icon: CalendarDays, label: "Calendar", to: "/calendar" },
-  { icon: Users, label: "Travelers", to: "/travelers" }, // Badge will be injected dynamically
-  { icon: Compass, label: "Guides", to: "/guides" },
-  { icon: ImageIcon, label: "Gallery", to: "/gallery" },
-  { icon: MessageCircle, label: "Messages", to: "/messages", badge: 7 },
-  { icon: Percent, label: "Deals", to: "/deals" },
-  { icon: ThumbsUp, label: "Feedback", to: "/feedback" },
+  { icon: LayoutDashboard, label: "Dashboard", to: "/", isAvailable: true },
+  { icon: Package, label: "Packages", to: "/packages", matchPaths: ["/packages"], isAvailable: true },
+  { icon: BookCheck, label: "Bookings", to: "/bookings", isAvailable: true },
+  { icon: CalendarDays, label: "Calendar", to: "/calendar", isAvailable: true },
+  { icon: Users, label: "Travelers", to: "/travelers", isAvailable: true }, // Badge will be injected dynamically
+  { icon: Compass, label: "Guides", to: "/guides", isAvailable: false },
+  { icon: ImageIcon, label: "Gallery", to: "/gallery", isAvailable: false },
+  { icon: MessageCircle, label: "Messages", to: "/messages", badge: 7, isAvailable: false },
+  { icon: Percent, label: "Deals", to: "/deals", isAvailable: false },
+  { icon: ThumbsUp, label: "Feedback", to: "/feedback", isAvailable: false },
 ]
 
 export function AppSidebar() {
@@ -104,27 +104,41 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.label}>
                   <SidebarMenuButton
-                    asChild
+                    asChild={item.isAvailable}
+                    type="button"
+                    aria-disabled={!item.isAvailable}
                     className="h-11 px-4 transition-all duration-200 group group-data-[collapsible=icon]:size-11!"
                   >
-                    <Link
-                      to={item.to as any}
-                      className={cn(
-                        "flex w-full items-center justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:bg-sidebar-accent focus-visible:text-sidebar-accent-foreground",
-                        isCollapsed && "justify-center px-0",
-                        (item.matchPaths ?? [item.to]).some(isActivePath)
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                          : "text-sidebar-foreground/70"
-                      )}
-                    >
-                      <item.icon className="shrink-0 size-5!" />
-                      <span className={cn(
-                        "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
-                        isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
-                      )}>
-                        {item.label}
-                      </span>
-                    </Link>
+                    {item.isAvailable ? (
+                      <Link
+                        to={item.to as any}
+                        className={cn(
+                          "flex w-full items-center justify-start text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:bg-sidebar-accent focus-visible:text-sidebar-accent-foreground",
+                          isCollapsed && "justify-center px-0",
+                          (item.matchPaths ?? [item.to]).some(isActivePath)
+                            ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
+                            : "text-sidebar-foreground/70"
+                        )}
+                      >
+                        <item.icon className="shrink-0 size-5!" />
+                        <span className={cn(
+                          "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                          isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+                        )}>
+                          {item.label}
+                        </span>
+                      </Link>
+                    ) : (
+                      <>
+                        <item.icon className="shrink-0 size-5!" />
+                        <span className={cn(
+                          "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                          isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
+                        )}>
+                          {item.label}
+                        </span>
+                      </>
+                    )}
                   </SidebarMenuButton>
                   {!isCollapsed && item.badge && (
                     <SidebarMenuBadge className="right-4 bg-sidebar-primary text-sidebar-primary-foreground">

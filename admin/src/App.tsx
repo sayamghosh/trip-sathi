@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react"
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -16,10 +17,51 @@ import { TopBar } from "@/components/TopBar"
 import { Outlet, useLocation } from "@tanstack/react-router"
 import { Link } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
+import api from "@/lib/axios"
+
+const VALID_ADMIN_PATHS = [
+  /^\/$/,
+  /^\/packages$/,
+  /^\/packages\/new$/,
+  /^\/packages\/[^/]+$/,
+  /^\/packages\/[^/]+\/edit$/,
+  /^\/bookings$/,
+  /^\/calendar$/,
+  /^\/profile$/,
+  /^\/travelers$/,
+]
+
+const isValidAdminPath = (path: string) => {
+  return VALID_ADMIN_PATHS.some((pattern) => pattern.test(path))
+}
 
 export function App() {
   const location = useLocation()
   const pathname = location.pathname
+
+  const [user, setUser] = useState<any>(() => {
+    const storedUser = localStorage.getItem("user")
+    return storedUser ? JSON.parse(storedUser) : null
+  })
+
+  useEffect(() => {
+    const fetchFreshProfile = async () => {
+      try {
+        const response = await api.get("/api/profile/me")
+        localStorage.setItem("user", JSON.stringify(response.data))
+        setUser(response.data)
+      } catch (error) {
+        console.error("Failed to fetch fresh user profile:", error)
+      }
+    }
+    fetchFreshProfile()
+  }, [pathname])
+
+  useEffect(() => {
+    if (isValidAdminPath(pathname)) {
+      sessionStorage.setItem("lastValidAdminPath", pathname)
+    }
+  }, [pathname])
   
   // Get title based on current path
   const getPageTitle = () => {
@@ -131,6 +173,32 @@ export function App() {
         </header>
 
         <main className="flex-1 overflow-y-auto px-5 pt-4 pb-6 bg-background">
+          {user && user.isActive === false && (
+            <div className="mb-6 rounded-2xl border border-red-500/20 bg-red-500/5 backdrop-blur-md p-5 text-sm text-red-300 flex items-start gap-4 shadow-[0_8px_30px_rgb(239,68,68,0.03)] animate-in slide-in-from-top-4 duration-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 font-semibold shadow-sm">
+                ❌
+              </div>
+              <div className="space-y-1">
+                <p className="font-bold text-[14px] text-red-400">Your validity has expired !</p>
+                <p className="text-[12px] text-red-300/80 leading-relaxed max-w-[900px]">
+                  Your validity has expired. Please contact the support team. 9477273201
+                </p>
+              </div>
+            </div>
+          )}
+          {user && user.isAuthorized === false && (
+            <div className="mb-6 rounded-2xl border border-amber-500/20 bg-amber-500/5 backdrop-blur-md p-5 text-sm text-amber-300 flex items-start gap-4 shadow-[0_8px_30px_rgb(245,158,11,0.03)] animate-in slide-in-from-top-4 duration-500">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 font-semibold shadow-sm">
+                ⚠️
+              </div>
+              <div className="space-y-1">
+                <p className="font-bold text-[14px] text-amber-400">Verification in Progress • Estimated Time: 1–48 Hours</p>
+                <p className="text-[12px] text-amber-300/80 leading-relaxed max-w-[900px]">
+                  Your guide portfolio is currently undergoing verification by our administrators. While under review, you can design and save travel experiences, manage business coordinates, and inspect stats. Tour packages will remain hidden from travelers until your profile has been authorized.
+                </p>
+              </div>
+            </div>
+          )}
           <Outlet />
         </main>
       </SidebarInset>

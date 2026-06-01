@@ -72,6 +72,12 @@ export function CreatePlanPage() {
   const navigate = useNavigate()
   const isEdit = !!packageId
 
+  const [user] = useState<any>(() => {
+    const storedUser = localStorage.getItem("user")
+    return storedUser ? JSON.parse(storedUser) : null
+  })
+  const isAuthorized = user?.isAuthorized === true
+
   const [planName, setPlanName] = useState("")
   const [description, setDescription] = useState("")
   const [destination, setDestination] = useState("")
@@ -210,6 +216,7 @@ export function CreatePlanPage() {
           setDestination(data.locations?.[0] || "")
           setBannerImages(data.bannerImages || [])
           setIsRecommended(data.isRecommended || false)
+          setIsPublished(data.isPublic || false)
           
           const fetchedDays = data.days?.length > 0 ? data.days : [{ dayNumber: 1, title: "Arrival", activities: [] }]
           setItinerary(fetchedDays.map((d: any) => ({
@@ -238,7 +245,6 @@ export function CreatePlanPage() {
       fetchPlan()
     }
   }, [isEdit, packageId])
-
   const nights = useMemo(() => Math.max(duration - 1, 0), [duration])
   const selectedTags = useMemo(() => tags.join(", "), [tags])
 
@@ -407,16 +413,29 @@ export function CreatePlanPage() {
               </Button>
             )}
             <div className="h-8 w-px bg-border mx-1" />
-            <Button variant="outline" size="sm" className="h-10 border-border font-semibold px-5">Save Draft</Button>
-            <Button variant="secondary" size="sm" className="h-10 font-semibold px-5">Preview</Button>
-            <Button 
-              onClick={handlePublish} 
-              disabled={isSubmitting || isUploading} 
-              size="sm" 
-              className="h-10 bg-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 font-bold px-6 transition-all"
-            >
-              {isSubmitting ? "Processing..." : (isEdit ? "Update Plan" : "Publish Plan")}
-            </Button>
+            {isAuthorized ? (
+              <>
+                <Button variant="outline" size="sm" className="h-10 border-border font-semibold px-5">Save Draft</Button>
+                <Button variant="secondary" size="sm" className="h-10 font-semibold px-5">Preview</Button>
+                <Button 
+                  onClick={handlePublish} 
+                  disabled={isSubmitting || isUploading} 
+                  size="sm" 
+                  className="h-10 bg-primary shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 font-bold px-6 transition-all"
+                >
+                  {isSubmitting ? "Processing..." : (isEdit ? "Update Plan" : "Publish Plan")}
+                </Button>
+              </>
+            ) : (
+              <Button 
+                onClick={handlePublish} 
+                disabled={isSubmitting || isUploading} 
+                size="sm" 
+                className="h-10 bg-amber-600 hover:bg-amber-700 text-white font-bold px-6 shadow-md transition-all animate-in fade-in"
+              >
+                {isSubmitting ? "Saving Draft..." : (isEdit ? "Update Draft" : "Save Draft")}
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -431,7 +450,16 @@ export function CreatePlanPage() {
                 <h3 className="text-[16px] font-bold text-foreground">Plan basics</h3>
                 <p className="text-[12px] text-secondary-foreground">The foundational details travelers will see first.</p>
               </div>
-              <span className="rounded-full bg-amber-100 dark:bg-amber-900/30 px-3 py-1.5 text-[11px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-widest border border-amber-200/50 dark:border-amber-700/50">Draft</span>
+              <span className={cn(
+                "rounded-full px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest border",
+                !isAuthorized 
+                  ? "bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-700/50"
+                  : isPublished 
+                    ? "bg-emerald-50 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border-emerald-200/50 dark:border-emerald-700/50"
+                    : "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200/50 dark:border-amber-700/50"
+              )}>
+                {!isAuthorized ? "Draft (Awaiting Auth)" : isPublished ? "Published" : "Draft"}
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -908,23 +936,61 @@ export function CreatePlanPage() {
           <section className="rounded-[14px] border border-border bg-card p-4">
             <div className="flex items-center justify-between">
               <h3 className="text-[14px] font-semibold text-foreground">Launch controls</h3>
-              <span className={cn("rounded-full px-2.5 py-0.75 text-[11px] font-semibold", isPublished ? "bg-success/20 text-success" : "bg-warning/20 text-warning")}>{isPublished ? "Published" : "Draft"}</span>
+              <span className={cn(
+                "rounded-full px-2.5 py-0.75 text-[11px] font-bold uppercase",
+                !isAuthorized 
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-300"
+                  : isPublished 
+                    ? "bg-success/20 text-success" 
+                    : "bg-warning/20 text-warning"
+              )}>
+                {!isAuthorized ? "Draft Only" : isPublished ? "Published" : "Draft"}
+              </span>
             </div>
 
             <div className="mt-3 space-y-3">
-              <SwitchRow label="Visible to travelers" sub="Listed on search, booking open" checked={isPublished} onChange={setIsPublished} />
+              {isAuthorized ? (
+                <SwitchRow label="Visible to travelers" sub="Listed on search, booking open" checked={isPublished} onChange={setIsPublished} />
+              ) : (
+                <div className="flex items-center justify-between rounded-[10px] border border-border px-3 py-2.5 bg-card opacity-60">
+                  <div>
+                    <p className="text-[12px] font-semibold text-foreground">Visible to travelers</p>
+                    <p className="text-[11px] text-amber-600 dark:text-amber-400 font-bold">⚠️ Awaiting authorization</p>
+                  </div>
+                  <button type="button" disabled className="relative inline-flex h-6 w-11 items-center rounded-full bg-muted cursor-not-allowed">
+                    <span className="inline-block h-5 w-5 transform rounded-full bg-background shadow" />
+                  </button>
+                </div>
+              )}
               <SwitchRow label="Mark as featured" sub="Show on homepage hero" checked={isFeatured} onChange={setIsFeatured} />
               <SwitchRow label="Recommended Packages" sub="Show in the Recommended section" checked={isRecommended} onChange={setIsRecommended} />
               <SwitchRow label="Accept waitlist" sub="Collect leads when seats fill" checked={capacity <= 0} onChange={() => setCapacity((c) => (c === 0 ? 18 : 0))} />
             </div>
 
-            <div className="mt-4 flex items-center justify-between rounded-[12px] border border-border bg-secondary/50 px-3 py-3">
-              <div className="space-y-0.5 text-[12px] text-secondary-foreground">
-                <p className="font-semibold text-foreground">Ready to publish?</p>
-                <p>{selectedTags || "Add at least one tag"}</p>
+            {isAuthorized ? (
+              <div className="mt-4 flex items-center justify-between rounded-[12px] border border-border bg-secondary/50 px-3 py-3">
+                <div className="space-y-0.5 text-[12px] text-secondary-foreground">
+                  <p className="font-semibold text-foreground">Ready to publish?</p>
+                  <p>{selectedTags || "Add at least one tag"}</p>
+                </div>
+                <Button size="sm" disabled={isSubmitting || isUploading} onClick={handlePublish}>Publish</Button>
               </div>
-              <Button size="sm" disabled={isSubmitting || isUploading} onClick={handlePublish}>Publish</Button>
-            </div>
+            ) : (
+              <div className="mt-4 flex flex-col gap-2 rounded-[12px] border border-border bg-amber-50/50 dark:bg-amber-950/10 p-3">
+                <div className="space-y-0.5 text-[12px]">
+                  <p className="font-bold text-amber-800 dark:text-amber-300">Draft Saving Active</p>
+                  <p className="text-[11px] text-amber-700/90 dark:text-amber-400/90 leading-relaxed">Your account is awaiting review. Your tour will be saved as a draft.</p>
+                </div>
+                <Button 
+                  size="sm" 
+                  disabled={isSubmitting || isUploading} 
+                  onClick={handlePublish}
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold"
+                >
+                  {isSubmitting ? "Saving..." : "Save Draft"}
+                </Button>
+              </div>
+            )}
           </section>
 
           <section className="rounded-[14px] border border-border bg-card p-4">

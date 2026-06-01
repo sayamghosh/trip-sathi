@@ -1,5 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import { Quote } from 'lucide-react';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'About Us - Our Journey | TripSathi',
+  description: "Learn about TripSathi's mission to simplify travel planning. Discover how we connect travelers with trusted local guides and curated experiences across India.",
+  keywords: ['about TripSathi', 'travel platform', 'local guides', 'mission', 'travel planning'],
+};
 
 const testimonials = [
   {

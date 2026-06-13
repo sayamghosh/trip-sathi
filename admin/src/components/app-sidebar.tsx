@@ -12,6 +12,8 @@ import {
   LogOut,
 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
+import * as React from "react"
+import { useTheme } from "@/components/theme-provider"
 import api from "@/lib/axios"
 
 import {
@@ -29,7 +31,6 @@ import {
 } from "@/components/ui/sidebar"
 import { Link, useLocation } from "@tanstack/react-router"
 import { cn } from "@/lib/utils"
-import { siteConfig } from "@/config/site"
 
 
 // Base menu items
@@ -51,6 +52,25 @@ export function AppSidebar() {
   const isCollapsed = state === "collapsed"
   const location = useLocation()
   const pathname = location.pathname
+  const { theme } = useTheme()
+  const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">("dark")
+
+  React.useEffect(() => {
+    const checkTheme = () => {
+      const isDark = document.documentElement.classList.contains("dark")
+      setResolvedTheme(isDark ? "dark" : "light")
+    }
+
+    checkTheme()
+
+    const observer = new MutationObserver(checkTheme)
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    })
+
+    return () => observer.disconnect()
+  }, [theme])
 
   const isActivePath = (path: string) => {
     if (path === "/") return pathname === "/"
@@ -85,15 +105,19 @@ export function AppSidebar() {
     <Sidebar collapsible="icon" className="border-r-0 border-sidebar-border transition-all duration-300 ease-in-out">
       <SidebarHeader className={cn("bg-sidebar px-6 py-8 transition-all duration-300", isCollapsed ? "p-0 py-8 flex items-center justify-center" : "items-start")}>
         <Link to="/" className="flex items-center">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-white shadow-lg shadow-primary/20">
-            <Compass className="h-5 w-5" />
-          </div>
-          <span className={cn(
-            "text-xl font-bold tracking-tight text-sidebar-foreground transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
-            isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
-          )}>
-            {siteConfig.projectName}
-          </span>
+          {isCollapsed ? (
+            <img
+              src={resolvedTheme === "dark" ? "/logo-light.png" : "/logo-dark.png"}
+              alt="Logo"
+              className="h-12 w-12 object-cover object-left shrink-0"
+            />
+          ) : (
+            <img
+              src={resolvedTheme === "dark" ? "/logo-light.png" : "/logo-dark.png"}
+              alt="Logo"
+              className="h-16 w-auto max-w-full object-contain"
+            />
+          )}
         </Link>
       </SidebarHeader>
 

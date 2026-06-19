@@ -100,11 +100,11 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
             await user.save();
         } else {
             // Existing user — upgrade to guide and sync profile/contact info if missing
+            // Preserve existing isAuthorized, isActive, and isProfilePublic values
+            // so admin-set authorization and subscription statuses are not wiped on re-login
             user.role = 'guide';
             user.picture = picture || user.picture || '';
             user.name = user.name || name || '';
-            user.isAuthorized = false;
-            user.isProfilePublic = false;
 
             if (needsContact) {
                 user.phone = trimmedPhone;

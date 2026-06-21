@@ -56,7 +56,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="shrink-0 flex items-center gap-2">
             <Link href="/" className="text-2xl font-bold text-[#1a2b4c] tracking-tight">
-              <img src="/logo-dark.png" alt={`${siteConfig.projectName} Logo`} width={160} height={60} />
+              <img src="/logo-dark.svg" alt={`${siteConfig.projectName} Logo`} width={160} height={60} />
             </Link>
           </div>
 

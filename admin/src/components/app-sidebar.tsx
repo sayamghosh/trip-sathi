@@ -107,13 +107,13 @@ export function AppSidebar() {
         <Link to="/" className="flex items-center">
           {isCollapsed ? (
             <img
-              src={resolvedTheme === "dark" ? "/logo-light.png" : "/logo-dark.png"}
+              src="/logo.png"
               alt="Logo"
-              className="h-12 w-12 object-cover object-left shrink-0"
+              className="h-8 w-8 object-contain shrink-0"
             />
           ) : (
             <img
-              src={resolvedTheme === "dark" ? "/logo-light.png" : "/logo-dark.png"}
+              src={resolvedTheme === "dark" ? "/logo-light.svg" : "/logo-dark.svg"}
               alt="Logo"
               className="h-16 w-auto max-w-full object-contain"
             />

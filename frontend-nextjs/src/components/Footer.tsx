@@ -205,7 +205,12 @@ const Footer = () => {
 
                 <span className="opacity-40">•</span>
 
-                <a href="#" className="hover:text-white transition-all">
+                <a
+                  href="https://www.instagram.com/joytrips.site/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-all"
+                >
                   Instagram
                 </a>
 

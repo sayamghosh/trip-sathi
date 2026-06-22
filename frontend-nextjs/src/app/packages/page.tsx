@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   ChevronLeft,
   ChevronRight,
@@ -13,6 +14,7 @@ import type { TourPlanSummary } from "@/types/tourPlan";
 import { siteConfig } from "@/config/site";
 
 type DealCard = {
+  id: string;
   label: string;
   location: string;
   name: string;
@@ -115,6 +117,7 @@ export default function PackagesPage() {
 
       // Map backend data to DealCard structure
       const mappedDeals: DealCard[] = data.map((plan: TourPlanSummary) => ({
+        id: plan._id,
         label:
           plan.locations.length > 1 ? "Multi-city Package" : "Tour Package",
         location: plan.locations.join(", "),
@@ -288,114 +291,128 @@ function DealCard({ deal }: { deal: DealCard }) {
     deal.ratingTone === "blue" ? "bg-[#1877f2]" : "bg-[#00a85a]";
 
   return (
-    <article className="overflow-hidden rounded-[9px] border border-[#e8ebef] bg-white">
-      <div className="relative h-[274px] overflow-hidden bg-[#f5f5f5]">
-        <img
-          src={deal.image}
-          alt={deal.name}
-          className="h-full w-full object-cover"
-          width={400}
-          height={274}
-          loading="lazy"
-          decoding="async"
-        />
-        <button
-          className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-black/20 text-white"
-          type="button"
-          aria-label={`Save ${deal.name}`}
-        >
-          <Heart className="h-4 w-4 fill-current" />
-        </button>
-        <button
-          className="absolute left-4 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/25 text-white"
-          type="button"
-          aria-label="Previous image"
-        >
-          <ChevronLeft className="h-4 w-4" />
-        </button>
-        <button
-          className="absolute right-4 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/25 text-white"
-          type="button"
-          aria-label="Next image"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-        <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
-          <div className="h-1.5 w-1.5 rounded-full bg-white" />
-          <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
-          <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
-          <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
-        </div>
-      </div>
-
-      <div className="px-5 pb-5 pt-4">
-        <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-[#8a8f98]">
-          <span className="rounded-full bg-[#f1f3f5] px-2 py-1 text-[#6b7078]">
-            {deal.label}
-          </span>
-          <span>&middot;</span>
-          <span>{deal.location}</span>
-        </div>
-        <h3 className="mt-4 text-[18px] font-medium leading-tight tracking-[-0.02em] text-[#2a2d31] lg:text-[22px]">
-          {deal.name}
-        </h3>
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px]">
-          <span
-            className={`${ratingClass} rounded-full px-2 py-0.5 font-bold leading-none text-white`}
+    <Link href={`/guides/${deal.id}`} className="block group">
+      <article className="overflow-hidden rounded-[9px] border border-[#e8ebef] bg-white transition hover:shadow-md h-full">
+        <div className="relative h-[274px] overflow-hidden bg-[#f5f5f5]">
+          <img
+            src={deal.image}
+            alt={deal.name}
+            className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+            width={400}
+            height={274}
+            loading="lazy"
+            decoding="async"
+          />
+          <button
+            className="absolute right-4 top-4 grid h-8 w-8 place-items-center rounded-full bg-black/20 text-white transition hover:bg-black/40"
+            type="button"
+            aria-label={`Save ${deal.name}`}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           >
-            {deal.rating}
-          </span>
-          <span
-            className={
-              deal.ratingTone === "blue"
-                ? "font-semibold text-[#1877f2]"
-                : "font-semibold text-[#00a85a]"
-            }
+            <Heart className="h-4 w-4 fill-current" />
+          </button>
+          <button
+            className="absolute left-4 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/25 text-white transition hover:bg-black/40"
+            type="button"
+            aria-label="Previous image"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
           >
-            {deal.ratingText}
-          </span>
-          <span className="text-[#9aa0a9]">&middot;</span>
-          <span className="font-medium text-[#858b94]">{deal.reviews}</span>
-        </div>
-
-        <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-2 text-[12px] font-medium text-[#969ca5]">
-          {deal.features.map((feature) => (
-            <span className="flex min-w-0 items-center gap-1.5" key={feature}>
-              <Check
-                className="h-3.5 w-3.5 shrink-0 text-[#b7bcc4]"
-                strokeWidth={3}
-              />
-              <span className="truncate">{feature}</span>
-            </span>
-          ))}
-          <span className="font-semibold text-[#1458df]">{deal.more}</span>
-        </div>
-
-        <div className="mt-[58px]">
-          <div className="flex items-end gap-1">
-            <span className="text-[30px] font-semibold leading-none tracking-[-0.045em] text-[#2b2e33]">
-              {deal.price}
-            </span>
-            <span className="text-[12px] font-medium text-[#565b63]">
-              /night
-            </span>
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            className="absolute right-4 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-black/25 text-white transition hover:bg-black/40"
+            type="button"
+            aria-label="Next image"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+          >
+            <ChevronRight className="h-4 w-4" />
+          </button>
+          <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-1.5">
+            <div className="h-1.5 w-1.5 rounded-full bg-white" />
+            <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
+            <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
+            <div className="h-1.5 w-1.5 rounded-full bg-white/60" />
           </div>
-          {deal.normalPrice && deal.discount ? (
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-medium text-[#7b818a]">
-              <span>Normal price</span>
-              <span className="line-through">{deal.normalPrice}/night</span>
-              <span className="rounded-full bg-[#ff2f2f] px-2 py-0.5 text-[11px] font-bold text-white">
-                {deal.discount}
+        </div>
+
+        <div className="px-5 pb-5 pt-4">
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-medium text-[#8a8f98]">
+            <span className="rounded-full bg-[#f1f3f5] px-2 py-1 text-[#6b7078]">
+              {deal.label}
+            </span>
+            <span>&middot;</span>
+            <span>{deal.location}</span>
+          </div>
+          <h3 className="mt-4 text-[18px] font-medium leading-tight tracking-[-0.02em] text-[#2a2d31] lg:text-[22px] group-hover:text-[#1458df] transition-colors">
+            {deal.name}
+          </h3>
+          <div className="mt-3 flex flex-wrap items-center gap-2 text-[12px]">
+            <span
+              className={`${ratingClass} rounded-full px-2 py-0.5 font-bold leading-none text-white`}
+            >
+              {deal.rating}
+            </span>
+            <span
+              className={
+                deal.ratingTone === "blue"
+                  ? "font-semibold text-[#1877f2]"
+                  : "font-semibold text-[#00a85a]"
+              }
+            >
+              {deal.ratingText}
+            </span>
+            <span className="text-[#9aa0a9]">&middot;</span>
+            <span className="font-medium text-[#858b94]">{deal.reviews}</span>
+          </div>
+
+          <div className="mt-5 grid grid-cols-2 gap-x-3 gap-y-2 text-[12px] font-medium text-[#969ca5]">
+            {deal.features.map((feature) => (
+              <span className="flex min-w-0 items-center gap-1.5" key={feature}>
+                <Check
+                  className="h-3.5 w-3.5 shrink-0 text-[#b7bcc4]"
+                  strokeWidth={3}
+                />
+                <span className="truncate">{feature}</span>
+              </span>
+            ))}
+            <span className="font-semibold text-[#1458df]">{deal.more}</span>
+          </div>
+
+          <div className="mt-[58px]">
+            <div className="flex items-end gap-1">
+              <span className="text-[30px] font-semibold leading-none tracking-[-0.045em] text-[#2b2e33]">
+                {deal.price}
+              </span>
+              <span className="text-[12px] font-medium text-[#565b63]">
+                /night
               </span>
             </div>
-          ) : (
-            <div className="mt-2 h-[18px]" />
-          )}
-          <p className="mt-5 text-[12px] font-medium text-[#7b818a]">
-            {deal.rooms}
-          </p>
+            {deal.normalPrice && deal.discount ? (
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-medium text-[#7b818a]">
+                <span>Normal price</span>
+                <span className="line-through">{deal.normalPrice}/night</span>
+                <span className="rounded-full bg-[#ff2f2f] px-2 py-0.5 text-[11px] font-bold text-white">
+                  {deal.discount}
+                </span>
+              </div>
+            ) : (
+              <div className="mt-2 h-[18px]" />
+            )}
+            <p className="mt-5 text-[12px] font-medium text-[#7b818a]">
+              {deal.rooms}
+            </p>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   );
 }

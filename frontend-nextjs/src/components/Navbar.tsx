@@ -17,6 +17,7 @@ const LoginModal = dynamic(() => import('./LoginModal'), {
 });
 
 const navItems = [
+  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/packages', label: 'Packages' },

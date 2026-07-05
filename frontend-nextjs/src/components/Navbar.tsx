@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Menu, X, User as UserIcon, LogOut, Search, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useAuthFlow } from "../context/AuthFlowContext";
@@ -25,6 +25,8 @@ const Navbar = () => {
   const { isLoginModalOpen, openLoginModal, closeLoginModal } = useAuthFlow();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const destination = searchParams ? searchParams.get("destination") || "" : "";
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const [scrolled, setScrolled] = useState(false);
@@ -286,8 +288,10 @@ const Navbar = () => {
                     onClick={() => setIsSearchExpanded(true)}
                     className="w-full relative flex items-center bg-gray-50/80 hover:bg-white hover:border-[#1458df]/30 border border-gray-200 rounded-full py-2 px-3.5 cursor-pointer transition-all duration-200"
                   >
-                    <Search size={16} className="text-gray-400 mr-2 shrink-0" />
-                    <span className="text-[13px] font-medium text-gray-400">Search destinations...</span>
+                    <Search size={16} className={`mr-2 shrink-0 ${destination ? 'text-[#1458df]' : 'text-gray-400'}`} />
+                    <span className={`text-[13px] font-medium ${destination ? 'text-gray-950 font-semibold' : 'text-gray-400'}`}>
+                      {destination || "Search destinations..."}
+                    </span>
                   </div>
                 </div>
               </div>

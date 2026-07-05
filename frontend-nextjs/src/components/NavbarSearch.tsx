@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, TrendingUp, History, ArrowRight, X, MapPin } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const trendingDestinations = [
     { name: "Munnar", region: "Kerala", image: "https://images.unsplash.com/photo-1591089101324-2280d9260000?w=800&q=80" },
@@ -28,7 +28,10 @@ interface NavbarSearchProps {
 }
 
 const NavbarSearch: React.FC<NavbarSearchProps> = ({ isMobile = false, autoFocus = false, onClose }) => {
-    const [query, setQuery] = useState("");
+    const searchParams = useSearchParams();
+    const destination = searchParams.get("destination") || "";
+
+    const [query, setQuery] = useState(destination);
     const [isFocused, setIsFocused] = useState(autoFocus);
     const [recentSearches, setRecentSearches] = useState<string[]>([]);
     const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -42,6 +45,10 @@ const NavbarSearch: React.FC<NavbarSearchProps> = ({ isMobile = false, autoFocus
             inputRef.current?.focus();
         }
     }, [autoFocus]);
+
+    useEffect(() => {
+        setQuery(destination);
+    }, [destination]);
 
     useEffect(() => {
         const saved = localStorage.getItem("recentSearches");
@@ -96,7 +103,7 @@ const NavbarSearch: React.FC<NavbarSearchProps> = ({ isMobile = false, autoFocus
         setRecentSearches(updated);
         
         setIsFocused(false);
-        setQuery("");
+        setQuery(trimmed);
         inputRef.current?.blur();
         onClose?.();
         
@@ -294,4 +301,17 @@ const NavbarSearch: React.FC<NavbarSearchProps> = ({ isMobile = false, autoFocus
     );
 };
 
-export default NavbarSearch;
+const NavbarSearchWrapper: React.FC<NavbarSearchProps> = (props) => {
+    return (
+        <Suspense fallback={
+            <div className={`relative flex items-center bg-gray-50/80 border border-gray-200 rounded-full py-2 px-3.5 ${props.isMobile ? 'w-full' : 'w-[240px]'}`}>
+                <Search size={16} className="text-gray-400 mr-2 shrink-0" />
+                <span className="text-[13px] font-medium text-gray-400">Search destinations...</span>
+            </div>
+        }>
+            <NavbarSearch {...props} />
+        </Suspense>
+    );
+};
+
+export default NavbarSearchWrapper;

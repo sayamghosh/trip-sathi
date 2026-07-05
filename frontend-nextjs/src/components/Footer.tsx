@@ -187,7 +187,7 @@ const Footer = () => {
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center flex-wrap">
                   <p>1, Madhyamgram, Kolkata - 700132</p>
                   <span className="opacity-40 hidden sm:block">•</span>
-                  <p>support@tripsathi.com</p>
+                  <a href="mailto:support.joytrips@gmail.com">support.joytrips@gmail.com</a>
                 </div>
 
                 {/* <p>+91 91X XXX XXX0</p> */}

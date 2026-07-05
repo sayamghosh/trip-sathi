@@ -437,7 +437,7 @@ function SearchPageContent() {
     }, [plans]);
 
     return (
-        <main className="bg-white pt-32 text-[#202124] lg:pt-20 min-h-screen">
+        <main className="bg-white pt-32 text-[#202124] sm:pt-20 min-h-screen">
             <section className="mx-auto max-w-[1390px] px-6 pb-20 pt-4 sm:px-10 lg:px-12">
                 {/* Popular Destinations pills with quick search functionality */}
                 <div className="mb-6 flex flex-col items-center gap-3">

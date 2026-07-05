@@ -160,7 +160,10 @@ const NavbarSearch: React.FC<NavbarSearchProps> = ({ isMobile = false, autoFocus
                         setQuery(e.target.value);
                         setSelectedIndex(-1);
                     }}
-                    onFocus={() => setIsFocused(true)}
+                    onFocus={(e) => {
+                        setIsFocused(true);
+                        e.target.select();
+                    }}
                     onKeyDown={handleKeyDown}
                     placeholder={isMobile ? "Search..." : "Search destinations..."}
                     className={`flex-1 bg-transparent py-2 text-[13px] font-medium outline-none text-gray-900 placeholder:text-gray-500 pr-8 ${isMobile ? 'py-2.5 text-[14px]' : ''}`}

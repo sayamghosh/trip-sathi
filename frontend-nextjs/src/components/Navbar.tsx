@@ -171,7 +171,7 @@ const Navbar = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, y: 10 }}
-                      className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] border border-gray-100 overflow-hidden z-50"
+                      className="absolute right-0 mt-3 w-60 bg-white rounded-xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] border border-gray-100 overflow-hidden z-50"
                     >
                       <div className="p-4 border-b border-gray-50 bg-gray-50/30">
                         <p className="text-[16px] font-medium text-gray-900 truncate">
@@ -234,20 +234,33 @@ const Navbar = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="flex flex-col w-full pb-3"
+              className="flex flex-col w-full pb-3 sm:pb-0 sm:h-15 justify-center"
             >
               {/* Row 1: Logo & Hamburgers */}
               <div className="flex justify-between h-15 items-center relative w-full">
-                <div className="flex items-center">
+                <div className="flex items-center shrink-0">
                   <Link
                     href="/"
                     className="text-[24px] font-bold tracking-tight text-gray-900 transition-colors"
                   >
-                    tripsathi
+                    {siteConfig.projectName}
                   </Link>
                 </div>
 
-                <div className="flex items-center ml-auto">
+                <div className="flex items-center ml-auto shrink-0 gap-3">
+                  {/* Tablet-only search bar: placed on the right, next to the menu/profile */}
+                  <div className="hidden sm:block lg:hidden w-[180px]">
+                    <div
+                      onClick={() => setIsSearchExpanded(true)}
+                      className="w-full relative flex items-center bg-gray-50/80 hover:bg-white hover:border-[#1458df]/30 border border-gray-200 rounded-full py-1.5 px-3 cursor-pointer transition-all duration-200"
+                    >
+                      <Search size={14} className={`mr-1.5 shrink-0 ${destination ? 'text-[#1458df]' : 'text-gray-400'}`} />
+                      <span className={`text-[12px] font-medium truncate ${destination ? 'text-gray-950 font-semibold' : 'text-gray-400'}`}>
+                        {destination || "Search..."}
+                      </span>
+                    </div>
+                  </div>
+
                   {isAuthenticated ? (
                     <button
                       onClick={() => setIsOpen(!isOpen)}
@@ -279,7 +292,7 @@ const Navbar = () => {
               </div>
 
               {/* Row 2: Amazon Style Search Bar */}
-              <div className="w-full mt-0.5">
+              <div className="w-full mt-0.5 sm:hidden">
                 <div 
                   onClick={() => setIsOpen(false) /* Close drawer if open */}
                   className="w-full"

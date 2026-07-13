@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "../config/site";
 
-const BECOME_TRAVEL_AGENT_URL =
+const GUIDE_LOGIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_APP_URL || "http://localhost:3001/login";
 
 const Footer = () => {
@@ -64,22 +64,22 @@ const Footer = () => {
                     </li>
 
                     <li>
-                      <a
-                        href="#"
+                      <Link
+                        href="/become-a-guide"
                         className="hover:text-white transition-all"
                       >
-                        Become a Agent
-                      </a>
+                        Become a Guide
+                      </Link>
                     </li>
 
                     <li>
                       <a
-                        href={BECOME_TRAVEL_AGENT_URL}
+                        href={GUIDE_LOGIN_URL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-white transition-colors"
                       >
-                        Agent Login
+                        Guide Login
                       </a>
                     </li>
                   </ul>

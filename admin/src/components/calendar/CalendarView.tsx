@@ -240,14 +240,21 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                                currentDate.getMonth() === today.getMonth() && 
                                currentDate.getFullYear() === today.getFullYear()
                 
+                const hasEvents = dayEvents.length > 0
+
                 return (
                   <div
                     key={i}
+                    onClick={() => {
+                      if (dayEvents.length === 1) onSelectEvent(dayEvents[0])
+                      else if (dayEvents.length > 1) onShowMore?.(dayDate, dayEvents)
+                    }}
                     className={cn(
                       "relative border-r border-b border-border transition-colors h-full min-h-0 flex flex-col pt-2 overflow-hidden",
                       (i + 1) % 7 === 0 && "border-r-0",
                       i >= totalCells - 7 && "border-b-0",
-                      isToday ? "bg-background" : "bg-card"
+                      isToday ? "bg-background" : "bg-card",
+                      hasEvents && "cursor-pointer hover:bg-accent/40"
                     )}
                   >
                     <div className="px-3 mb-1.5 flex">

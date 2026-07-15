@@ -2,28 +2,8 @@ import { useState, useEffect } from "react"
 import { CalendarView, type Event } from "@/components/calendar/CalendarView"
 import { ScheduleDetails } from "@/components/calendar/ScheduleDetails"
 import { DayBookingsSheet } from "@/components/calendar/DayBookingsSheet"
+import { mapBookingToEvent, type BookingResponse } from "@/lib/calendarEvents"
 import api from "@/lib/axios"
-
-interface BookingResponse {
-  _id: string
-  travelerName: string
-  travelerPhone?: string
-  tripDate: string
-  numberOfTravelers: number
-  paymentStatus: "unpaid" | "advance_paid" | "fully_paid"
-  tourPlanId?: {
-    title?: string
-    locations?: string[]
-    durationDays?: number
-    durationNights?: number
-  }
-}
-
-const paymentColor: Record<BookingResponse["paymentStatus"], string> = {
-  fully_paid: "bg-green-500",
-  advance_paid: "bg-orange-500",
-  unpaid: "bg-gray-500",
-}
 
 export default function Calendar() {
   const [events, setEvents] = useState<Event[]>([])
@@ -43,29 +23,7 @@ export default function Calendar() {
           params: { status: "confirmed", limit: 500 },
         })
         const bookings: BookingResponse[] = data.data
-
-        const mappedEvents: Event[] = bookings.map((booking) => {
-          const start = new Date(booking.tripDate)
-          const end = new Date(start)
-          end.setDate(start.getDate() + Math.max(1, booking.tourPlanId?.durationDays || 1))
-
-          return {
-            id: booking._id,
-            title: `${booking.travelerName} · ${booking.tourPlanId?.title || "Custom Package"}`,
-            start,
-            end,
-            type: "tour",
-            color: paymentColor[booking.paymentStatus],
-            destination: booking.tourPlanId?.locations?.join(", ") || "Not specified",
-            duration: `${booking.tourPlanId?.durationDays ?? 0} Days / ${booking.tourPlanId?.durationNights ?? 0} Nights`,
-            participants: booking.numberOfTravelers,
-            travelerName: booking.travelerName,
-            travelerPhone: booking.travelerPhone,
-            paymentStatus: booking.paymentStatus,
-          }
-        })
-
-        setEvents(mappedEvents)
+        setEvents(bookings.map(mapBookingToEvent))
       } catch (error) {
         console.error("Error fetching calendar data:", error)
       } finally {

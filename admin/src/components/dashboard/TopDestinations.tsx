@@ -1,32 +1,50 @@
+import { useQuery } from "@tanstack/react-query"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
+import api from "@/lib/axios"
 
-const data = [
-  { name: "Tokyo, Japan", pct: 35, color: "#2E7CF6", participants: "2,458" },
-  {
-    name: "Sydney, Australia",
-    pct: 28,
-    color: "#5BC5F0",
-    participants: "2,458",
-  },
-  { name: "Paris, France", pct: 22, color: "#818CF8", participants: "2,458" },
-  { name: "Venice, Italy", pct: 15, color: "#F472B6", participants: "2,458" },
-]
+interface Destination {
+  locations: string[]
+  count: number
+  participants: number
+}
+
+interface BookingMetricsResponse {
+  destinations: Destination[]
+}
+
+const COLORS = ["#2E7CF6", "#5BC5F0", "#818CF8", "#F472B6"]
 
 export function TopDestinations() {
+  const { data: metrics } = useQuery<BookingMetricsResponse>({
+    queryKey: ['bookings', 'metrics'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/bookings/metrics')
+      return data as BookingMetricsResponse
+    },
+  })
+
+  const destinations = metrics?.destinations || []
+  const total = destinations.reduce((acc, d) => acc + d.count, 0)
+
+  const data = destinations.length
+    ? destinations.map((d, i) => ({
+        name: d.locations?.join(", ") || "Custom Destination",
+        pct: total === 0 ? 0 : Math.round((d.count / total) * 100),
+        participants: d.participants,
+        color: COLORS[i % COLORS.length],
+      }))
+    : [{ name: "No confirmed bookings yet", pct: 100, participants: 0, color: "#E5E7EB" }]
+
   return (
     <div className="rounded-[14px] border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-[14px] font-semibold text-foreground">
           Top Destinations
         </h3>
-        <button className="rounded-[8px] bg-primary px-3 py-[5px] text-[11px] font-medium text-white transition hover:bg-primary/90">
-          This Month
-        </button>
       </div>
 
       <div className="flex items-center gap-5">
-        {/* Donut */}
-        <div className="relative" style={{ width: 140, height: 140 }}>
+        <div className="relative shrink-0" style={{ width: 140, height: 140 }}>
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -47,17 +65,13 @@ export function TopDestinations() {
           </ResponsiveContainer>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-1 flex-col gap-[10px]">
+        <div className="flex flex-1 flex-col gap-[10px] min-w-0">
           {data.map((d) => (
             <div key={d.name} className="flex items-start gap-2">
-              <div
-                className="mt-[4px] h-[8px] w-[8px] shrink-0 rounded-full"
-                style={{ backgroundColor: d.color }}
-              />
-              <div>
-                <p className="text-[12px] leading-tight font-medium text-foreground">
-                  {d.name} ({d.pct}%)
+              <div className="mt-[4px] h-[8px] w-[8px] shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
+              <div className="min-w-0">
+                <p className="text-[12px] leading-tight font-medium text-foreground truncate">
+                  {d.name} {total > 0 && `(${d.pct}%)`}
                 </p>
                 <p className="text-[10px] text-muted-foreground">
                   {d.participants} Participants

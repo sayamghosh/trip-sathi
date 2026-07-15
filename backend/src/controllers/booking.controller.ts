@@ -177,6 +177,46 @@ export const getBookingMetrics = async (req: Request, res: Response): Promise<vo
                             },
                         },
                     ],
+                    distinctTravelers: [
+                        { $match: { status: { $ne: 'cancelled' } } },
+                        { $group: { _id: '$travelerPhone' } },
+                        { $count: 'count' },
+                    ],
+                    tripStatus: [
+                        {
+                            $group: {
+                                _id: {
+                                    $cond: [
+                                        { $eq: ['$status', 'cancelled'] },
+                                        'cancelled',
+                                        { $cond: [{ $lt: ['$tripDate', new Date()] }, 'done', 'booked'] },
+                                    ],
+                                },
+                                count: { $sum: 1 },
+                            },
+                        },
+                    ],
+                    byDestination: [
+                        { $match: { status: { $ne: 'cancelled' } } },
+                        {
+                            $lookup: {
+                                from: 'tourplans',
+                                localField: 'tourPlanId',
+                                foreignField: '_id',
+                                as: 'plan',
+                            },
+                        },
+                        { $unwind: '$plan' },
+                        {
+                            $group: {
+                                _id: '$plan.locations',
+                                count: { $sum: 1 },
+                                participants: { $sum: '$numberOfTravelers' },
+                            },
+                        },
+                        { $sort: { count: -1 } },
+                        { $limit: 4 },
+                    ],
                     monthly: [
                         { $match: { createdAt: { $gte: startDate } } },
                         {
@@ -211,7 +251,22 @@ export const getBookingMetrics = async (req: Request, res: Response): Promise<vo
             },
         ]);
 
-        const totals = result.totals[0] || { totalRevenue: 0, totalBookings: 0, totalParticipants: 0 };
+        const totals = {
+            ...(result.totals[0] || { totalRevenue: 0, totalBookings: 0, totalParticipants: 0 }),
+            totalTravelers: result.distinctTravelers[0]?.count || 0,
+        };
+
+        const tripStatusRows: { _id: 'done' | 'booked' | 'cancelled'; count: number }[] = result.tripStatus;
+        const tripStatus = { done: 0, booked: 0, cancelled: 0 };
+        for (const row of tripStatusRows) {
+            tripStatus[row._id] = row.count;
+        }
+
+        const destinations = result.byDestination.map((d: any) => ({
+            locations: d._id as string[],
+            count: d.count,
+            participants: d.participants,
+        }));
 
         // Zero-fill the monthly buckets so the chart always shows a fixed window.
         const monthly: { month: string; confirmed: number; cancelled: number; revenue: number }[] = [];
@@ -249,7 +304,7 @@ export const getBookingMetrics = async (req: Request, res: Response): Promise<vo
             participants: p.participants,
         }));
 
-        res.status(200).json({ totals, monthly, topPackages });
+        res.status(200).json({ totals, monthly, topPackages, tripStatus, destinations });
     } catch (error: any) {
         console.error('Get booking metrics error', error);
         res.status(500).json({ message: 'Error fetching booking metrics', error: error.message });

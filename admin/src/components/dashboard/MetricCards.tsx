@@ -1,40 +1,51 @@
-import { useEffect, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { TrendingUp, TrendingDown } from "lucide-react"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
 
+interface BookingMetricsResponse {
+  totals: { totalRevenue: number; totalBookings: number; totalParticipants: number }
+  monthly: { month: string; confirmed: number; cancelled: number; revenue: number }[]
+}
+
+function pctChange(current: number, previous: number): number | null {
+  if (!previous) return null
+  return ((current - previous) / previous) * 100
+}
+
 export function MetricCards() {
-  const [totalPlans, setTotalPlans] = useState<number | string>("...")
+  const { data: tourPlans } = useQuery({
+    queryKey: ['tour-plans', 'mine'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/tour-plans')
+      return data as any[]
+    },
+  })
 
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const [plansRes, callbacksRes] = await Promise.all([
-           api.get("/api/tour-plans"),
-           api.get("/api/callbacks/mine")
-        ])
-        setTotalPlans(plansRes.data.length)
-        setTotalGuests(callbacksRes.data.length || 0)
-        
-        const totalVolume = plansRes.data.reduce((acc: number, p: any) => acc + (p.basePrice || 0), 0)
-        setGrossVolume(`₹${totalVolume.toLocaleString('en-IN')}`)
-      } catch (error) {
-        console.error("Error fetching stats:", error)
-        setTotalPlans("ERR")
-        setTotalGuests("ERR")
-      }
-    }
-    fetchStats()
-  }, [])
+  const { data: metrics } = useQuery<BookingMetricsResponse>({
+    queryKey: ['bookings', 'metrics'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/bookings/metrics')
+      return data as BookingMetricsResponse
+    },
+  })
 
-  const [totalGuests, setTotalGuests] = useState<number | string>("...")
-  const [grossVolume, setGrossVolume] = useState<string>("...")
+  const totalPlans = tourPlans ? tourPlans.length : "..."
+  const totals = metrics?.totals || { totalRevenue: 0, totalBookings: 0, totalParticipants: 0 }
+  const monthly = metrics?.monthly || []
+  const thisMonth = monthly[monthly.length - 1]
+  const lastMonth = monthly[monthly.length - 2]
 
-  const metrics = [
+  const revenueChange = thisMonth && lastMonth ? pctChange(thisMonth.revenue, lastMonth.revenue) : null
+  const guestsChange = thisMonth && lastMonth ? pctChange(thisMonth.confirmed, lastMonth.confirmed) : null
+
+  const formatChange = (change: number | null) => (change === null ? null : `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`)
+
+  const metricsList = [
     {
       label: "Live Packages",
       value: totalPlans,
-      change: "+2.98%",
+      change: null as string | null,
       positive: true,
       bg: "bg-[#E8F2FE]",
       iconBg: "bg-[#D4E8FC]",
@@ -56,9 +67,9 @@ export function MetricCards() {
     },
     {
       label: "Total Guests",
-      value: totalGuests,
-      change: "-1.45%",
-      positive: false,
+      value: totals.totalParticipants.toLocaleString(),
+      change: formatChange(guestsChange),
+      positive: (guestsChange ?? 0) >= 0,
       bg: "bg-[#E3F7EC]",
       iconBg: "bg-[#C9EFDA]",
       iconColor: "#22B357",
@@ -82,9 +93,9 @@ export function MetricCards() {
     },
     {
       label: "Gross Volume",
-      value: grossVolume,
-      change: "+3.75%",
-      positive: true,
+      value: `₹${totals.totalRevenue.toLocaleString('en-IN')}`,
+      change: formatChange(revenueChange),
+      positive: (revenueChange ?? 0) >= 0,
       bg: "bg-[#EDE8FE]",
       iconBg: "bg-[#DDD4FC]",
       iconColor: "#7C5CE7",
@@ -108,7 +119,7 @@ export function MetricCards() {
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {metrics.map((m) => (
+      {metricsList.map((m) => (
         <div
           key={m.label}
           className={`relative rounded-[14px] bg-card border border-border px-5 py-4 transition-transform duration-200 hover:scale-[1.015]`}
@@ -132,22 +143,25 @@ export function MetricCards() {
               {m.icon}
             </div>
           </div>
-          <div className="mt-1.5 flex items-center gap-1.5">
-            {m.positive ? (
-              <TrendingUp className="h-3 w-3 text-[#22B357]" />
-            ) : (
-              <TrendingDown className="h-3 w-3 text-[#EF4444]" />
-            )}
-            <span
-              className={`rounded-full px-[8px] py-[2px] text-[10px] font-semibold ${
-                m.positive
-                  ? "bg-[#C9EFDA]/20 text-[#22B357]"
-                  : "bg-[#FDD]/20 text-[#EF4444]"
-              }`}
-            >
-              {m.change}
-            </span>
-          </div>
+          {m.change && (
+            <div className="mt-1.5 flex items-center gap-1.5">
+              {m.positive ? (
+                <TrendingUp className="h-3 w-3 text-[#22B357]" />
+              ) : (
+                <TrendingDown className="h-3 w-3 text-[#EF4444]" />
+              )}
+              <span
+                className={`rounded-full px-[8px] py-[2px] text-[10px] font-semibold ${
+                  m.positive
+                    ? "bg-[#C9EFDA]/20 text-[#22B357]"
+                    : "bg-[#FDD]/20 text-[#EF4444]"
+                }`}
+              >
+                {m.change}
+              </span>
+              <span className="text-muted-foreground">from last month</span>
+            </div>
+          )}
         </div>
       ))}
     </div>

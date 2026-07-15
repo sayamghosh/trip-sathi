@@ -8,6 +8,7 @@ import hotelRoutes from './routes/hotel.routes.js';
 import tourPlanRoutes from './routes/tourPlan.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import callbackRoutes from './routes/callback.routes.js';
+import bookingRoutes from './routes/booking.routes.js';
 import superAdminRoutes from './routes/superAdmin.routes.js';
 
 dotenv.config();
@@ -30,6 +31,7 @@ app.use('/api/hotels', hotelRoutes);
 app.use('/api/tour-plans', tourPlanRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/callbacks', callbackRoutes);
+app.use('/api/bookings', bookingRoutes);
 app.use('/api/super-admin', superAdminRoutes);
 
 app.get('/', (req, res) => {

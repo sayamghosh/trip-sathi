@@ -1,29 +1,116 @@
-import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Plus, Search } from "lucide-react"
+import { ChevronLeft, ChevronRight, Plus, Search, XCircle } from "lucide-react"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import api from "@/lib/axios"
 
-interface BookingsTableProps {
-  bookings: any[]
+export interface Booking {
+  _id: string
+  travelerName: string
+  travelerPhone?: string
+  tripDate?: string
+  createdAt?: string
+  finalPrice: number
+  paymentStatus: 'unpaid' | 'advance_paid' | 'fully_paid'
+  status: 'confirmed' | 'cancelled'
+  tourPlanId?: {
+    title?: string
+    durationDays?: number
+    durationNights?: number
+  }
 }
 
-export function BookingsTable({ bookings }: BookingsTableProps) {
+export interface BookingFilters {
+  page: number
+  limit: number
+  search: string
+  status: 'confirmed' | 'cancelled' | 'all'
+  dateFrom: string
+  dateTo: string
+}
+
+interface Pagination {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
+interface BookingsTableProps {
+  bookings: Booking[]
+  pagination?: Pagination
+  filters: BookingFilters
+  onFiltersChange: (next: Partial<BookingFilters>) => void
+  onAddBooking: () => void
+}
+
+const paymentStatusLabel: Record<Booking['paymentStatus'], string> = {
+  unpaid: "Unpaid",
+  advance_paid: "Advance Paid",
+  fully_paid: "Fully Paid",
+}
+
+export function BookingsTable({ bookings, pagination, filters, onFiltersChange, onAddBooking }: BookingsTableProps) {
+  const queryClient = useQueryClient()
+
+  const cancelMutation = useMutation({
+    mutationFn: async (id: string) => {
+      await api.patch(`/api/bookings/${id}/cancel`)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bookings'] })
+    },
+  })
+
+  const handleCancel = (id: string) => {
+    if (window.confirm("Cancel this booking?")) {
+      cancelMutation.mutate(id)
+    }
+  }
+
+  const totalPages = pagination?.totalPages ?? 1
+  const page = pagination?.page ?? filters.page
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <h3 className="text-[18px] font-bold text-foreground">Bookings</h3>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 sm:flex-none">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
             <input
               type="text"
-              placeholder="Search name, package, etc"
+              value={filters.search}
+              onChange={(e) => onFiltersChange({ search: e.target.value, page: 1 })}
+              placeholder="Search traveler name, phone, email"
               className="h-9 w-full sm:w-[250px] rounded-[10px] border border-border bg-card pl-9 pr-3 text-[13px] text-foreground placeholder-muted-foreground/60 outline-none transition-all hover:bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/10"
             />
           </div>
-          <button className="flex h-9 items-center gap-2 rounded-[10px] border border-border bg-card px-3 text-[13px] font-medium text-foreground hover:bg-muted/80 transition-colors">
-            <CalendarDays className="h-4 w-4 text-muted-foreground/80" />
-            Today
-            <ChevronDown className="h-4 w-4 text-muted-foreground/80" />
-          </button>
-          <button className="flex h-9 items-center gap-1.5 rounded-[10px] bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]">
+          <input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => onFiltersChange({ dateFrom: e.target.value, page: 1 })}
+            className="h-9 rounded-[10px] border border-border bg-card px-2.5 text-[13px] text-foreground outline-none"
+            title="Trip date from"
+          />
+          <input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => onFiltersChange({ dateTo: e.target.value, page: 1 })}
+            className="h-9 rounded-[10px] border border-border bg-card px-2.5 text-[13px] text-foreground outline-none"
+            title="Trip date to"
+          />
+          <select
+            value={filters.status}
+            onChange={(e) => onFiltersChange({ status: e.target.value as BookingFilters['status'], page: 1 })}
+            className="h-9 rounded-[10px] border border-border bg-card px-2.5 text-[13px] text-foreground outline-none"
+          >
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="all">All</option>
+          </select>
+          <button
+            onClick={onAddBooking}
+            className="flex h-9 items-center gap-1.5 rounded-[10px] bg-primary px-3.5 text-[13px] font-semibold text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/90 transition-all hover:scale-[1.02] active:scale-[0.98]"
+          >
             <Plus className="h-4 w-4" />
             Add Booking
           </button>
@@ -35,59 +122,58 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
           <table className="w-full text-left text-[13px]">
             <thead className="bg-muted/50 font-medium text-muted-foreground border-b border-border">
               <tr>
-                <th className="px-5 py-3.5 flex items-center gap-1 cursor-pointer">Name <ChevronDown className="h-3 w-3 opacity-50" /></th>
-                <th className="px-5 py-3.5">Booking Code <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
-                <th className="px-5 py-3.5">Package <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
-                <th className="px-5 py-3.5">Duration <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
-                <th className="px-5 py-3.5">Date <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
-                <th className="px-5 py-3.5">Price <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
-                <th className="px-5 py-3.5">Status <ChevronDown className="h-3 w-3 inline opacity-50 mb-[2px] ml-1" /></th>
+                <th className="px-5 py-3.5">Name</th>
+                <th className="px-5 py-3.5">Booking Code</th>
+                <th className="px-5 py-3.5">Package</th>
+                <th className="px-5 py-3.5">Duration</th>
+                <th className="px-5 py-3.5">Trip Date</th>
+                <th className="px-5 py-3.5">Price</th>
+                <th className="px-5 py-3.5">Payment</th>
+                <th className="px-5 py-3.5">Status</th>
+                <th className="px-5 py-3.5">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {bookings.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-muted-foreground">
+                  <td colSpan={9} className="px-5 py-8 text-center text-muted-foreground">
                     No bookings found.
                   </td>
                 </tr>
               ) : (
-                bookings.map((booking: any) => {
-                  const statusClass = booking.status === "contacted"
+                bookings.map((booking) => {
+                  const statusClass = booking.status === "confirmed"
                     ? "bg-primary text-white"
-                    : booking.status === "pending"
-                      ? "bg-blue-500/10 text-blue-500"
-                      : "bg-red-500/10 text-red-500";
+                    : "bg-red-500/10 text-red-500";
 
-                  const statusText = booking.status === "contacted"
-                    ? "Confirmed"
-                    : booking.status === "pending"
-                      ? "Pending"
-                      : "Cancelled";
+                  const statusText = booking.status === "confirmed" ? "Confirmed" : "Cancelled";
 
-                  const dateString = booking.createdAt
-                    ? new Date(booking.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                  const dateString = booking.tripDate
+                    ? new Date(booking.tripDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                     : "N/A";
 
                   return (
                     <tr key={booking._id} className="hover:bg-muted/30 transition-colors">
                       <td className="px-5 py-4 font-medium text-foreground">
-                        {booking.requesterName || "Anonymous"}
+                        {booking.travelerName || "Anonymous"}
                       </td>
                       <td className="px-5 py-4 text-muted-foreground">
-                        BKG{booking._id?.toString().substring(0, 5).toUpperCase()}
+                        BKG{booking._id?.toString().slice(-6).toUpperCase()}
                       </td>
                       <td className="px-5 py-4 text-muted-foreground">
                         {booking.tourPlanId?.title || "Custom Package"}
                       </td>
                       <td className="px-5 py-4 text-muted-foreground">
-                        {booking.tourPlanId?.duration || "N/A"} Days
+                        {booking.tourPlanId?.durationDays ?? "-"}D / {booking.tourPlanId?.durationNights ?? "-"}N
                       </td>
                       <td className="px-5 py-4 text-muted-foreground">
                         {dateString}
                       </td>
                       <td className="px-5 py-4 font-medium text-foreground">
-                        {booking.tourPlanId?.basePrice ? `₹${booking.tourPlanId.basePrice.toLocaleString()}` : "N/A"}
+                        ₹{booking.finalPrice.toLocaleString()}
+                      </td>
+                      <td className="px-5 py-4 text-muted-foreground">
+                        {paymentStatusLabel[booking.paymentStatus]}
                       </td>
                       <td className="px-5 py-4">
                         <span
@@ -95,6 +181,19 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
                         >
                           {statusText}
                         </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        {booking.status === "confirmed" && (
+                          <button
+                            onClick={() => handleCancel(booking._id)}
+                            disabled={cancelMutation.isPending}
+                            className="flex items-center gap-1 text-[12px] text-red-500 hover:text-red-600 disabled:opacity-50"
+                            title="Cancel booking"
+                          >
+                            <XCircle className="h-3.5 w-3.5" />
+                            Cancel
+                          </button>
+                        )}
                       </td>
                     </tr>
                   );
@@ -107,30 +206,32 @@ export function BookingsTable({ bookings }: BookingsTableProps) {
         <div className="flex items-center justify-between border-t border-border px-5 py-3">
           <div className="text-[13px] text-muted-foreground">
             Showing{" "}
-            <select className="mx-1 rounded border border-border bg-card text-foreground outline-none py-0.5 px-1">
-              <option className="bg-card text-foreground">8</option>
+            <select
+              value={filters.limit}
+              onChange={(e) => onFiltersChange({ limit: Number(e.target.value), page: 1 })}
+              className="mx-1 rounded border border-border bg-card text-foreground outline-none py-0.5 px-1"
+            >
+              {[8, 20, 50].map(n => <option key={n} value={n}>{n}</option>)}
             </select>{" "}
-            out of 286
+            out of {pagination?.total ?? 0}
           </div>
           <div className="flex items-center gap-1">
-            <button className="flex h-8 items-center gap-1 rounded-[6px] px-2.5 text-[13px] text-muted-foreground hover:bg-muted">
+            <button
+              onClick={() => onFiltersChange({ page: Math.max(1, page - 1) })}
+              disabled={page <= 1}
+              className="flex h-8 items-center gap-1 rounded-[6px] px-2.5 text-[13px] text-muted-foreground hover:bg-muted disabled:opacity-40"
+            >
               <ChevronLeft className="h-4 w-4" />
               Previous
             </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-[6px] bg-[#3B82F6] text-[13px] font-medium text-white hover:bg-[#3B82F6]/90">
-              1
-            </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-[6px] text-[13px] font-medium text-muted-foreground hover:bg-muted">
-              2
-            </button>
-            <button className="flex h-8 w-8 items-center justify-center rounded-[6px] text-[13px] font-medium text-muted-foreground hover:bg-muted">
-              3
-            </button>
-            <span className="text-muted-foreground mx-1">...</span>
-            <button className="flex h-8 w-8 items-center justify-center rounded-[6px] text-[13px] font-medium text-muted-foreground hover:bg-muted">
-              16
-            </button>
-            <button className="flex h-8 items-center gap-1 rounded-[6px] px-2.5 text-[13px] text-muted-foreground hover:bg-muted">
+            <span className="px-2 text-[13px] text-muted-foreground">
+              Page {page} of {totalPages}
+            </span>
+            <button
+              onClick={() => onFiltersChange({ page: Math.min(totalPages, page + 1) })}
+              disabled={page >= totalPages}
+              className="flex h-8 items-center gap-1 rounded-[6px] px-2.5 text-[13px] text-muted-foreground hover:bg-muted disabled:opacity-40"
+            >
               Next
               <ChevronRight className="h-4 w-4" />
             </button>

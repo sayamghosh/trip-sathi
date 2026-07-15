@@ -7,9 +7,11 @@ export const metadata: Metadata = {
     title: `${siteConfig.projectName} - Best Travel Packages & Local Guides in India`,
     description: `Book your dream vacation with ${siteConfig.projectName}. Discover 120+ destinations, compare tour packages, find local guides, and get the best deals on hotels and experiences.`,
   keywords: ['travel packages India', 'book tour', 'local guide', 'holiday packages', 'best deals travel', 'India tourism', 'tour operator'],
+  alternates: { canonical: '/' },
   openGraph: {
         title: `${siteConfig.projectName} - Best Travel Packages & Local Guides in India`,
     description: 'Discover 120+ destinations with trusted local guides. Book your perfect trip today.',
+    url: '/',
   },
 };
 

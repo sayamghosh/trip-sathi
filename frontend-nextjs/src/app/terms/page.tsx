@@ -4,6 +4,7 @@ import { siteConfig } from '../../config/site';
 export const metadata: Metadata = {
   title: `Terms & Conditions | ${siteConfig.projectName}`,
   description: `Read the terms and conditions for using ${siteConfig.projectName}, a platform that connects travelers directly with independent local guides.`,
+  alternates: { canonical: '/terms' },
 };
 
 const sections: { heading: string; body: string[] }[] = [

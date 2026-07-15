@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { submitContactMessage } from '../services/contact.service';
@@ -22,7 +23,7 @@ export function ContactUsModal({ open, onClose }: { open: boolean; onClose: () =
     }
   }, [open, user]);
 
-  if (!open) return null;
+  if (!open || typeof document === 'undefined') return null;
 
   const handleSubmit = async () => {
     if (!email.trim() || !message.trim()) {
@@ -42,8 +43,13 @@ export function ContactUsModal({ open, onClose }: { open: boolean; onClose: () =
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+  return createPortal(
+    // Rendered via a portal into document.body - this modal is triggered
+    // from places like the Footer, which sets a white ambient text color
+    // for its own content. Without a portal, this modal would stay nested
+    // in that DOM subtree and silently inherit the wrong text color via
+    // CSS inheritance, regardless of any color classes set here.
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 text-gray-900">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
         <button
           onClick={onClose}
@@ -76,7 +82,7 @@ export function ContactUsModal({ open, onClose }: { open: boolean; onClose: () =
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                  className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-primary"
                   placeholder="you@example.com"
                 />
               </div>
@@ -86,7 +92,7 @@ export function ContactUsModal({ open, onClose }: { open: boolean; onClose: () =
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={4}
-                  className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary resize-none"
+                  className="w-full mt-1 rounded-lg border border-gray-200 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-primary resize-none"
                   placeholder="Describe what you're facing..."
                 />
               </div>
@@ -112,7 +118,8 @@ export function ContactUsModal({ open, onClose }: { open: boolean; onClose: () =
           </>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -137,15 +137,6 @@ const Footer = () => {
 
                   <ul className="space-y-4 text-white/75 text-sm">
                     <li>
-                      <a
-                        href="#"
-                        className="hover:text-white transition-all"
-                      >
-                        Help Center
-                      </a>
-                    </li>
-
-                    <li>
                       <ContactUsTrigger className="hover:text-white transition-all text-left" />
                     </li>
 

@@ -9,6 +9,7 @@ import {
     getAgentMetrics,
     getAgentPackages
 } from '../controllers/superAdmin.controller.js';
+import { getContactMessages, updateContactMessageStatus } from '../controllers/contactMessage.controller.js';
 import { authMiddleware, isAdmin } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.patch('/agents/:id/authorize', authMiddleware, isAdmin, authorizeAgent);
 router.patch('/agents/:id/status', authMiddleware, isAdmin, toggleAgentStatus);
 router.get('/agents/:id/metrics', authMiddleware, isAdmin, getAgentMetrics);
 router.get('/agents/:id/packages', authMiddleware, isAdmin, getAgentPackages);
+
+router.get('/contact-messages', authMiddleware, isAdmin, getContactMessages);
+router.patch('/contact-messages/:id/status', authMiddleware, isAdmin, updateContactMessageStatus);
 
 export default router;

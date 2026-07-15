@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "../config/site";
+import { ContactUsTrigger } from "./ContactUsModal";
 
 const GUIDE_LOGIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_APP_URL || "http://localhost:3001/login";
@@ -145,12 +146,7 @@ const Footer = () => {
                     </li>
 
                     <li>
-                      <a
-                        href="#"
-                        className="hover:text-white transition-all"
-                      >
-                        Contact Us
-                      </a>
+                      <ContactUsTrigger className="hover:text-white transition-all text-left" />
                     </li>
 
                     <li>

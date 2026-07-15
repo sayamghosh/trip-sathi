@@ -8,6 +8,7 @@ import {
   ServerOff,
   Construction,
   HelpCircle,
+  Mail,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -25,6 +26,11 @@ export const sidebarData: SidebarData = {
           title: 'Agents',
           url: '/agents',
           icon: UserCog,
+        },
+        {
+          title: 'Contact Messages',
+          url: '/contact-messages',
+          icon: Mail,
         },
       ],
     },

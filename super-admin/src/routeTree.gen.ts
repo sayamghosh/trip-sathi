@@ -18,6 +18,7 @@ import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedContactMessagesIndexRouteImport } from './routes/_authenticated/contact-messages/index'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents/index'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedAgentsAgentIdRouteImport } from './routes/_authenticated/agents/$agentId'
@@ -67,6 +68,12 @@ const AuthenticatedHelpCenterIndexRoute =
     path: '/help-center/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedContactMessagesIndexRoute =
+  AuthenticatedContactMessagesIndexRouteImport.update({
+    id: '/contact-messages/',
+    path: '/contact-messages/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAgentsIndexRoute =
   AuthenticatedAgentsIndexRouteImport.update({
     id: '/agents/',
@@ -97,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/contact-messages/': typeof AuthenticatedContactMessagesIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
 }
 export interface FileRoutesByTo {
@@ -110,6 +118,7 @@ export interface FileRoutesByTo {
   '/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/agents': typeof AuthenticatedAgentsIndexRoute
+  '/contact-messages': typeof AuthenticatedContactMessagesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
 }
 export interface FileRoutesById {
@@ -125,6 +134,7 @@ export interface FileRoutesById {
   '/_authenticated/agents/$agentId': typeof AuthenticatedAgentsAgentIdRoute
   '/_authenticated/errors/$error': typeof AuthenticatedErrorsErrorRoute
   '/_authenticated/agents/': typeof AuthenticatedAgentsIndexRoute
+  '/_authenticated/contact-messages/': typeof AuthenticatedContactMessagesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/agents/$agentId'
     | '/errors/$error'
     | '/agents/'
+    | '/contact-messages/'
     | '/help-center/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/agents/$agentId'
     | '/errors/$error'
     | '/agents'
+    | '/contact-messages'
     | '/help-center'
   id:
     | '__root__'
@@ -167,6 +179,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents/$agentId'
     | '/_authenticated/errors/$error'
     | '/_authenticated/agents/'
+    | '/_authenticated/contact-messages/'
     | '/_authenticated/help-center/'
   fileRoutesById: FileRoutesById
 }
@@ -245,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/contact-messages/': {
+      id: '/_authenticated/contact-messages/'
+      path: '/contact-messages'
+      fullPath: '/contact-messages/'
+      preLoaderRoute: typeof AuthenticatedContactMessagesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agents/': {
       id: '/_authenticated/agents/'
       path: '/agents'
@@ -274,6 +294,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsAgentIdRoute: typeof AuthenticatedAgentsAgentIdRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
+  AuthenticatedContactMessagesIndexRoute: typeof AuthenticatedContactMessagesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
 }
 
@@ -282,6 +303,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgentsAgentIdRoute: AuthenticatedAgentsAgentIdRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedAgentsIndexRoute: AuthenticatedAgentsIndexRoute,
+  AuthenticatedContactMessagesIndexRoute:
+    AuthenticatedContactMessagesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
 }
 

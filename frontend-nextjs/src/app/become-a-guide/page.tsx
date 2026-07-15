@@ -13,7 +13,7 @@ const CTA_URL = process.env.NEXT_PUBLIC_ADMIN_APP_URL || "https://admin.joytrips
 export default function BecomeAGuidePage() {
   return (
     <div
-      className="text-[#121212] bg-[#FBF9F4] overflow-x-hidden"
+      className="text-[#121212] bg-[#FBF9F4] overflow-x-clip"
       style={{ fontFamily: "var(--font-guide-space-grotesk), sans-serif" }}
     >
       <GuideNav ctaUrl={CTA_URL} />

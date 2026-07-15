@@ -66,6 +66,8 @@ const Footer = () => {
                     <li>
                       <Link
                         href="/become-a-guide"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="hover:text-white transition-all"
                       >
                         Become a Guide

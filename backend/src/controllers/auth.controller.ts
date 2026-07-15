@@ -51,7 +51,6 @@ export const googleLogin = async (req: Request, res: Response): Promise<void> =>
                 bio: user.bio,
                 isAuthorized: user.isAuthorized,
                 isActive: user.isActive,
-                isProfilePublic: user.isProfilePublic,
             }
         });
     } catch (error: any) {
@@ -95,13 +94,12 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 phone: trimmedPhone,
                 address: trimmedAddress,
                 isAuthorized: false,
-                isProfilePublic: false,
             });
             await user.save();
         } else {
             // Existing user — upgrade to guide and sync profile/contact info if missing
-            // Preserve existing isAuthorized, isActive, and isProfilePublic values
-            // so admin-set authorization and subscription statuses are not wiped on re-login
+            // Preserve existing isAuthorized and isActive values so admin-set
+            // authorization and subscription statuses are not wiped on re-login
             user.role = 'guide';
             user.picture = picture || user.picture || '';
             user.name = user.name || name || '';
@@ -130,7 +128,6 @@ export const googleGuideLogin = async (req: Request, res: Response): Promise<voi
                 bio: user.bio,
                 isAuthorized: user.isAuthorized,
                 isActive: user.isActive,
-                isProfilePublic: user.isProfilePublic,
             }
         });
     } catch (error: any) {

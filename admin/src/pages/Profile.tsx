@@ -1,10 +1,12 @@
 import type { ReactNode } from "react"
 import { useEffect, useState } from "react"
 import {
+  AtSign,
   BadgeCheck,
   Camera,
   Check,
   Edit3,
+  ExternalLink,
   Image as ImageIcon,
   Loader2,
   Mail,
@@ -27,12 +29,13 @@ type ProfileUser = {
   phone?: string
   address?: string
   bio?: string
+  username?: string
   isAuthorized?: boolean
   isActive?: boolean
-  isProfilePublic?: boolean
 }
 
 const DEFAULT_BIO = ""
+const SITE_URL = import.meta.env.VITE_SITE_URL || "https://joytrips.site"
 
 export function Profile() {
   const [user, setUser] = useState<ProfileUser | null>(() => {
@@ -47,6 +50,7 @@ export function Profile() {
   const [phone, setPhone] = useState(() => user?.phone || "")
   const [address, setAddress] = useState(() => user?.address || "")
   const [bio, setBio] = useState(() => user?.bio || DEFAULT_BIO)
+  const [username, setUsername] = useState(() => user?.username || "")
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -57,6 +61,7 @@ export function Profile() {
         setPhone(response.data.phone || "")
         setAddress(response.data.address || "")
         setBio(response.data.bio || DEFAULT_BIO)
+        setUsername(response.data.username || "")
         localStorage.setItem("user", JSON.stringify(response.data))
       } catch (error) {
         console.error("Failed to fetch fresh user profile:", error)
@@ -106,6 +111,7 @@ export function Profile() {
         phone: phone.trim(),
         address: address.trim(),
         bio: bio.trim(),
+        username: username.trim() || undefined,
       })
       const updatedUser = response.data.user as ProfileUser
       setUser(updatedUser)
@@ -113,11 +119,12 @@ export function Profile() {
       setPhone(updatedUser.phone || "")
       setAddress(updatedUser.address || "")
       setBio(updatedUser.bio || DEFAULT_BIO)
+      setUsername(updatedUser.username || "")
       localStorage.setItem("user", JSON.stringify(updatedUser))
       setIsEditing(false)
-    } catch (error) {
+    } catch (error: any) {
       console.error("Profile save failed:", error)
-      setSaveError("Could not save your changes. Please try again.")
+      setSaveError(error?.response?.data?.message || "Could not save your changes. Please try again.")
     } finally {
       setIsSaving(false)
     }
@@ -303,6 +310,23 @@ export function Profile() {
                   />
                 </div>
               </ProfileField>
+
+              <ProfileField label="Channel Username">
+                <div className="relative">
+                  <AtSign className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <input
+                    type="text"
+                    value={username}
+                    readOnly={!isEditing}
+                    onChange={(event) => setUsername(event.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ""))}
+                    placeholder="e.g. rahul_treks"
+                    className={`h-12 w-full rounded-2xl border pl-10 pr-4 text-[14px] font-bold outline-none transition-all placeholder:text-muted-foreground/60 ${editableInputClass}`}
+                  />
+                </div>
+                <p className="text-[11px] font-medium text-muted-foreground">
+                  Your public channel page: {SITE_URL}/guide/{username || "your-username"}
+                </p>
+              </ProfileField>
             </div>
 
             <div className="mt-6 space-y-2 border-t border-border pt-6">
@@ -316,59 +340,32 @@ export function Profile() {
               />
             </div>
 
-            {/* Profile Visibility Toggle */}
+            {/* Public channel page */}
             <div className="mt-6 border-t border-border pt-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between rounded-2xl border border-border bg-background/30 p-5 gap-4">
                 <div className="space-y-1">
-                  <p className="text-sm font-bold text-foreground">Public Profile Listing</p>
+                  <p className="text-sm font-bold text-foreground">Public Channel Page</p>
                   <p className="text-xs text-muted-foreground leading-relaxed max-w-[600px]">
-                    Display your professional business profile in the traveller agent directory. When disabled, travellers can only find your profile through direct links on your tour plan detail pages.
+                    {user?.isAuthorized && user?.username
+                      ? `Your channel is live at ${SITE_URL}/guide/${user.username}, showcasing your bio and all of your published tour plans in one place — like a YouTube channel for your guiding business.`
+                      : "Once you're an authorized guide with a username set above, your channel page goes live automatically — no extra step needed."}
                   </p>
-                </div>
-                <div className="flex items-center gap-3 self-end sm:self-center">
-                  {!user?.isAuthorized && (
-                    <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0">
-                      <Shield className="h-3.5 w-3.5" /> Requires Authorization
-                    </span>
+                  {user?.isAuthorized && user?.username && (
+                    <a
+                      href={`${SITE_URL}/guide/${user.username}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline"
+                    >
+                      View your channel <ExternalLink className="h-3 w-3" />
+                    </a>
                   )}
-                  <button
-                    type="button"
-                    disabled={!user?.isAuthorized || isSaving}
-                    onClick={async () => {
-                      if (!user?.isAuthorized) return
-                      try {
-                        setIsSaving(true)
-                        const response = await api.patch("/api/profile/guide", {
-                          name: fullName.trim(),
-                          phone: phone.trim(),
-                          address: address.trim(),
-                          bio: bio.trim(),
-                          isProfilePublic: !user.isProfilePublic,
-                        })
-                        const updatedUser = response.data.user
-                        setUser(updatedUser)
-                        localStorage.setItem("user", JSON.stringify(updatedUser))
-                      } catch (error) {
-                        console.error("Failed to toggle profile visibility:", error)
-                        setSaveError("Could not update profile visibility.")
-                      } finally {
-                        setIsSaving(false)
-                      }
-                    }}
-                    className={cn(
-                      "relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 shrink-0",
-                      user?.isProfilePublic ? "bg-primary" : "bg-muted",
-                      (!user?.isAuthorized || isSaving) && "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    <span
-                      className={cn(
-                        "inline-block h-5 w-5 transform rounded-full bg-background shadow transition duration-200",
-                        user?.isProfilePublic ? "translate-x-5" : "translate-x-1"
-                      )}
-                    />
-                  </button>
                 </div>
+                {!user?.isAuthorized && (
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/20 border border-amber-200/50 px-3 py-1 rounded-full flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+                    <Shield className="h-3.5 w-3.5" /> Requires Authorization
+                  </span>
+                )}
               </div>
             </div>
           </div>

@@ -139,7 +139,7 @@ export function AppSidebar() {
                           isCollapsed && "justify-center px-0",
                           (item.matchPaths ?? [item.to]).some(isActivePath)
                             ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                            : "text-sidebar-foreground/70"
+                            : "text-sidebar-foreground"
                         )}
                       >
                         <item.icon className="shrink-0 size-5!" />
@@ -168,7 +168,7 @@ export function AppSidebar() {
                     </SidebarMenuBadge>
                   )}
                   {!isCollapsed && !item.isAvailable && (
-                    <SidebarMenuBadge className="right-4 bg-sidebar-accent text-sidebar-foreground/50 text-[10px] font-semibold tracking-wide">
+                    <SidebarMenuBadge className="right-4 bg-sidebar-accent text-sidebar-accent-foreground text-[10px] font-semibold tracking-wide">
                       Soon
                     </SidebarMenuBadge>
                   )}
@@ -184,7 +184,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               className={cn(
-                "h-10 text-sidebar-foreground/80 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
+                "h-10 text-sidebar-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
                 isCollapsed && "px-0 justify-center group-data-[collapsible=icon]:size-10!"
               )}
               onClick={handleLogout}

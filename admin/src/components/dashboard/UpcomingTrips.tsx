@@ -1,18 +1,10 @@
+import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Calendar, Users } from "lucide-react"
 import api from "@/lib/axios"
-
-interface BookingResponse {
-  _id: string
-  tripDate: string
-  numberOfTravelers: number
-  paymentStatus: "unpaid" | "advance_paid" | "fully_paid"
-  tourPlanId?: {
-    title?: string
-    locations?: string[]
-    durationDays?: number
-  }
-}
+import { mapBookingToEvent, type BookingResponse } from "@/lib/calendarEvents"
+import type { Event } from "@/components/calendar/CalendarView"
+import { ScheduleDetails } from "@/components/calendar/ScheduleDetails"
 
 const paymentDot: Record<string, string> = {
   fully_paid: "bg-green-500",
@@ -23,6 +15,9 @@ const paymentDot: Record<string, string> = {
 const UPCOMING_WINDOW_DAYS = 14
 
 export function UpcomingTrips() {
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
+
   const { data } = useQuery({
     queryKey: ['bookings', 'upcoming'],
     queryFn: async () => {
@@ -46,6 +41,11 @@ export function UpcomingTrips() {
     .sort((a, b) => new Date(a.tripDate).getTime() - new Date(b.tripDate).getTime())
     .slice(0, 4)
 
+  const handleSelect = (booking: BookingResponse) => {
+    setSelectedEvent(mapBookingToEvent(booking))
+    setDetailsOpen(true)
+  }
+
   return (
     <div className="rounded-[14px] border border-border bg-card p-3">
       <div className="mb-2 flex items-center justify-between">
@@ -60,7 +60,12 @@ export function UpcomingTrips() {
       ) : (
         <div className="space-y-2">
           {upcoming.map((b) => (
-            <div key={b._id} className="rounded-[10px] border border-border/60 p-2.5 transition hover:border-border hover:shadow-sm">
+            <button
+              key={b._id}
+              type="button"
+              onClick={() => handleSelect(b)}
+              className="w-full rounded-[10px] border border-border/60 p-2.5 text-left transition hover:border-primary/40 hover:bg-accent/40 hover:shadow-sm"
+            >
               <div className="flex items-center justify-between gap-2">
                 <span className="truncate text-[9px] font-semibold text-muted-foreground">
                   {b.tourPlanId?.title || "Custom Package"}
@@ -80,10 +85,12 @@ export function UpcomingTrips() {
                   {new Date(b.tripDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
       )}
+
+      <ScheduleDetails selectedEvent={selectedEvent} open={detailsOpen} onOpenChange={setDetailsOpen} />
     </div>
   )
 }

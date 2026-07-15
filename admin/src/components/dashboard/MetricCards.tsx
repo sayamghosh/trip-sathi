@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
-import { TrendingUp, TrendingDown } from "lucide-react"
+import { TrendingUp, TrendingDown, IndianRupee } from "lucide-react"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
 
@@ -70,12 +70,7 @@ export function MetricCards() {
       change: formatChange(revenueChange),
       positive: (revenueChange ?? 0) >= 0,
       iconBg: "bg-[#DDD4FC]",
-      icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C5CE7" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="12" x2="12" y1="2" y2="22" />
-          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-        </svg>
-      ),
+      icon: <IndianRupee width={18} height={18} stroke="#7C5CE7" strokeWidth={1.8} />,
     },
   ]
 

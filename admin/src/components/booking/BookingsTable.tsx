@@ -1,6 +1,9 @@
+import { useEffect, useState } from "react"
 import { ChevronLeft, ChevronRight, Plus, Search, XCircle } from "lucide-react"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
+
+const SEARCH_DEBOUNCE_MS = 400
 
 export interface Booking {
   _id: string
@@ -51,6 +54,24 @@ const paymentStatusLabel: Record<Booking['paymentStatus'], string> = {
 export function BookingsTable({ bookings, pagination, filters, onFiltersChange, onAddBooking }: BookingsTableProps) {
   const queryClient = useQueryClient()
 
+  // Keep the input snappy while typing, but only push into the actual
+  // filter (and thus trigger a new /api/bookings/mine request) once the
+  // guide pauses - avoids firing a request per keystroke.
+  const [searchInput, setSearchInput] = useState(filters.search)
+
+  useEffect(() => {
+    setSearchInput(filters.search)
+  }, [filters.search])
+
+  useEffect(() => {
+    if (searchInput === filters.search) return
+    const handle = setTimeout(() => {
+      onFiltersChange({ search: searchInput, page: 1 })
+    }, SEARCH_DEBOUNCE_MS)
+    return () => clearTimeout(handle)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput])
+
   const cancelMutation = useMutation({
     mutationFn: async (id: string) => {
       await api.patch(`/api/bookings/${id}/cancel`)
@@ -78,8 +99,8 @@ export function BookingsTable({ bookings, pagination, filters, onFiltersChange, 
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/70" />
             <input
               type="text"
-              value={filters.search}
-              onChange={(e) => onFiltersChange({ search: e.target.value, page: 1 })}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search traveler name, phone, email"
               className="h-9 w-full sm:w-[250px] rounded-[10px] border border-border bg-card pl-9 pr-3 text-[13px] text-foreground placeholder-muted-foreground/60 outline-none transition-all hover:bg-muted/30 focus:border-primary focus:ring-2 focus:ring-primary/10"
             />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "../config/site";
 
-const BECOME_TRAVEL_AGENT_URL =
+const GUIDE_LOGIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_APP_URL || "http://localhost:3001/login";
 
 const Footer = () => {
@@ -64,22 +64,24 @@ const Footer = () => {
                     </li>
 
                     <li>
-                      <a
-                        href="#"
+                      <Link
+                        href="/become-a-guide"
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="hover:text-white transition-all"
                       >
-                        Become a Agent
-                      </a>
+                        Become a Guide
+                      </Link>
                     </li>
 
                     <li>
                       <a
-                        href={BECOME_TRAVEL_AGENT_URL}
+                        href={GUIDE_LOGIN_URL}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:text-white transition-colors"
                       >
-                        Agent Login
+                        Guide Login
                       </a>
                     </li>
                   </ul>
@@ -187,7 +189,7 @@ const Footer = () => {
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center flex-wrap">
                   <p>1, Madhyamgram, Kolkata - 700132</p>
                   <span className="opacity-40 hidden sm:block">•</span>
-                  <p>support@tripsathi.com</p>
+                  <a href="mailto:support.joytrips@gmail.com">support.joytrips@gmail.com</a>
                 </div>
 
                 {/* <p>+91 91X XXX XXX0</p> */}
@@ -205,7 +207,12 @@ const Footer = () => {
 
                 <span className="opacity-40">•</span>
 
-                <a href="#" className="hover:text-white transition-all">
+                <a
+                  href="https://www.instagram.com/joytrips.site/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-all"
+                >
                   Instagram
                 </a>
 

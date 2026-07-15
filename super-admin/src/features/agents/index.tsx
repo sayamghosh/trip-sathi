@@ -15,7 +15,9 @@ import {
   ChevronLeft, 
   UserCog, 
   ShieldCheck, 
-  ShieldAlert 
+  ShieldAlert,
+  CreditCard,
+  AlertTriangle
 } from 'lucide-react'
 import api from '@/lib/api'
 
@@ -40,6 +42,8 @@ export function Agents() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [total, setTotal] = useState(0)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [searchKey, setSearchKey] = useState(0)
 
   const fetchAgents = async () => {
     setLoading(true)
@@ -68,39 +72,45 @@ export function Agents() {
 
   useEffect(() => {
     fetchAgents()
-  }, [page, isAuthorizedFilter, isActiveFilter])
+  }, [page, isAuthorizedFilter, isActiveFilter, searchKey])
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     setPage(1)
-    fetchAgents()
+    setSearchKey(k => k + 1)
   }
 
   const toggleAuthorization = async (id: string, currentStatus: boolean) => {
+    if (togglingId) return
     const updatedStatus = !currentStatus
+    setTogglingId(id)
     try {
       const response = await api.patch(`/super-admin/agents/${id}/authorize`, {
         isAuthorized: updatedStatus
       })
       toast.success(response.data.message || `Agent authorization set to ${updatedStatus}`)
-      // Update local state
       setAgents(prev => prev.map(agent => agent._id === id ? { ...agent, isAuthorized: updatedStatus } : agent))
     } catch (error: any) {
       toast.error('Failed to update authorization status: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setTogglingId(null)
     }
   }
 
   const toggleActivation = async (id: string, currentStatus: boolean) => {
+    if (togglingId) return
     const updatedStatus = !currentStatus
+    setTogglingId(id)
     try {
       const response = await api.patch(`/super-admin/agents/${id}/status`, {
         isActive: updatedStatus
       })
-      toast.success(response.data.message || `Agent active status set to ${updatedStatus}`)
-      // Update local state
+      toast.success(response.data.message || `Agent account status set to ${updatedStatus}`)
       setAgents(prev => prev.map(agent => agent._id === id ? { ...agent, isActive: updatedStatus } : agent))
     } catch (error: any) {
-      toast.error('Failed to update activation status: ' + (error.response?.data?.message || error.message))
+      toast.error('Failed to update account status: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setTogglingId(null)
     }
   }
 
@@ -154,9 +164,9 @@ export function Agents() {
               </select>
             </div>
 
-            {/* Filter by Activation */}
+            {/* Filter by Subscription */}
             <div className='flex items-center gap-2'>
-              <span className='text-sm font-medium text-muted-foreground'>Status:</span>
+              <span className='text-sm font-medium text-muted-foreground'>Subscription:</span>
               <select 
                 value={isActiveFilter} 
                 onChange={(e) => { setIsActiveFilter(e.target.value); setPage(1); }}
@@ -194,7 +204,7 @@ export function Agents() {
                     <th className='py-4 px-4'>Email</th>
                     <th className='py-4 px-4'>Contact & Address</th>
                     <th className='py-4 px-4 text-center'>Authorized</th>
-                    <th className='py-4 px-4 text-center'>Account Status</th>
+                    <th className='py-4 px-4 text-center'>Subscription</th>
                     <th className='py-4 px-6 text-right'>Action</th>
                   </tr>
                 </thead>
@@ -224,6 +234,7 @@ export function Agents() {
                           <Switch 
                             checked={agent.isAuthorized}
                             onCheckedChange={() => toggleAuthorization(agent._id, agent.isAuthorized)}
+                            disabled={togglingId === agent._id}
                             className='data-[state=checked]:bg-green-500'
                           />
                           {agent.isAuthorized ? (
@@ -242,15 +253,16 @@ export function Agents() {
                           <Switch 
                             checked={agent.isActive}
                             onCheckedChange={() => toggleActivation(agent._id, agent.isActive)}
+                            disabled={togglingId === agent._id}
                             className='data-[state=checked]:bg-indigo-600'
                           />
                           {agent.isActive ? (
-                            <span className='inline-flex items-center text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/20 px-2.5 py-0.5 rounded-full'>
-                              Active
+                            <span className='inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 bg-indigo-50 dark:bg-indigo-950/20 px-2.5 py-0.5 rounded-full'>
+                              <CreditCard className='h-3 w-3' /> Active (Paid)
                             </span>
                           ) : (
-                            <span className='inline-flex items-center text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/20 px-2.5 py-0.5 rounded-full'>
-                              Inactive
+                            <span className='inline-flex items-center gap-1 text-xs font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/20 px-2.5 py-0.5 rounded-full'>
+                              <AlertTriangle className='h-3 w-3' /> Inactive (Unpaid)
                             </span>
                           )}
                         </div>

@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'dynamic-media-cdn.tripadvisor.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com',
+      },
     ],
     minimumCacheTTL: 60 * 60 * 24 * 30,
   },
@@ -29,10 +33,8 @@ const nextConfig: NextConfig = {
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
-};
 
-module.exports = {
   allowedDevOrigins: ['10.58.83.132'],
-}
+};
 
 export default nextConfig;

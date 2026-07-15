@@ -1,5 +1,21 @@
 import type { Metadata } from "next";
+import { Space_Grotesk, Instrument_Serif } from "next/font/google";
 import { siteConfig } from "../../config/site";
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-guide-space-grotesk",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-guide-instrument-serif",
+});
 
 export const metadata: Metadata = {
   title: `Become a Guide - Join ${siteConfig.projectName} | ${siteConfig.projectName}`,
@@ -12,5 +28,9 @@ export const metadata: Metadata = {
 };
 
 export default function BecomeAGuideLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <div className={`${spaceGrotesk.variable} ${instrumentSerif.variable}`}>
+      {children}
+    </div>
+  );
 }

@@ -9,7 +9,6 @@ import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
 import { 
   ChevronLeft, 
-  User, 
   Mail, 
   Phone, 
   MapPin, 
@@ -21,7 +20,9 @@ import {
   ShieldCheck, 
   ShieldAlert, 
   Globe, 
-  Lock 
+  Lock,
+  CreditCard,
+  AlertTriangle
 } from 'lucide-react'
 import api from '@/lib/api'
 
@@ -65,6 +66,8 @@ export function AgentDetail() {
   const [packages, setPackages] = useState<TourPlan[]>([])
   const [metrics, setMetrics] = useState<Metrics>({ totalPackages: 0, activePackages: 0, totalBookings: 0, revenue: 0 })
   const [loading, setLoading] = useState(true)
+  const [togglingAuth, setTogglingAuth] = useState(false)
+  const [togglingStatus, setTogglingStatus] = useState(false)
 
   const fetchAgentData = async () => {
     setLoading(true)
@@ -95,36 +98,40 @@ export function AgentDetail() {
   }, [agentId])
 
   const toggleAuthorization = async () => {
-    if (!agent) return
+    if (!agent || togglingAuth || togglingStatus) return
     const updatedStatus = !agent.isAuthorized
+    setTogglingAuth(true)
     try {
       const response = await api.patch(`/super-admin/agents/${agentId}/authorize`, {
         isAuthorized: updatedStatus
       })
       toast.success(response.data.message || `Agent authorization set to ${updatedStatus}`)
       setAgent(prev => prev ? { ...prev, isAuthorized: updatedStatus } : null)
-      // Sync metrics immediately since active packages counts depend on authorization status
       const metricsRes = await api.get(`/super-admin/agents/${agentId}/metrics`)
       setMetrics(metricsRes.data)
     } catch (error: any) {
       toast.error('Failed to update authorization: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setTogglingAuth(false)
     }
   }
 
   const toggleActivation = async () => {
-    if (!agent) return
+    if (!agent || togglingStatus || togglingAuth) return
     const updatedStatus = !agent.isActive
+    setTogglingStatus(true)
     try {
       const response = await api.patch(`/super-admin/agents/${agentId}/status`, {
         isActive: updatedStatus
       })
       toast.success(response.data.message || `Agent account status set to ${updatedStatus}`)
       setAgent(prev => prev ? { ...prev, isActive: updatedStatus } : null)
-      // Sync metrics
       const metricsRes = await api.get(`/super-admin/agents/${agentId}/metrics`)
       setMetrics(metricsRes.data)
     } catch (error: any) {
-      toast.error('Failed to update active status: ' + (error.response?.data?.message || error.message))
+      toast.error('Failed to update account status: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setTogglingStatus(false)
     }
   }
 
@@ -250,6 +257,7 @@ export function AgentDetail() {
                   <Switch 
                     checked={agent.isAuthorized}
                     onCheckedChange={toggleAuthorization}
+                    disabled={togglingAuth || togglingStatus}
                     className='data-[state=checked]:bg-green-500'
                   />
                 </div>
@@ -259,18 +267,23 @@ export function AgentDetail() {
               <div className='border rounded-xl p-5 flex flex-col justify-between gap-4 bg-muted/10'>
                 <div>
                   <div className='flex items-center gap-2 mb-2'>
-                    <User className='h-5 w-5 text-indigo-500' />
-                    <h4 className='font-bold text-lg'>Account Activation</h4>
+                    {agent.isActive ? (
+                      <CreditCard className='h-5 w-5 text-indigo-500' />
+                    ) : (
+                      <AlertTriangle className='h-5 w-5 text-rose-500' />
+                    )}
+                    <h4 className='font-bold text-lg'>Subscription Status</h4>
                   </div>
                   <p className='text-xs text-muted-foreground leading-relaxed'>
-                    Deactivating an agent immediately blocks their access to the admin portal and removes all public packages from being visible to travelers.
+                    Toggle whether this agent has paid their subscription fee. Deactivating immediately blocks their access and hides all public packages from travelers.
                   </p>
                 </div>
                 <div className='flex items-center justify-between border-t pt-4'>
-                  <span className='text-sm font-semibold'>{agent.isActive ? 'Active Account' : 'Deactivated'}</span>
+                  <span className='text-sm font-semibold'>{agent.isActive ? 'Active (Paid)' : 'Inactive (Unpaid)'}</span>
                   <Switch 
                     checked={agent.isActive}
                     onCheckedChange={toggleActivation}
+                    disabled={togglingStatus || togglingAuth}
                     className='data-[state=checked]:bg-indigo-600'
                   />
                 </div>

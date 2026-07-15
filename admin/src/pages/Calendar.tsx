@@ -1,58 +1,71 @@
 import { useState, useEffect } from "react"
 import { CalendarView, type Event } from "@/components/calendar/CalendarView"
 import { ScheduleDetails } from "@/components/calendar/ScheduleDetails"
+import { DayBookingsSheet } from "@/components/calendar/DayBookingsSheet"
 import api from "@/lib/axios"
+
+interface BookingResponse {
+  _id: string
+  travelerName: string
+  travelerPhone?: string
+  tripDate: string
+  numberOfTravelers: number
+  paymentStatus: "unpaid" | "advance_paid" | "fully_paid"
+  tourPlanId?: {
+    title?: string
+    locations?: string[]
+    durationDays?: number
+    durationNights?: number
+  }
+}
+
+const paymentColor: Record<BookingResponse["paymentStatus"], string> = {
+  fully_paid: "bg-green-500",
+  advance_paid: "bg-orange-500",
+  unpaid: "bg-gray-500",
+}
 
 export default function Calendar() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [detailsOpen, setDetailsOpen] = useState(false)
+  const [dayList, setDayList] = useState<{ date: Date; events: Event[] } | null>(null)
+  const [dayListOpen, setDayListOpen] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true)
-        // Fetch Tour Plans (Packages)
-        const { data: plans } = await api.get("/api/tour-plans")
-        
-        // Map Tour Plans to Calendar Events
-        // Since Tour Plans don't have fixed dates in the current schema,
-        // we map them to events spread across the current month for visualization.
-        const mappedEvents: Event[] = plans.map((plan: any, index: number) => {
-          const startDate = new Date()
-          startDate.setDate(1 + (index * 5) % 25) // Spread them out
-          startDate.setMonth(new Date().getMonth()) // Current month
-          
-          const endDate = new Date(startDate)
-          endDate.setDate(startDate.getDate() + (plan.durationDays || 3))
+        // Only confirmed bookings belong on the calendar - it's meant to be
+        // the guide's "who's actually coming" view, not raw inquiries.
+        const { data } = await api.get("/api/bookings/mine", {
+          params: { status: "confirmed", limit: 500 },
+        })
+        const bookings: BookingResponse[] = data.data
+
+        const mappedEvents: Event[] = bookings.map((booking) => {
+          const start = new Date(booking.tripDate)
+          const end = new Date(start)
+          end.setDate(start.getDate() + Math.max(1, booking.tourPlanId?.durationDays || 1))
 
           return {
-            id: plan._id,
-            title: plan.title,
-            start: startDate,
-            end: endDate,
+            id: booking._id,
+            title: `${booking.travelerName} · ${booking.tourPlanId?.title || "Custom Package"}`,
+            start,
+            end,
             type: "tour",
-            color: index % 4 === 0 
-              ? "bg-blue-500" 
-              : index % 4 === 1 
-              ? "bg-purple-500"
-              : index % 4 === 2
-              ? "bg-green-500"
-              : "bg-orange-500",
-            destination: plan.locations?.join(", ") || "Various",
-            duration: `${plan.durationDays || 0} Days / ${plan.durationNights || 0} Nights`,
-            participants: 10 + (index * 5), // Mock participant data as it's not in TourPlan schema
-            meetingPoints: [
-              { type: "AIRPORT", name: "Local International Airport", time: "08:00 AM" },
-              { type: "AIRPORT", name: "Local International Airport", time: "04:30 PM", isFinish: true },
-            ]
+            color: paymentColor[booking.paymentStatus],
+            destination: booking.tourPlanId?.locations?.join(", ") || "Not specified",
+            duration: `${booking.tourPlanId?.durationDays ?? 0} Days / ${booking.tourPlanId?.durationNights ?? 0} Nights`,
+            participants: booking.numberOfTravelers,
+            travelerName: booking.travelerName,
+            travelerPhone: booking.travelerPhone,
+            paymentStatus: booking.paymentStatus,
           }
         })
 
         setEvents(mappedEvents)
-        if (mappedEvents.length > 0) {
-          setSelectedEvent(mappedEvents[0])
-        }
       } catch (error) {
         console.error("Error fetching calendar data:", error)
       } finally {
@@ -63,6 +76,21 @@ export default function Calendar() {
     fetchData()
   }, [])
 
+  const handleSelectEvent = (event: Event) => {
+    setSelectedEvent(event)
+    setDetailsOpen(true)
+  }
+
+  const handleShowMore = (date: Date, dayEvents: Event[]) => {
+    setDayList({ date, events: dayEvents })
+    setDayListOpen(true)
+  }
+
+  const handleSelectFromDayList = (event: Event) => {
+    setDayListOpen(false)
+    handleSelectEvent(event)
+  }
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
@@ -72,18 +100,29 @@ export default function Calendar() {
   }
 
   return (
-    <div className="flex h-full flex-col text-foreground pr-2">
-      <div className="flex flex-1 gap-6 overflow-hidden min-h-[700px]">
-        {/* Main Calendar Area */}
-        <CalendarView 
-          events={events} 
-          selectedEvent={selectedEvent} 
-          onSelectEvent={setSelectedEvent} 
+    <div className="flex h-full min-h-0 flex-col text-foreground pr-2">
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+        <CalendarView
+          events={events}
+          selectedEvent={detailsOpen ? selectedEvent : null}
+          onSelectEvent={handleSelectEvent}
+          onShowMore={handleShowMore}
         />
-
-        {/* Sidebar: Schedule Details */}
-        <ScheduleDetails selectedEvent={selectedEvent} />
       </div>
+
+      <ScheduleDetails
+        selectedEvent={selectedEvent}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+      />
+
+      <DayBookingsSheet
+        date={dayList?.date ?? null}
+        events={dayList?.events ?? []}
+        open={dayListOpen}
+        onOpenChange={setDayListOpen}
+        onSelectEvent={handleSelectFromDayList}
+      />
     </div>
   )
 }

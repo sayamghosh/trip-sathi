@@ -4,7 +4,7 @@ import Booking from '../models/booking.model.js';
 import TourPlan from '../models/tourPlan.model.js';
 import CallbackRequest from '../models/callbackRequest.model.js';
 
-const TOUR_PLAN_POPULATE = 'title basePrice durationDays durationNights';
+const TOUR_PLAN_POPULATE = 'title basePrice durationDays durationNights locations';
 
 export const createBooking = async (req: Request, res: Response): Promise<void> => {
     try {

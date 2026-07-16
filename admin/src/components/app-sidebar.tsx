@@ -4,7 +4,6 @@ import {
   BookCheck,
   CalendarDays,
   Users,
-  Compass,
   ImageIcon,
   MessageCircle,
   Percent,
@@ -40,11 +39,10 @@ const baseItems = [
   { icon: BookCheck, label: "Bookings", to: "/bookings", isAvailable: true },
   { icon: CalendarDays, label: "Calendar", to: "/calendar", isAvailable: true },
   { icon: Users, label: "Travelers", to: "/travelers", isAvailable: true }, // Badge will be injected dynamically
-  { icon: Compass, label: "Guides", to: "/guides", isAvailable: false },
-  { icon: ImageIcon, label: "Gallery", to: "/gallery", isAvailable: false },
-  { icon: MessageCircle, label: "Messages", to: "/messages", badge: 7, isAvailable: false },
-  { icon: Percent, label: "Deals", to: "/deals", isAvailable: false },
+  { icon: MessageCircle, label: "Messages", to: "/messages", isAvailable: false },
   { icon: ThumbsUp, label: "Feedback", to: "/feedback", isAvailable: false },
+  { icon: ImageIcon, label: "Gallery", to: "/gallery", isAvailable: false },
+  { icon: Percent, label: "Deals", to: "/deals", isAvailable: false },
 ]
 
 export function AppSidebar() {
@@ -141,7 +139,7 @@ export function AppSidebar() {
                           isCollapsed && "justify-center px-0",
                           (item.matchPaths ?? [item.to]).some(isActivePath)
                             ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                            : "text-sidebar-foreground/70"
+                            : "text-sidebar-foreground"
                         )}
                       >
                         <item.icon className="shrink-0 size-5!" />
@@ -164,9 +162,14 @@ export function AppSidebar() {
                       </>
                     )}
                   </SidebarMenuButton>
-                  {!isCollapsed && item.badge && (
+                  {!isCollapsed && item.isAvailable && "badge" in item && item.badge && (
                     <SidebarMenuBadge className="right-4 bg-sidebar-primary text-sidebar-primary-foreground">
                       {item.badge}
+                    </SidebarMenuBadge>
+                  )}
+                  {!isCollapsed && !item.isAvailable && (
+                    <SidebarMenuBadge className="right-4 bg-sidebar-accent text-sidebar-accent-foreground text-[10px] font-semibold tracking-wide">
+                      Soon
                     </SidebarMenuBadge>
                   )}
                 </SidebarMenuItem>
@@ -181,7 +184,7 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               className={cn(
-                "h-10 text-sidebar-foreground/80 hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
+                "h-10 text-sidebar-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
                 isCollapsed && "px-0 justify-center group-data-[collapsible=icon]:size-10!"
               )}
               onClick={handleLogout}

@@ -7,32 +7,30 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar'
-// import { AppTitle } from './app-title'
+import { AppTitle } from './app-title'
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
-import { TeamSwitcher } from './team-switcher'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   const { auth } = useAuthStore()
 
+  // The _authenticated route guard always populates auth.user before this
+  // renders, but keep a neutral fallback (never a hardcoded fake person)
+  // in case of a render before that resolves.
   const dynamicUser = auth.user
     ? {
         name: auth.user.name || auth.user.email,
         email: auth.user.email,
-        avatar: auth.user.picture || '/avatars/shadcn.jpg',
+        avatar: auth.user.picture || '',
       }
-    : sidebarData.user
+    : { name: 'Admin', email: '', avatar: '' }
 
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
-        <TeamSwitcher teams={sidebarData.teams} />
-
-        {/* Replace <TeamSwitch /> with the following <AppTitle />
-         /* if you want to use the normal app title instead of TeamSwitch dropdown */}
-        {/* <AppTitle /> */}
+        <AppTitle />
       </SidebarHeader>
       <SidebarContent>
         {sidebarData.navGroups.map((props) => (

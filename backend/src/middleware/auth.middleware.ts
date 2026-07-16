@@ -23,6 +23,30 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction):
     }
 };
 
+// Attaches req.user when a valid token is present, but never rejects the
+// request - for endpoints usable by both guests and logged-in users.
+export const optionalAuthMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        next();
+        return;
+    }
+
+    const token = authHeader.split(' ')[1] as string;
+    const jwtSecret = process.env.JWT_SECRET || 'fallback_secret_for_development_only';
+
+    try {
+        const decoded = jwt.verify(token, jwtSecret) as unknown as { id: string; role: string };
+        (req as any).user = {
+            id: decoded.id,
+            role: decoded.role
+        };
+    } catch {
+        // Invalid/expired token on an optional-auth route - proceed as a guest.
+    }
+    next();
+};
+
 export const isGuide = (req: Request, res: Response, next: NextFunction): void => {
     const user = (req as any).user;
     if (!user || (user.role !== 'guide' && user.role !== 'admin')) {

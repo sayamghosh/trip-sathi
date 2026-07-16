@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: `About Us - Our Journey | ${siteConfig.projectName}`,
   description: `Learn about ${siteConfig.projectName}'s mission to simplify travel planning. Discover how we connect travelers with trusted local guides and curated experiences across India.`,
   keywords: [`about ${siteConfig.projectName}`, 'travel platform', 'local guides', 'mission', 'travel planning'],
+  alternates: { canonical: '/about' },
 };
 
 const testimonials = [

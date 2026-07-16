@@ -1,28 +1,28 @@
 import { motion } from 'framer-motion';
-import { Banknote, Building2, Headset, Copy } from 'lucide-react';
+import { Handshake, ShieldCheck, MessageCircle, Star } from 'lucide-react';
 import OptimizedImage from './ui/OptimizedImage';
 import { siteConfig } from '../config/site';
 
 const features = [
     {
-        icon: Banknote,
-        title: 'Best Price Transparency',
-        desc: 'Every hotel and activity is screened for quality, location, and guest satisfaction.'
+        icon: Handshake,
+        title: 'Direct Connections, No Middleman',
+        desc: 'Every trip is arranged directly between you and your guide, with transparent pricing and zero platform commission.'
     },
     {
-        icon: Building2,
-        title: 'Curated Stays & Experiences',
-        desc: 'Every hotel and activity is screened for quality, location, and guest satisfaction.'
+        icon: ShieldCheck,
+        title: '100% Verified Guides',
+        desc: "Every guide is identity-verified and reviewed by our team before their profile goes live, so you know who you're traveling with."
     },
     {
-        icon: Headset,
-        title: '24/7 Travel Support',
-        desc: 'From last-minute changes to urgent help, our support team is always on standby.'
+        icon: MessageCircle,
+        title: 'Talk to Your Guide, Not a Call Center',
+        desc: 'Once you connect, you have your guide\'s direct contact — reach out anytime with questions or last-minute changes.'
     },
     {
-        icon: Copy,
-        title: 'Flexible Plans & Free Cancellations',
-        desc: 'Many stays and packages offer flexible dates and generous cancellation policies.'
+        icon: Star,
+        title: 'Real Reviews From Real Travelers',
+        desc: "See honest ratings from travelers who've taken the trip before you, so you can choose your guide with confidence."
     }
 ];
 

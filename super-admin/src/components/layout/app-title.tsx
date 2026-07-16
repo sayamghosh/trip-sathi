@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
+import { siteConfig } from '@/config/site'
 import { cn } from '@/lib/utils'
 import {
   SidebarMenu,
@@ -25,8 +26,8 @@ export function AppTitle() {
               onClick={() => setOpenMobile(false)}
               className='grid flex-1 text-start text-sm leading-tight'
             >
-              <span className='truncate font-bold'>Shadcn-Admin</span>
-              <span className='truncate text-xs'>Vite + ShadcnUI</span>
+              <span className='truncate font-bold'>{siteConfig.projectName}</span>
+              <span className='truncate text-xs'>Super Admin</span>
             </Link>
             <ToggleSidebar />
           </div>

@@ -12,6 +12,9 @@ export interface Event {
   destination?: string
   duration?: string
   participants?: number
+  travelerName?: string
+  travelerPhone?: string
+  paymentStatus?: "unpaid" | "advance_paid" | "fully_paid"
   meetingPoints?: {
     type: "AIRPORT" | "STATION"
     name: string
@@ -26,15 +29,27 @@ interface CalendarViewProps {
   events: Event[]
   selectedEvent: Event | null
   onSelectEvent: (event: Event) => void
+  onShowMore?: (date: Date, events: Event[]) => void
 }
 
-export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarViewProps) {
+function paymentChipStyle(paymentStatus?: string): string {
+  switch (paymentStatus) {
+    case "fully_paid":
+      return "bg-[#e6f4ea] text-[#0d652d] dark:bg-green-900/30 dark:text-green-200"
+    case "advance_paid":
+      return "bg-[#fef7e0] text-[#b06000] dark:bg-orange-900/30 dark:text-orange-200"
+    default:
+      return "bg-[#f1f3f4] text-[#3c4043] dark:bg-gray-800/40 dark:text-gray-300"
+  }
+}
+
+export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [view, setView] = useState<"Day" | "Week" | "Month">("Month")
 
 
 
-  const monthName = currentDate.toLocaleString("default", { month: "long" })
+  const monthName = currentDate.toLocaleString("default", { month: "short" }).toUpperCase()
   const year = currentDate.getFullYear()
 
   // Calendar logic
@@ -139,7 +154,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
   }, [events, currentDate, rowAssignments])
 
   return (
-    <div className="flex flex-1 flex-col rounded-3xl border border-border bg-card/50 dark:bg-background p-6 shadow-sm backdrop-blur-sm">
+    <div className="flex flex-1 min-h-0 flex-col rounded-3xl border border-border bg-card/50 dark:bg-background p-6 shadow-sm backdrop-blur-sm">
       {/* Calendar Header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-6">
@@ -196,9 +211,9 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
       </div>
 
       {/* Calendar content based on view */}
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-y-auto min-h-0">
         {view === "Month" && (
-          <div className="flex flex-1 flex-col border border-border bg-card rounded-md overflow-hidden">
+          <div className="flex flex-1 min-h-0 flex-col border border-border bg-card rounded-md">
             <div className="grid grid-cols-7 border-b border-border">
               {DAYS.map((day) => (
                 <div key={day} className="text-left text-sm font-medium text-foreground py-2.5 px-4 lg:px-4 border-r border-border last:border-r-0">
@@ -206,8 +221,8 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                 </div>
               ))}
             </div>
-            <div 
-              className="grid flex-1 grid-cols-7"
+            <div
+              className="grid flex-1 min-h-0 grid-cols-7"
               style={{ gridTemplateRows: `repeat(${rowsCount}, minmax(0, 1fr))` }}
             >
               {days.map((d, i) => {
@@ -225,14 +240,21 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                                currentDate.getMonth() === today.getMonth() && 
                                currentDate.getFullYear() === today.getFullYear()
                 
+                const hasEvents = dayEvents.length > 0
+
                 return (
                   <div
                     key={i}
+                    onClick={() => {
+                      if (dayEvents.length === 1) onSelectEvent(dayEvents[0])
+                      else if (dayEvents.length > 1) onShowMore?.(dayDate, dayEvents)
+                    }}
                     className={cn(
-                      "relative border-r border-b border-border transition-colors h-full flex flex-col pt-2 overflow-hidden",
+                      "relative border-r border-b border-border transition-colors h-full min-h-0 flex flex-col pt-2 overflow-hidden",
                       (i + 1) % 7 === 0 && "border-r-0",
                       i >= totalCells - 7 && "border-b-0",
-                      isToday ? "bg-background" : "bg-card"
+                      isToday ? "bg-background" : "bg-card",
+                      hasEvents && "cursor-pointer hover:bg-accent/40"
                     )}
                   >
                     <div className="px-3 mb-1.5 flex">
@@ -244,51 +266,36 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                         {d.day}
                       </span>
                     </div>
-                    <div className="flex flex-col gap-1 z-10 relative">
-                      {[0, 1, 2, 3].map((rowIndex) => {
-                        const event = dayEvents.find(e => rowAssignments[e.id] === rowIndex)
-                        if (event) {
-                          const eStart = new Date(event.start).setHours(0,0,0,0)
-                          const eEnd = new Date(event.end).setHours(0,0,0,0)
-                          
-                          const nDay = new Date(dayDate); nDay.setDate(dayDate.getDate() + 1); const nDate = nDay.setHours(0,0,0,0)
-                          const pDay = new Date(dayDate); pDay.setDate(dayDate.getDate() - 1); const pDate = pDay.setHours(0,0,0,0)
-                          
-                          const continuesNext = eEnd >= nDate
-                          const continuesPrev = eStart <= pDate
-                          
-                          // Custom pastel color mapping based on screenshot
-                          let colorStyle = "bg-[#fce8e6] text-[#8c1d18] border-[#c5221f] dark:bg-pink-900/30 dark:text-pink-200 dark:border-pink-700" // default pink
-                          const colorKey = event.color?.split(' ')[0]
-                          if (colorKey?.includes("blue")) colorStyle = "bg-[#d3e3fd] text-[#041e49] border-[#0b57d0] dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-700"
-                          if (colorKey?.includes("green")) colorStyle = "bg-[#e6f4ea] text-[#0d652d] border-[#137333] dark:bg-green-900/30 dark:text-green-200 dark:border-green-700"
-                          if (colorKey?.includes("purple")) colorStyle = "bg-[#f3e8fd] text-[#681fa2] border-[#8e24aa] dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-700"
-                          if (colorKey?.includes("orange")) colorStyle = "bg-[#fef7e0] text-[#b06000] border-[#e65100] dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700"
-
-                          return (
-                            <div
-                              key={event.id}
-                              onClick={() => onSelectEvent(event)}
-                              className={cn(
-                                "cursor-pointer h-[22px] px-2 text-xs font-medium leading-none flex items-center transition-opacity hover:opacity-80 active:opacity-60",
-                                colorStyle,
-                                !continuesPrev ? "rounded-l ml-2 border-l-[3px]" : "border-l-0 ml-0",
-                                !continuesNext ? "rounded-r mr-2" : "mr-0",
-                                selectedEvent?.id === event.id && "brightness-95 ring-1 ring-inset ring-black/5"
-                              )}
-                            >
-                              <span className="truncate w-full">{event.title}</span>
-                            </div>
-                          )
-                        }
-                        return <div key={rowIndex} className="h-[22px]" />
-                      })}
-                      {dayEvents.length > 4 && (
-                        <div className="text-[10px] font-bold text-muted-foreground/60 hover:text-foreground transition-colors pl-2 mt-0.5 cursor-default">
-                           + {dayEvents.length - 4} more
-                        </div>
-                      )}
-                    </div>
+                    {/* A single fixed-height summary row per day (one pill for a
+                        lone booking, one "N bookings" chip otherwise) instead of
+                        stacking one row per event - guarantees the indicator
+                        always fits and is never clipped, no matter how short a
+                        compressed 6-row month makes each cell. */}
+                    {dayEvents.length > 0 && (
+                      <div className="z-10 relative px-2">
+                        {dayEvents.length === 1 ? (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); onSelectEvent(dayEvents[0]) }}
+                            className={cn(
+                              "flex h-[22px] w-full items-center rounded px-2 text-left text-xs font-medium leading-none transition-opacity hover:opacity-80 active:opacity-60",
+                              paymentChipStyle(dayEvents[0].paymentStatus),
+                              selectedEvent?.id === dayEvents[0].id && "brightness-95 ring-1 ring-inset ring-black/5"
+                            )}
+                          >
+                            <span className="truncate w-full">{dayEvents[0].travelerName}</span>
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); onShowMore?.(dayDate, dayEvents) }}
+                            className="flex h-[22px] w-full items-center rounded bg-primary/10 px-2 text-left text-xs font-bold text-primary hover:bg-primary hover:text-white transition-colors"
+                          >
+                            {dayEvents.length} bookings
+                          </button>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )
               })}
@@ -352,6 +359,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                           if (colorKey?.includes("green")) colorStyle = "bg-[#e6f4ea] text-[#0d652d] border-[#137333] dark:bg-green-900/30 dark:text-green-200 dark:border-green-700"
                           if (colorKey?.includes("purple")) colorStyle = "bg-[#f3e8fd] text-[#681fa2] border-[#8e24aa] dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-700"
                           if (colorKey?.includes("orange")) colorStyle = "bg-[#fef7e0] text-[#b06000] border-[#e65100] dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700"
+                          if (colorKey?.includes("gray")) colorStyle = "bg-[#f1f3f4] text-[#3c4043] border-[#5f6368] dark:bg-gray-800/40 dark:text-gray-300 dark:border-gray-600"
 
                           return (
                             <div
@@ -433,7 +441,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                           <span className="text-xs font-black px-6 py-3 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/30 uppercase tracking-[0.2em]">{event.duration}</span>
                         </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
                           <div className="flex items-center gap-5 group/item">
                             <div className="p-4 rounded-2xl bg-accent group-hover/item:bg-primary/20 transition-all duration-300">
                                 <CalendarIcon className="h-6 w-6 text-primary" />
@@ -443,7 +451,20 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                                 <span className="text-lg font-bold text-foreground">{event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                           </div>
-                          
+
+                          {event.travelerName && (
+                            <div className="flex items-center gap-5 group/item">
+                              <div className="p-4 rounded-2xl bg-accent group-hover/item:bg-primary/20 transition-all duration-300">
+                                  <Users className="h-6 w-6 text-primary" />
+                              </div>
+                              <div>
+                                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5">Traveler</p>
+                                  <span className="text-lg font-bold text-foreground line-clamp-1">{event.travelerName}</span>
+                                  {event.travelerPhone && <span className="block text-sm font-medium text-muted-foreground">{event.travelerPhone}</span>}
+                              </div>
+                            </div>
+                          )}
+
                           {event.destination && (
                             <div className="flex items-center gap-5 group/item">
                               <div className="p-4 rounded-2xl bg-accent group-hover/item:bg-primary/20 transition-all duration-300">
@@ -461,10 +482,10 @@ export function CalendarView({ events, selectedEvent, onSelectEvent }: CalendarV
                                   <Users className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5">Status</p>
+                                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5">Payment</p>
                                   <span className="text-lg font-bold text-success flex items-center gap-2">
                                      <span className="h-2 w-2 rounded-full bg-current animate-pulse" />
-                                     Confirmed
+                                     {event.paymentStatus === "fully_paid" ? "Fully Paid" : event.paymentStatus === "advance_paid" ? "Advance Paid" : "Unpaid"}
                                   </span>
                               </div>
                           </div>

@@ -1,11 +1,18 @@
 import type { Request, Response } from 'express';
 import User from '../models/user.model.js';
-import jwt from 'jsonwebtoken';
+import TourPlan from '../models/tourPlan.model.js';
+
+const USERNAME_REGEX = /^[a-z0-9_]{3,30}$/;
+// The channel page lives at /guide/:username in the Next.js app, alongside
+// the guide's own static dashboard routes (/guide/dashboard, /guide/tour-plans) -
+// a guide claiming either word as their username would make those pages
+// unreachable, so they're blocked here.
+const RESERVED_USERNAMES = new Set(['dashboard', 'tour-plans']);
 
 // ─── Update guide profile ────────────────────────────────────────────────────
 export const updateGuideProfile = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { name, phone, address, bio, isProfilePublic } = req.body;
+        const { name, phone, address, bio, username } = req.body;
 
         // The user ID comes from the JWT middleware (set as req.user in middleware)
         const userInReq = (req as any).user;
@@ -39,12 +46,22 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
             updates.bio = bio.trim();
         }
 
-        if (typeof isProfilePublic === 'boolean') {
-            if (isProfilePublic && !user.isAuthorized) {
-                res.status(403).json({ message: 'Only authorized guides can make their profile public.' });
+        if (typeof username === 'string' && username.trim()) {
+            const normalized = username.trim().toLowerCase();
+            if (!USERNAME_REGEX.test(normalized)) {
+                res.status(400).json({ message: 'Username must be 3-30 characters, lowercase letters, numbers, or underscores only.' });
                 return;
             }
-            updates.isProfilePublic = isProfilePublic;
+            if (RESERVED_USERNAMES.has(normalized)) {
+                res.status(400).json({ message: 'That username is reserved. Please choose another.' });
+                return;
+            }
+            const existing = await User.findOne({ username: normalized, _id: { $ne: userId } });
+            if (existing) {
+                res.status(409).json({ message: 'That username is already taken.' });
+                return;
+            }
+            updates.username = normalized;
         }
 
         const updatedUser = await User.findByIdAndUpdate(
@@ -69,9 +86,9 @@ export const updateGuideProfile = async (req: Request, res: Response): Promise<v
                 phone: updatedUser.phone,
                 address: updatedUser.address,
                 bio: updatedUser.bio,
+                username: updatedUser.username,
                 isAuthorized: updatedUser.isAuthorized,
                 isActive: updatedUser.isActive,
-                isProfilePublic: updatedUser.isProfilePublic,
             },
         });
     } catch (error: any) {
@@ -98,5 +115,41 @@ export const getProfileMe = async (req: Request, res: Response): Promise<void> =
         res.status(200).json(user);
     } catch (error: any) {
         res.status(500).json({ message: 'Error retrieving profile', error: error.message });
+    }
+};
+
+// ─── Public guide channel page (by username) ─────────────────────────────────
+// A channel page goes live automatically the moment an authorized, active
+// guide sets a username - no separate "make public" step to forget about.
+export const getGuideChannelByUsername = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { username } = req.params as any;
+
+        const guide = await User.findOne({
+            username: username?.toLowerCase(),
+            role: 'guide',
+            isAuthorized: true,
+            isActive: true,
+        }).select('name picture bio address username createdAt');
+
+        if (!guide) {
+            res.status(404).json({ message: 'Guide channel not found' });
+            return;
+        }
+
+        const totalPackages = await TourPlan.countDocuments({ guideId: guide._id, isPublic: true });
+
+        res.status(200).json({
+            id: guide._id,
+            name: guide.name,
+            picture: guide.picture,
+            bio: guide.bio,
+            address: guide.address,
+            username: guide.username,
+            memberSince: (guide as any).createdAt,
+            totalPackages,
+        });
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error retrieving guide channel', error: error.message });
     }
 };

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { siteConfig } from "../config/site";
 import { ContactUsTrigger } from "./ContactUsModal";
+import { NewsletterSubscribeForm } from "./NewsletterSubscribeForm";
 
 const GUIDE_LOGIN_URL =
   process.env.NEXT_PUBLIC_ADMIN_APP_URL || "http://localhost:3001/login";
@@ -25,17 +26,7 @@ const Footer = () => {
               </div>
 
               {/* SUBSCRIBE */}
-              <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="w-full sm:w-[320px] h-13 rounded-full bg-[#2E69E3] px-6 text-white placeholder:text-white/70 outline-none border border-white/10 focus:border-white/40"
-                />
-
-                <button className="w-full sm:w-auto h-13 px-8 rounded-full bg-white text-black font-medium cursor-pointer hover:bg-neutral-200">
-                  Subscribe
-                </button>
-              </div>
+              <NewsletterSubscribeForm />
             </div>
 
             {/* RIGHT SECTION */}

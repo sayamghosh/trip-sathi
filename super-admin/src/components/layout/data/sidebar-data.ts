@@ -9,6 +9,7 @@ import {
   Construction,
   HelpCircle,
   Mail,
+  Send,
 } from 'lucide-react'
 import { type SidebarData } from '../types'
 
@@ -31,6 +32,11 @@ export const sidebarData: SidebarData = {
           title: 'Contact Messages',
           url: '/contact-messages',
           icon: Mail,
+        },
+        {
+          title: 'Newsletter',
+          url: '/newsletter',
+          icon: Send,
         },
       ],
     },

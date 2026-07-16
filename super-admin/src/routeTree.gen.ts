@@ -17,6 +17,7 @@ import { Route as errors404RouteImport } from './routes/(errors)/404'
 import { Route as errors403RouteImport } from './routes/(errors)/403'
 import { Route as errors401RouteImport } from './routes/(errors)/401'
 import { Route as authSignInRouteImport } from './routes/(auth)/sign-in'
+import { Route as AuthenticatedNewsletterIndexRouteImport } from './routes/_authenticated/newsletter/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedContactMessagesIndexRouteImport } from './routes/_authenticated/contact-messages/index'
 import { Route as AuthenticatedAgentsIndexRouteImport } from './routes/_authenticated/agents/index'
@@ -62,6 +63,12 @@ const authSignInRoute = authSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedNewsletterIndexRoute =
+  AuthenticatedNewsletterIndexRouteImport.update({
+    id: '/newsletter/',
+    path: '/newsletter/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
@@ -106,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/agents/': typeof AuthenticatedAgentsIndexRoute
   '/contact-messages/': typeof AuthenticatedContactMessagesIndexRoute
   '/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/newsletter/': typeof AuthenticatedNewsletterIndexRoute
 }
 export interface FileRoutesByTo {
   '/sign-in': typeof authSignInRoute
@@ -120,6 +128,7 @@ export interface FileRoutesByTo {
   '/agents': typeof AuthenticatedAgentsIndexRoute
   '/contact-messages': typeof AuthenticatedContactMessagesIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/newsletter': typeof AuthenticatedNewsletterIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -136,6 +145,7 @@ export interface FileRoutesById {
   '/_authenticated/agents/': typeof AuthenticatedAgentsIndexRoute
   '/_authenticated/contact-messages/': typeof AuthenticatedContactMessagesIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/newsletter/': typeof AuthenticatedNewsletterIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -152,6 +162,7 @@ export interface FileRouteTypes {
     | '/agents/'
     | '/contact-messages/'
     | '/help-center/'
+    | '/newsletter/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/sign-in'
@@ -166,6 +177,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/contact-messages'
     | '/help-center'
+    | '/newsletter'
   id:
     | '__root__'
     | '/_authenticated'
@@ -181,6 +193,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents/'
     | '/_authenticated/contact-messages/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/newsletter/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authSignInRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/newsletter/': {
+      id: '/_authenticated/newsletter/'
+      path: '/newsletter'
+      fullPath: '/newsletter/'
+      preLoaderRoute: typeof AuthenticatedNewsletterIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -296,6 +316,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgentsIndexRoute: typeof AuthenticatedAgentsIndexRoute
   AuthenticatedContactMessagesIndexRoute: typeof AuthenticatedContactMessagesIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedNewsletterIndexRoute: typeof AuthenticatedNewsletterIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -306,6 +327,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedContactMessagesIndexRoute:
     AuthenticatedContactMessagesIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedNewsletterIndexRoute: AuthenticatedNewsletterIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

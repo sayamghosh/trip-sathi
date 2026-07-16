@@ -21,7 +21,7 @@ export default function ClientShell({ children }: { children: React.ReactNode })
                     <Navbar />
                 </Suspense>
             )}
-            <main id="main-content">
+            <main id="main-content" className="min-h-screen">
                 {children}
             </main>
             {!hasOwnChrome && (

@@ -1,10 +1,13 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { BadgeCheck, Clock, MapPin, Package } from 'lucide-react';
+import { BadgeCheck, Package } from 'lucide-react';
 import { siteConfig } from '../../../config/site';
 import { getGuideChannel, getGuideTourPlans } from '../../../services/guideChannel.service';
 import { getOptimizedImageUrl } from '../../../lib/utils';
+import { ShareProfileButton } from '../../../components/guide/ShareProfileButton';
+import { ProfileTabs } from '../../../components/guide/ProfileTabs';
+import { TourPlanCard } from '../../../components/guide/TourPlanCard';
+import { Button } from '../../../components/ui/button';
 
 type Props = {
   params: Promise<{ username: string }>;
@@ -36,9 +39,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
-const formatDuration = (days: number, nights: number) => `${nights} Night${nights !== 1 ? 's' : ''} / ${days} Day${days !== 1 ? 's' : ''}`;
-
 export default async function GuideChannelPage({ params }: Props) {
   const { username } = await params;
   const guide = await getGuideChannel(username);
@@ -48,92 +48,112 @@ export default async function GuideChannelPage({ params }: Props) {
   }
 
   const plans = await getGuideTourPlans(guide.id).catch(() => []);
+  const memberSinceYear = new Date(guide.memberSince).getFullYear();
+
+  const stats = [
+    { label: 'Packages', value: guide.totalPackages },
+    { label: 'Member since', value: Number.isNaN(memberSinceYear) ? '—' : memberSinceYear },
+  ];
 
   return (
-    <main className="bg-white min-h-screen">
-      {/* Channel header */}
-      <div className="bg-linear-to-br from-brand-dark via-brand-primary to-brand-secondary">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
-          <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 text-white">
-            <div className="h-28 w-28 sm:h-36 sm:w-36 shrink-0 rounded-full border-4 border-white/30 shadow-2xl overflow-hidden bg-white/10">
+    <main className="min-h-screen bg-white pt-15">
+      {/* Soft gradient banner */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-100 via-fuchsia-50 to-orange-50" />
+        <div className="absolute top-0 left-1/4 h-56 w-72 -translate-y-1/3 rounded-full bg-indigo-300/30 blur-3xl" />
+        <div className="absolute top-0 right-1/3 h-48 w-64 -translate-y-1/4 rounded-full bg-fuchsia-200/30 blur-3xl" />
+        <div className="relative h-32 sm:h-40" />
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+        {/* Identity row */}
+        <div className="-mt-20 flex flex-col gap-8 sm:-mt-24 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col items-start gap-6 sm:flex-row">
+            <div className="h-32 w-32 shrink-0 overflow-hidden rounded-[28px] bg-slate-100 shadow-xl ring-4 ring-white sm:h-44 sm:w-44">
               {guide.picture ? (
-                <img src={getOptimizedImageUrl(guide.picture, 200)} alt={guide.name} className="h-full w-full object-cover" />
+                <img
+                  src={getOptimizedImageUrl(guide.picture, 250)}
+                  alt={guide.name}
+                  className="h-full w-full object-cover"
+                />
               ) : (
-                <div className="h-full w-full flex items-center justify-center text-4xl font-black">
+                <div className="flex h-full w-full items-center justify-center bg-brand-primary/10 text-5xl font-black text-brand-primary">
                   {guide.name?.[0]?.toUpperCase() ?? 'G'}
                 </div>
               )}
             </div>
-            <div className="text-center sm:text-left">
-              <div className="flex items-center justify-center sm:justify-start gap-2">
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight font-display">{guide.name}</h1>
-                <BadgeCheck className="h-7 w-7 text-emerald-300 shrink-0" />
-              </div>
-              <div className="mt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-sm font-medium text-white/85">
-                <span>@{guide.username}</span>
-                {guide.address && (
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-4 w-4" /> {guide.address}
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1">
-                  <Package className="h-4 w-4" /> {guide.totalPackages} package{guide.totalPackages !== 1 ? 's' : ''}
+
+            <div className="pt-2 sm:pb-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="font-display text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
+                  {guide.name}
+                </h1>
+                <span className="inline-flex items-center gap-1 rounded-md bg-brand-primary px-2 py-0.5 text-xs font-bold text-white">
+                  <BadgeCheck className="h-3.5 w-3.5" /> Verified
                 </span>
               </div>
-              {guide.bio && (
-                <p className="mt-4 max-w-xl text-sm sm:text-base text-white/90 leading-relaxed">{guide.bio}</p>
-              )}
+              <p className="mt-2 max-w-md text-sm font-medium text-slate-500 sm:text-base">
+                @{guide.username}
+                {guide.address ? ` · ${guide.address}` : ''}
+              </p>
+
+              <div className="mt-5 flex items-center gap-3">
+                <ShareProfileButton className="rounded-lg bg-slate-900 text-white hover:bg-slate-800" />
+                <Button asChild variant="outline" className="rounded-lg">
+                  <a href="#packages">View packages</a>
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Packages grid */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <h2 className="text-2xl font-bold text-gray-900 font-display mb-8">
-          Packages by {guide.name}
-        </h2>
-
-        {plans.length === 0 ? (
-          <p className="text-center text-gray-400 py-16 text-lg">No packages published yet — check back soon.</p>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {plans.map((plan) => (
-              <Link href={`/guides/${plan._id}`} key={plan._id} className="block">
-                <div className="bg-[#F8FAFF] rounded-[20px] border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-300 group cursor-pointer h-full overflow-hidden">
-                  <div className="h-52 overflow-hidden relative">
-                    <img
-                      src={getOptimizedImageUrl(plan.bannerImages?.[0] || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=600&q=80', 600)}
-                      alt={plan.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold text-gray-800 shadow-sm">
-                      <Clock size={14} className="text-brand-primary" />
-                      {formatDuration(plan.durationDays, plan.durationNights)}
-                    </div>
-                  </div>
-                  <div className="p-5 flex flex-col gap-2">
-                    <h3 className="text-lg font-extrabold text-gray-900 leading-tight group-hover:text-brand-primary transition-colors line-clamp-2">
-                      {plan.title}
-                    </h3>
-                    <div className="flex flex-wrap gap-1 text-[12px] text-gray-500 font-medium">
-                      {(plan.locations ?? []).slice(0, 3).map((loc) => (
-                        <span key={loc} className="inline-flex items-center gap-1 bg-white border border-gray-100 rounded-full px-2 py-1">
-                          <MapPin size={12} className="text-brand-primary" /> {loc}
-                        </span>
-                      ))}
-                    </div>
-                    <div className="mt-2 flex items-center justify-between pt-3 border-t border-gray-100">
-                      <p className="text-xl font-black text-brand-primary">{formatPrice(plan.basePrice)}</p>
-                      <span className="text-sm font-semibold text-brand-primary group-hover:underline">View details</span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
+          <div className="flex items-center gap-10 lg:pb-1">
+            {stats.map((stat) => (
+              <div key={stat.label}>
+                <p className="text-sm font-medium text-slate-500">{stat.label}</p>
+                <p className="text-2xl font-black text-slate-900">{stat.value}</p>
+              </div>
             ))}
           </div>
-        )}
+        </div>
+
+        {/* Tabs */}
+        <div id="packages" className="mt-10 scroll-mt-24">
+          <ProfileTabs
+            tabs={[
+              {
+                key: 'packages',
+                label: 'Packages',
+                count: plans.length,
+                content:
+                  plans.length === 0 ? (
+                    <div className="flex flex-col items-center gap-2 py-16 text-center">
+                      <Package className="h-8 w-8 text-slate-300" />
+                      <p className="text-lg text-slate-400">No packages published yet — check back soon.</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                      {plans.map((plan) => (
+                        <TourPlanCard key={plan._id} plan={plan} />
+                      ))}
+                    </div>
+                  ),
+              },
+              {
+                key: 'about',
+                label: 'About',
+                content: (
+                  <div className="max-w-2xl">
+                    {guide.bio ? (
+                      <p className="whitespace-pre-line text-base leading-relaxed text-slate-700">{guide.bio}</p>
+                    ) : (
+                      <p className="text-base text-slate-400">{guide.name} hasn&apos;t added a bio yet.</p>
+                    )}
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </div>
       </div>
     </main>
   );

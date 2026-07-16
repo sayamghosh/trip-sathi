@@ -7,17 +7,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts"
-import { ChevronDown } from "lucide-react"
+import { useQuery } from "@tanstack/react-query"
+import api from "@/lib/axios"
 
-const data = [
-  { day: "Sun", value: 180 },
-  { day: "Mon", value: 350 },
-  { day: "Tue", value: 380 },
-  { day: "Wed", value: 420 },
-  { day: "Thu", value: 635 },
-  { day: "Fri", value: 380 },
-  { day: "Sat", value: 320 },
-]
+interface BookingMetricsResponse {
+  monthly: { month: string; confirmed: number; cancelled: number; revenue: number }[]
+}
 
 interface CustomTooltipProps {
   active?: boolean
@@ -31,7 +26,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
       <div className="rounded-[8px] border border-border bg-card px-3 py-1.5 shadow-lg">
         <p className="text-[10px] text-muted-foreground">{label}</p>
         <p className="text-[13px] font-bold text-foreground">
-          ${payload[0].value}
+          ₹{payload[0].value.toLocaleString('en-IN')}
         </p>
       </div>
     )
@@ -40,16 +35,25 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 }
 
 export function RevenueChart() {
+  const { data: metrics } = useQuery<BookingMetricsResponse>({
+    queryKey: ['bookings', 'metrics'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/bookings/metrics')
+      return data as BookingMetricsResponse
+    },
+  })
+
+  const data = (metrics?.monthly || []).map(m => ({ month: m.month, value: m.revenue }))
+
   return (
     <div className="rounded-[14px] border border-border bg-card p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-[14px] font-semibold text-foreground">
           Revenue Overview
         </h3>
-        <button className="flex items-center gap-1 rounded-[8px] bg-primary px-3 py-[5px] text-[11px] font-medium text-white transition hover:bg-primary/90">
-          Weekly
-          <ChevronDown className="h-3 w-3" />
-        </button>
+        <span className="rounded-[8px] bg-primary px-3 py-[5px] text-[11px] font-medium text-white">
+          Last 12 Months
+        </span>
       </div>
 
       <div style={{ height: 185 }}>
@@ -70,7 +74,7 @@ export function RevenueChart() {
               vertical={false}
             />
             <XAxis
-              dataKey="day"
+              dataKey="month"
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
@@ -79,7 +83,7 @@ export function RevenueChart() {
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 10, fill: "var(--muted-foreground)" }}
-              tickFormatter={(v: number) => `$${v}`}
+              tickFormatter={(v: number) => `₹${v.toLocaleString('en-IN')}`}
             />
             <Tooltip content={<CustomTooltip />} />
             <Area

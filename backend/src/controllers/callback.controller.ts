@@ -63,7 +63,7 @@ export const getGuideCallbacks = async (req: Request, res: Response): Promise<vo
         const query = user.role === 'admin' ? {} : { guideId: user.id };
         const callbacks = await CallbackRequest.find(query)
             .sort({ createdAt: -1 })
-            .populate('tourPlanId', 'title locations')
+            .populate('tourPlanId', 'title locations basePrice durationDays durationNights')
             .lean();
 
         res.status(200).json(callbacks);
@@ -87,7 +87,7 @@ export const markCallbackAsRead = async (req: Request, res: Response): Promise<v
             { _id: id },
             { isRead: true },
             { new: true }
-        ).populate('tourPlanId', 'title locations');
+        ).populate('tourPlanId', 'title locations basePrice durationDays durationNights');
 
         if (!callback) {
             res.status(404).json({ message: 'Callback not found' });
@@ -123,7 +123,7 @@ export const updateCallbackStatus = async (req: Request, res: Response): Promise
             query,
             { status, isRead: true },
             { new: true }
-        ).populate('tourPlanId', 'title locations');
+        ).populate('tourPlanId', 'title locations basePrice durationDays durationNights');
 
         if (!callback) {
             res.status(404).json({ message: 'Callback not found' });

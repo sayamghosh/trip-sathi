@@ -31,6 +31,24 @@ export const getAllTourPlans = async (req: Request, res: Response): Promise<void
     }
 };
 
+// Get a specific guide's public tour plans (for their public channel page)
+export const getPublicGuideTourPlans = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { guideId } = req.params as any;
+
+        const guide = await User.findOne({ _id: guideId, role: 'guide', isAuthorized: true, isActive: true });
+        if (!guide) {
+            res.status(404).json({ message: 'Guide not found' });
+            return;
+        }
+
+        const plans = await TourPlan.find({ guideId, isPublic: true }).sort({ createdAt: -1 });
+        res.status(200).json(plans);
+    } catch (error: any) {
+        res.status(500).json({ message: 'Error retrieving guide tour plans', error: error.message });
+    }
+};
+
 // Create a new tour plan - sets isPublic to false by default
 export const createTourPlan = async (req: Request, res: Response): Promise<void> => {
     try {

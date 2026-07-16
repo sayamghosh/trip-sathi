@@ -1,6 +1,8 @@
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { Check, X, Clock, CheckCircle2, XCircle } from "lucide-react"
+import { CreateBookingModal, type GuideTourPlan, type BookingPrefill } from "@/components/booking/CreateBookingModal"
 
 type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
 
@@ -9,14 +11,18 @@ interface CallbackRequest {
   createdAt?: string
   requesterName?: string
   requesterEmail?: string
+  requesterPhone?: string
   status: CallbackStatus
   tourPlanId?: {
+    _id?: string
     title?: string
+    basePrice?: number
   }
 }
 
 export default function Travelers() {
   const queryClient = useQueryClient()
+  const [bookingModal, setBookingModal] = useState<{ open: boolean; prefill?: BookingPrefill }>({ open: false })
 
   const { data: requests = [], isLoading: loading } = useQuery<CallbackRequest[]>({
     queryKey: ['callbacks'],
@@ -26,8 +32,16 @@ export default function Travelers() {
     }
   })
 
+  const { data: tourPlans = [] } = useQuery<GuideTourPlan[]>({
+    queryKey: ['tour-plans', 'mine'],
+    queryFn: async () => {
+      const { data } = await api.get('/api/tour-plans')
+      return data as GuideTourPlan[]
+    }
+  })
+
   const updateStatusMutation = useMutation({
-    mutationFn: async ({ id, status }: { id: string, status: 'positive' | 'negative' }) => {
+    mutationFn: async ({ id, status }: { id: string, status: 'negative' }) => {
       await api.patch(`/api/callbacks/${id}/status`, { status })
     },
     onSuccess: () => {
@@ -38,8 +52,21 @@ export default function Travelers() {
     }
   })
 
-  const updateStatus = (id: string, status: 'positive' | 'negative') => {
-    updateStatusMutation.mutate({ id, status })
+  const markNotInterested = (id: string) => {
+    updateStatusMutation.mutate({ id, status: 'negative' })
+  }
+
+  const markInterested = (req: CallbackRequest) => {
+    setBookingModal({
+      open: true,
+      prefill: {
+        callbackRequestId: req._id,
+        tourPlanId: req.tourPlanId?._id,
+        travelerName: req.requesterName,
+        travelerEmail: req.requesterEmail,
+        travelerPhone: req.requesterPhone,
+      },
+    })
   }
 
   return (
@@ -97,16 +124,15 @@ export default function Travelers() {
                     </td>
                     <td className="p-4 align-middle">
                       <div className="flex items-center justify-center gap-3">
-                        <button 
-                          onClick={() => updateStatus(req._id, 'positive')}
-                          disabled={updateStatusMutation.isPending}
+                        <button
+                          onClick={() => markInterested(req)}
                           className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm disabled:opacity-50"
                           title="Mark as Interested"
                         >
                           <Check size={18} strokeWidth={3} />
                         </button>
-                        <button 
-                          onClick={() => updateStatus(req._id, 'negative')}
+                        <button
+                          onClick={() => markNotInterested(req._id)}
                           disabled={updateStatusMutation.isPending}
                           className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm disabled:opacity-50"
                           title="Mark as Not Interested"
@@ -122,6 +148,13 @@ export default function Travelers() {
           </table>
         </div>
       </div>
+
+      <CreateBookingModal
+        open={bookingModal.open}
+        onOpenChange={(open) => setBookingModal(s => ({ ...s, open }))}
+        guideTourPlans={tourPlans}
+        prefill={bookingModal.prefill}
+      />
     </div>
   )
 }

@@ -10,9 +10,9 @@ export interface IUser extends Document {
     address?: string;
     bio?: string;
     password?: string;
+    username?: string;
     isAuthorized: boolean;
     isActive: boolean;
-    isProfilePublic: boolean;
 }
 
 const UserSchema: Schema = new Schema({
@@ -25,9 +25,9 @@ const UserSchema: Schema = new Schema({
     address: { type: String },
     bio: { type: String },
     password: { type: String },
+    username: { type: String, unique: true, sparse: true, lowercase: true, trim: true },
     isAuthorized: { type: Boolean, default: false },
     isActive: { type: Boolean, default: true },
-    isProfilePublic: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

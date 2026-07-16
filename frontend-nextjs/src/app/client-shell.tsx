@@ -4,7 +4,6 @@ import React, { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import ScrollRestoration from '../components/ScrollRestoration';
 import { PageTransitionLoader } from '../components/PageTransitionLoader';
 
 export default function ClientShell({ children }: { children: React.ReactNode }) {
@@ -15,13 +14,12 @@ export default function ClientShell({ children }: { children: React.ReactNode })
     return (
         <>
             <PageTransitionLoader />
-            <ScrollRestoration />
             {!hasOwnChrome && (
                 <Suspense fallback={null}>
                     <Navbar />
                 </Suspense>
             )}
-            <main id="main-content">
+            <main id="main-content" className="min-h-screen">
                 {children}
             </main>
             {!hasOwnChrome && (

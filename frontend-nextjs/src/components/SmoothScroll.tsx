@@ -8,6 +8,19 @@ interface SmoothScrollProps {
     children: ReactNode;
 }
 
+const LENIS_RESIZE_EVENT = 'lenis:resize';
+
+/**
+ * Lenis only recalculates scroll boundaries on a 250ms-debounced
+ * ResizeObserver. Call this right after content that changes page
+ * height mounts (e.g. a loading skeleton swapping for real content)
+ * so Lenis doesn't clamp an in-progress scroll gesture to a stale,
+ * shorter boundary until the debounce catches up.
+ */
+export function requestLenisResize() {
+    window.dispatchEvent(new Event(LENIS_RESIZE_EVENT));
+}
+
 /**
  * Butter-smooth scroll wrapper using Lenis.
  * Provides a native-feeling, momentum-based scroll experience.
@@ -38,8 +51,12 @@ export default function SmoothScroll({ children }: SmoothScrollProps) {
 
         requestAnimationFrame(raf);
 
+        const handleResizeRequest = () => lenisRef.current?.resize();
+        window.addEventListener(LENIS_RESIZE_EVENT, handleResizeRequest);
+
         // Cleanup on unmount
         return () => {
+            window.removeEventListener(LENIS_RESIZE_EVENT, handleResizeRequest);
             lenis.destroy();
             lenisRef.current = null;
         };

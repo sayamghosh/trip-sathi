@@ -12,7 +12,7 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://tripsathi.vercel.app'),
+  metadataBase: new URL(siteConfig.siteUrl),
 
   title: {
     default: `${siteConfig.projectName} - Discover Local Guides & Travel Experiences`,
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_IN',
-    url: 'https://tripsathi.vercel.app/',
+    url: '/',
     siteName: siteConfig.projectName,
     title: `${siteConfig.projectName} - Discover Local Guides & Travel Experiences`,
     description: 'Find and book local travel guides, curated tour packages, and unique experiences across India.',
@@ -57,13 +57,13 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: `${siteConfig.projectName} - Discover Local Guides & Travel Experiences`,
     description: 'Find and book local travel guides and curated tour packages across India.',
-    creator: '@tripsathi',
     images: ['/og-image.jpg'],
   },
 
   alternates: {
+    canonical: '/',
     languages: {
-      'en-IN': 'https://tripsathi.vercel.app/',
+      'en-IN': '/',
     },
   },
 
@@ -84,12 +84,10 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "name": siteConfig.projectName,
-  "url": "https://tripsathi.vercel.app",
+  "url": siteConfig.siteUrl,
   "description": "Travel platform connecting travelers with local guides and curated experiences across India.",
   "sameAs": [
-    "https://www.facebook.com/tripsathi",
-    "https://www.instagram.com/tripsathi",
-    "https://twitter.com/tripsathi",
+    "https://www.instagram.com/joytrips.site/",
   ],
   "address": {
     "@type": "PostalAddress",

@@ -15,6 +15,8 @@ import { siteConfig } from "@/config/site";
 import { requestCallback } from "@/services/callback.service";
 import { useAuth } from "@/context/AuthContext";
 import { useAuthFlow } from "@/context/AuthFlowContext";
+import { requestLenisResize } from "@/components/SmoothScroll";
+import { getOptimizedImageUrl } from "@/lib/utils";
 import toast from "react-hot-toast";
 import axios from "axios";
 
@@ -54,10 +56,11 @@ function ImageTile({
 }) {
   return (
     <img
-      src={src}
+      src={getOptimizedImageUrl(src, 400)}
       alt={alt}
       className={`h-full w-full object-cover ${className}`}
       loading="lazy"
+      decoding="async"
       width={400}
       height={236}
     />
@@ -222,6 +225,33 @@ export default function PackagesPage() {
     fetchPlans();
   }, []);
 
+  // The skeleton -> real grid swap changes page height; nudge Lenis to
+  // recalculate its scroll boundaries immediately instead of waiting on
+  // its debounced ResizeObserver (see requestLenisResize for why).
+  useEffect(() => {
+    if (loading) return;
+    const frame = requestAnimationFrame(() => requestLenisResize());
+    return () => cancelAnimationFrame(frame);
+  }, [loading, realDeals]);
+
+  // Decode card images off the scroll path. Even optimized images pay a
+  // one-time main-thread decode the first time they paint; doing it now
+  // (while the user reads the top of the page) keeps the JS-driven Lenis
+  // scroll from hitching when the cards later scroll into view.
+  useEffect(() => {
+    if (loading || realDeals.length === 0) return;
+    let cancelled = false;
+    realDeals.forEach((deal) => {
+      const img = new Image();
+      img.src = getOptimizedImageUrl(deal.image, 400);
+      if (cancelled) return;
+      img.decode?.().catch(() => {});
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [loading, realDeals]);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -266,7 +296,7 @@ export default function PackagesPage() {
               key={destination.name}
             >
               <img
-                src={destination.image}
+                src={getOptimizedImageUrl(destination.image, 400)}
                 alt={destination.name}
                 className="h-full w-full object-cover"
                 width={400}
@@ -322,11 +352,17 @@ export default function PackagesPage() {
         </div>
 
         {loading ? (
-          <div className="mt-20 flex flex-col items-center justify-center py-20 text-center">
-            <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#1458df] border-t-transparent" />
-            <p className="mt-4 text-[#73777f]">
-              Fetching real-time packages...
-            </p>
+          <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="overflow-hidden rounded-[9px] border border-[#e8ebef] bg-white">
+                <div className="h-[274px] animate-pulse bg-[#f0f2f5]" />
+                <div className="space-y-3 p-4">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-[#f0f2f5]" />
+                  <div className="h-3 w-1/2 animate-pulse rounded bg-[#f0f2f5]" />
+                  <div className="h-4 w-1/3 animate-pulse rounded bg-[#f0f2f5]" />
+                </div>
+              </div>
+            ))}
           </div>
         ) : realDeals.length > 0 ? (
           <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -400,7 +436,7 @@ function DealCard({
         <div>
           <div className="relative h-[274px] overflow-hidden bg-[#f5f5f5]">
             <img
-              src={deal.image}
+              src={getOptimizedImageUrl(deal.image, 400)}
               alt={deal.name}
               className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
               width={400}

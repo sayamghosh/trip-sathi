@@ -72,6 +72,7 @@ export function App() {
     if (pathname.startsWith("/packages/")) return "Package Details"
     if (pathname === "/bookings") return "Bookings"
     if (pathname === "/calendar") return "Calendar"
+    if (pathname === "/travelers") return "Travelers"
     return "Dashboard"
 
   }
@@ -89,6 +90,7 @@ export function App() {
       edit: "Edit",
       bookings: "Bookings",
       calendar: "Calendar",
+      travelers: "Travelers",
     }
 
 
@@ -108,6 +110,11 @@ export function App() {
       }
 
       if (segment === "calendar") {
+        crumbs.push({ label: labelMap[segment], to: currentPath })
+        return
+      }
+
+      if (segment === "travelers") {
         crumbs.push({ label: labelMap[segment], to: currentPath })
         return
       }

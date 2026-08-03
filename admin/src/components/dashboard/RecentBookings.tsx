@@ -2,6 +2,18 @@ import { Search, ArrowUpDown, Loader2, XCircle } from "lucide-react"
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from "@/components/ui/table"
 
 interface Booking {
   _id: string
@@ -16,8 +28,8 @@ interface Booking {
 }
 
 const statusCls: Record<string, string> = {
-  confirmed: "bg-success/20 text-success border border-success/30",
-  cancelled: "bg-destructive/20 text-destructive border border-destructive/30",
+  confirmed: "border-success/30 bg-success/10 text-success",
+  cancelled: "border-destructive/30 bg-destructive/10 text-destructive",
 }
 
 export function RecentBookings() {
@@ -51,98 +63,90 @@ export function RecentBookings() {
   )
 
   return (
-    <div className="rounded-[14px] border border-border bg-card p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-[14px] font-semibold text-foreground">
-          Recent Bookings
-        </h3>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 rounded-[8px] border border-border px-2 py-[5px]">
-            <Search className="h-[13px] w-[13px] text-muted-foreground" />
-            <input
-              placeholder="Search bookings"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-[100px] border-none bg-transparent text-[11px] text-foreground placeholder-muted-foreground outline-none"
-            />
-          </div>
+    <Card>
+      <CardHeader className="flex-row items-center justify-between space-y-0 pb-3">
+        <CardTitle className="text-sm font-semibold">Recent Bookings</CardTitle>
+        <div className="relative w-40">
+          <Search className="pointer-events-none absolute left-2 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search bookings"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-8 pl-7 text-xs"
+          />
         </div>
-      </div>
+      </CardHeader>
 
-      <table className="w-full">
-        <thead>
-          <tr className="border-b border-border">
-            {["Name", "Package", "Phone", "Trip Date", "Status", "Actions"].map(
-              (h) => (
-                <th
-                  key={h}
-                  className="px-2.5 py-2 text-left text-[11px] font-medium text-muted-foreground"
-                >
-                  <span className="flex items-center gap-1">
-                    {h}
-                    <ArrowUpDown className="h-[10px] w-[10px]" />
-                  </span>
-                </th>
-              )
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {["Name", "Package", "Phone", "Trip Date", "Status", "Actions"].map(
+                (h) => (
+                  <TableHead key={h}>
+                    <span className="flex items-center gap-1 text-xs">
+                      {h}
+                      <ArrowUpDown className="h-2.5 w-2.5" />
+                    </span>
+                  </TableHead>
+                )
+              )}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center">
+                  <Loader2 className="mx-auto h-5 w-5 animate-spin text-primary" />
+                </TableCell>
+              </TableRow>
+            ) : filteredBookings.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="py-10 text-center text-xs text-muted-foreground">
+                  No recent bookings.
+                </TableCell>
+              </TableRow>
+            ) : (
+              filteredBookings.slice(0, 8).map((b) => (
+                <TableRow key={b._id}>
+                  <TableCell className="text-xs font-medium text-foreground">
+                    {b.travelerName || "Anonymous"}
+                  </TableCell>
+                  <TableCell className="text-xs text-secondary-foreground">
+                    <div className="max-w-40 truncate">{b.tourPlanId?.title || "Custom Package"}</div>
+                  </TableCell>
+                  <TableCell className="text-xs text-secondary-foreground">
+                    {b.travelerPhone}
+                  </TableCell>
+                  <TableCell className="text-xs text-secondary-foreground">
+                    {b.tripDate ? new Date(b.tripDate).toLocaleDateString() : "N/A"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`capitalize ${statusCls[b.status]}`}>
+                      {b.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {b.status === 'confirmed' && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-destructive hover:bg-accent hover:text-destructive"
+                        title="Cancel booking"
+                        onClick={() => {
+                          if (window.confirm("Cancel this booking?")) cancelMutation.mutate(b._id)
+                        }}
+                      >
+                        <XCircle className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))
             )}
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
-            <tr>
-              <td colSpan={6} className="py-10 text-center">
-                <Loader2 className="mx-auto h-5 w-5 animate-spin text-primary" />
-              </td>
-            </tr>
-          ) : filteredBookings.length === 0 ? (
-            <tr>
-              <td colSpan={6} className="py-10 text-center text-[12px] text-muted-foreground">
-                No recent bookings.
-              </td>
-            </tr>
-          ) : (
-            filteredBookings.slice(0, 8).map((b) => (
-              <tr
-                key={b._id}
-                className="border-b border-border transition last:border-0 hover:bg-accent"
-              >
-                <td className="px-2.5 py-2.5 text-[11.5px] font-medium text-foreground">
-                  {b.travelerName || "Anonymous"}
-                </td>
-                <td className="px-2.5 py-2.5 text-[11.5px] text-secondary-foreground">
-                  <div className="max-w-[150px] truncate">{b.tourPlanId?.title || "Custom Package"}</div>
-                </td>
-                <td className="px-2.5 py-2.5 text-[11.5px] text-secondary-foreground">
-                  {b.travelerPhone}
-                </td>
-                <td className="px-2.5 py-2.5 text-[11.5px] text-secondary-foreground">
-                  {b.tripDate ? new Date(b.tripDate).toLocaleDateString() : "N/A"}
-                </td>
-                <td className="px-2.5 py-2.5">
-                  <span
-                    className={`rounded-full px-2.5 py-[3px] text-[10px] font-semibold capitalize ${statusCls[b.status]}`}
-                  >
-                    {b.status}
-                  </span>
-                </td>
-                <td className="px-2.5 py-2.5">
-                  {b.status === 'confirmed' && (
-                    <button
-                      onClick={() => {
-                        if (window.confirm("Cancel this booking?")) cancelMutation.mutate(b._id)
-                      }}
-                      className="flex h-7 w-7 items-center justify-center rounded-md border border-border bg-card text-destructive hover:bg-accent"
-                      title="Cancel booking"
-                    >
-                      <XCircle className="h-3.5 w-3.5" />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
-    </div>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   )
 }

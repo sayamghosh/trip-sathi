@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { mapBookingToEvent, type BookingResponse } from "@/lib/calendarEvents"
 import type { Event } from "@/components/calendar/CalendarView"
 import { ScheduleDetails } from "@/components/calendar/ScheduleDetails"
@@ -88,48 +90,50 @@ export function CalendarWidget() {
   }
 
   return (
-    <div className="rounded-[14px] border border-border bg-card p-3">
-      <div className="mb-2 flex items-center justify-between">
-        <span className="text-[13px] font-semibold text-foreground">
+    <Card>
+      <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
+        <span className="text-sm font-semibold text-foreground">
           {monthStr} {y}
         </span>
         <div className="flex gap-0.5">
-          <button onClick={() => navigate(-1)} className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-accent">
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => navigate(-1)}>
             <ChevronLeft className="h-3 w-3 text-muted-foreground" />
-          </button>
-          <button onClick={() => navigate(1)} className="flex h-[22px] w-[22px] items-center justify-center rounded-[6px] hover:bg-accent">
+          </Button>
+          <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => navigate(1)}>
             <ChevronRight className="h-3 w-3 text-muted-foreground" />
-          </button>
+          </Button>
         </div>
-      </div>
-      <div className="grid grid-cols-7">
-        {DOW.map((d) => (
-          <div key={d} className="py-[3px] text-center text-[10px] font-medium text-muted-foreground/70">
-            {d}
-          </div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7">
-        {cells.map((c, i) => (
-          <button
-            key={i}
-            onClick={() => handleDayClick(c)}
-            title={c.hl ? "View confirmed trip(s) on this day" : undefined}
-            className={cn(
-              "flex h-[28px] items-center justify-center rounded-[6px] text-[11px] font-medium transition",
-              !c.cur
-                ? "text-muted-foreground/30"
-                : c.today
-                  ? "bg-primary font-bold text-white shadow-lg shadow-primary/20"
-                  : c.hl
-                    ? "font-semibold text-primary hover:bg-primary/10 cursor-pointer"
-                    : "text-foreground/80 hover:bg-accent hover:text-foreground"
-            )}
-          >
-            {c.d}
-          </button>
-        ))}
-      </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-7">
+          {DOW.map((d) => (
+            <div key={d} className="py-1 text-center text-xs font-medium text-muted-foreground/70">
+              {d}
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7">
+          {cells.map((c, i) => (
+            <button
+              key={i}
+              onClick={() => handleDayClick(c)}
+              title={c.hl ? "View confirmed trip(s) on this day" : undefined}
+              className={cn(
+                "flex h-7 items-center justify-center rounded-md text-xs font-medium transition",
+                !c.cur
+                  ? "text-muted-foreground/30"
+                  : c.today
+                    ? "bg-primary font-bold text-primary-foreground shadow-lg shadow-primary/20"
+                    : c.hl
+                      ? "cursor-pointer font-semibold text-primary hover:bg-primary/10"
+                      : "text-foreground/80 hover:bg-accent hover:text-foreground"
+              )}
+            >
+              {c.d}
+            </button>
+          ))}
+        </div>
+      </CardContent>
 
       <ScheduleDetails selectedEvent={selectedEvent} open={detailsOpen} onOpenChange={setDetailsOpen} />
       <DayBookingsSheet
@@ -139,6 +143,6 @@ export function CalendarWidget() {
         onOpenChange={setDayListOpen}
         onSelectEvent={handleSelectFromDayList}
       />
-    </div>
+    </Card>
   )
 }

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
 
 type PaymentStatus = "unpaid" | "advance_paid" | "fully_paid"
 
@@ -193,7 +194,7 @@ export function CreateBookingModal({ open, onOpenChange, guideTourPlans, prefill
               <Input id="governmentIdNumber" className={FIELD_INPUT_CLASS} value={form.governmentIdNumber} onChange={handleChange("governmentIdNumber")} />
             </div>
 
-            <div className="md:col-span-3 h-px bg-border my-1" />
+            <Separator className="md:col-span-3 my-1" />
 
             <div className="md:col-span-2 flex flex-col gap-2">
               <Label htmlFor="tourPlanId" className={FIELD_LABEL_CLASS}>Package *</Label>

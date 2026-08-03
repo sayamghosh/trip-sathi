@@ -3,6 +3,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import api from "@/lib/axios"
 import { Check, X, Clock, CheckCircle2, XCircle } from "lucide-react"
 import { CreateBookingModal, type GuideTourPlan, type BookingPrefill } from "@/components/booking/CreateBookingModal"
+import { Card } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 
 type CallbackStatus = 'pending' | 'positive' | 'negative' | 'contacted'
 
@@ -78,76 +89,90 @@ export default function Travelers() {
         </div>
       </div>
 
-      <div className="rounded-md border bg-card">
-        <div className="relative w-full overflow-auto">
-          <table className="w-full caption-bottom text-sm">
-            <thead className="[&_tr]:border-b">
-              <tr className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted bg-muted/20">
-                <th className="h-12 px-4 text-left align-middle font-semibold text-muted-foreground">Date</th>
-                <th className="h-12 px-4 text-left align-middle font-semibold text-muted-foreground">Traveler</th>
-                <th className="h-12 px-4 text-left align-middle font-semibold text-muted-foreground">Email ID</th>
-                <th className="h-12 px-4 text-left align-middle font-semibold text-muted-foreground">Tour Plan</th>
-                <th className="h-12 px-4 text-left align-middle font-semibold text-muted-foreground">Status</th>
-                <th className="h-12 px-4 text-center align-middle font-semibold text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="[&_tr:last-child]:border-0">
-              {loading ? (
-                <tr>
-                  <td colSpan={6} className="h-24 text-center">Loading...</td>
-                </tr>
-              ) : requests.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="h-24 text-center text-muted-foreground">No requests found.</td>
-                </tr>
-              ) : (
-                requests.map((req) => (
-                  <tr key={req._id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
-                    <td className="p-4 align-middle">
-                      {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : "N/A"}
-                    </td>
-                    <td className="p-4 align-middle font-medium">
-                      {req.requesterName || "Anonymous"}
-                    </td>
-                    <td className="p-4 align-middle text-muted-foreground">
-                      {req.requesterEmail || "N/A"}
-                    </td>
-                    <td className="p-4 align-middle max-w-[200px] truncate" title={req.tourPlanId?.title}>
-                      {req.tourPlanId?.title || "Unknown Plan"}
-                    </td>
-                    <td className="p-4 align-middle">
-                      <div className="flex items-center gap-2">
-                        {req.status === 'pending' && <span className="inline-flex items-center gap-1.5 text-yellow-700 bg-yellow-50 border border-yellow-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><Clock size={14} /> Pending</span>}
-                        {req.status === 'positive' && <span className="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><CheckCircle2 size={14} /> Interested</span>}
-                        {req.status === 'negative' && <span className="inline-flex items-center gap-1.5 text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-1 rounded-full text-xs font-semibold shadow-sm"><XCircle size={14} /> Not Interested</span>}
-                      </div>
-                    </td>
-                    <td className="p-4 align-middle">
-                      <div className="flex items-center justify-center gap-3">
-                        <button
-                          onClick={() => markInterested(req)}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm disabled:opacity-50"
-                          title="Mark as Interested"
-                        >
-                          <Check size={18} strokeWidth={3} />
-                        </button>
-                        <button
-                          onClick={() => markNotInterested(req._id)}
-                          disabled={updateStatusMutation.isPending}
-                          className="flex items-center justify-center w-8 h-8 rounded-full bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-white transition-all shadow-sm disabled:opacity-50"
-                          title="Mark as Not Interested"
-                        >
-                          <X size={18} strokeWidth={3} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <Card className="overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-muted/20">
+              <TableHead>Date</TableHead>
+              <TableHead>Traveler</TableHead>
+              <TableHead>Email ID</TableHead>
+              <TableHead>Tour Plan</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-center">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center">Loading...</TableCell>
+              </TableRow>
+            ) : requests.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">No requests found.</TableCell>
+              </TableRow>
+            ) : (
+              requests.map((req) => (
+                <TableRow key={req._id}>
+                  <TableCell>
+                    {req.createdAt ? new Date(req.createdAt).toLocaleDateString() : "N/A"}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {req.requesterName || "Anonymous"}
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {req.requesterEmail || "N/A"}
+                  </TableCell>
+                  <TableCell className="max-w-52 truncate" title={req.tourPlanId?.title}>
+                    {req.tourPlanId?.title || "Unknown Plan"}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {req.status === 'pending' && (
+                        <Badge variant="outline" className="gap-1.5 border-warning/30 bg-warning/10 text-warning">
+                          <Clock className="size-3.5" /> Pending
+                        </Badge>
+                      )}
+                      {req.status === 'positive' && (
+                        <Badge variant="outline" className="gap-1.5 border-success/30 bg-success/10 text-success">
+                          <CheckCircle2 className="size-3.5" /> Interested
+                        </Badge>
+                      )}
+                      {req.status === 'negative' && (
+                        <Badge variant="outline" className="gap-1.5 border-destructive/30 bg-destructive/10 text-destructive">
+                          <XCircle className="size-3.5" /> Not Interested
+                        </Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center justify-center gap-3">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => markInterested(req)}
+                        className="size-8 rounded-full border-success/30 bg-success/10 text-success hover:bg-success hover:text-success-foreground"
+                        title="Mark as Interested"
+                      >
+                        <Check className="size-4" strokeWidth={3} />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => markNotInterested(req._id)}
+                        disabled={updateStatusMutation.isPending}
+                        className="size-8 rounded-full border-destructive/30 bg-destructive/10 text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                        title="Mark as Not Interested"
+                      >
+                        <X className="size-4" strokeWidth={3} />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </Card>
 
       <CreateBookingModal
         open={bookingModal.open}

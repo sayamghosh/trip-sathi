@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react"
-import { Search, Bell, ChevronDown, Moon, Sun, User, Settings, CreditCard, LogOut } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Search, Bell, Moon, Sun, User, Settings, CreditCard, LogOut } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -12,13 +12,23 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function TopBar() {
   const [user, setUser] = useState<{ name: string; picture: string; role: string; email?: string } | null>(null)
   const { theme, setTheme } = useTheme()
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [sheetOpen, setSheetOpen] = useState(false)
-  const dropdownRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
@@ -73,15 +83,6 @@ export function TopBar() {
         console.error("Failed to parse user from localStorage", e)
       }
     }
-    
-    // Click outside handler
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
   const getInitials = (name: string) => {
@@ -104,40 +105,42 @@ export function TopBar() {
   return (
     <div className="flex items-center gap-3">
       {/* Search */}
-      <div className="flex items-center gap-2 rounded-[10px] border border-border bg-card px-3 py-[7px]">
-        <Search className="h-[14px] w-[14px] text-muted-foreground" />
-        <input
+      <div className="relative flex items-center">
+        <Search className="pointer-events-none absolute left-2.5 h-3.5 w-3.5 text-muted-foreground" />
+        <Input
           type="text"
           placeholder="Search anything"
-          className="w-[130px] border-none bg-transparent text-[12px] text-secondary-foreground placeholder-muted-foreground outline-none"
+          className="w-36 pl-8"
         />
       </div>
 
       {/* Theme Toggle */}
-      <button
+      <Button
+        variant="outline"
+        size="icon"
+        className="h-9 w-9"
         onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        className="relative flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-border bg-card transition hover:bg-accent"
       >
         {theme === "dark" ? (
-          <Sun className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.8} />
+          <Sun className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
         ) : (
-          <Moon className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.8} />
+          <Moon className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
         )}
-      </button>
+      </Button>
 
       {/* Notification */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
         <SheetTrigger asChild>
-          <button className="relative flex h-[34px] w-[34px] items-center justify-center rounded-[10px] border border-border bg-card transition hover:bg-accent cursor-pointer">
-            <Bell className="h-[15px] w-[15px] text-muted-foreground" strokeWidth={1.8} />
+          <Button variant="outline" size="icon" className="relative h-9 w-9">
+            <Bell className="h-4 w-4 text-muted-foreground" strokeWidth={1.8} />
             {unreadCount > 0 && (
-              <span className="absolute -top-[3px] -right-[3px] flex h-[15px] w-[15px] items-center justify-center rounded-full bg-primary text-[9px] font-bold text-primary-foreground ring-2 ring-card">
+              <Badge className="absolute -top-1 -right-1 h-4 w-4 justify-center rounded-full p-0 text-xs leading-none ring-2 ring-card">
                 {unreadCount}
-              </span>
+              </Badge>
             )}
-          </button>
+          </Button>
         </SheetTrigger>
-        <SheetContent className="w-[400px] sm:w-[540px] overflow-y-auto">
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
           <SheetHeader className="mb-4">
             <SheetTitle>Notifications</SheetTitle>
             <SheetDescription>
@@ -154,12 +157,12 @@ export function TopBar() {
               recentCallbacks.map((req: any) => {
                 const isUnread = !req.isRead && req.status === 'pending'
                 return (
-                  <div 
-                    key={req._id} 
+                  <div
+                    key={req._id}
                     onClick={(e) => handleNotificationClick(e, req)}
                     className={`flex flex-col gap-1.5 p-4 rounded-xl border transition-all shadow-sm cursor-pointer ${
-                      isUnread 
-                        ? 'bg-primary/5 border-primary/20 hover:bg-primary/10' 
+                      isUnread
+                        ? 'bg-primary/5 border-primary/20 hover:bg-primary/10'
                         : 'bg-card hover:bg-accent/50 opacity-75'
                     }`}
                   >
@@ -168,14 +171,14 @@ export function TopBar() {
                         {isUnread && <span className="h-2 w-2 rounded-full bg-primary" />}
                         {req.requesterName || "Anonymous Traveler"}
                       </span>
-                      <span className="text-[11px] font-medium text-muted-foreground">
+                      <span className="text-xs font-medium text-muted-foreground">
                         {new Date(req.createdAt).toLocaleDateString()}
                       </span>
                     </div>
-                    <p className={`text-[13px] ${isUnread ? 'text-foreground/80' : 'text-muted-foreground'} pl-4`}>
+                    <p className={`text-sm ${isUnread ? 'text-foreground/80' : 'text-muted-foreground'} pl-4`}>
                       Requested a callback for <span className="font-semibold">{req.tourPlanId?.title || "Unknown Plan"}</span>.
                     </p>
-                    <p className="text-[12px] text-muted-foreground pl-4">
+                    <p className="text-xs text-muted-foreground pl-4">
                       <span className="font-medium">{req.requesterEmail || "N/A"}</span>
                     </p>
                   </div>
@@ -187,82 +190,62 @@ export function TopBar() {
       </Sheet>
 
       {/* User Dropdown */}
-      <div className="relative" ref={dropdownRef}>
-        <button 
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className={`flex items-center gap-2 rounded-[10px] border border-border bg-card px-2.5 py-[5px] transition-colors hover:bg-accent ${isDropdownOpen ? 'bg-accent' : ''}`}
-        >
-          <div className="flex h-[32px] w-[32px] items-center justify-center overflow-hidden rounded-full bg-linear-to-br from-primary to-[#818CF8]">
-            {user?.picture ? (
-              <img src={user.picture} alt={user.name} className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-            ) : (
-              <span className="text-[12px] font-bold text-white">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className="flex h-auto items-center gap-2 rounded-lg px-2.5 py-1.5 data-[state=open]:bg-accent"
+          >
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={user?.picture} alt={user?.name} referrerPolicy="no-referrer" />
+              <AvatarFallback className="bg-linear-to-br from-primary to-primary/60 text-xs font-bold text-primary-foreground">
                 {getInitials(user?.name || "")}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col text-left leading-tight">
+              <span className="text-xs font-semibold text-foreground">
+                {user?.name || "User"}
               </span>
-            )}
-          </div>
-          <div className="flex flex-col text-left leading-tight">
-            <span className="text-[12px] font-semibold text-foreground">
+              <span className="text-xs capitalize text-muted-foreground">
+                {user?.role || "Agent"}
+              </span>
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="flex flex-col gap-0.5">
+            <span className="text-sm font-bold text-foreground">
               {user?.name || "User"}
             </span>
-            <span className="text-[10px] capitalize text-muted-foreground">
-              {user?.role || "Agent"}
+            <span className="truncate text-xs font-medium text-muted-foreground">
+              {user?.email || ""}
             </span>
-          </div>
-          <ChevronDown className={`ml-1 h-[14px] w-[14px] text-muted-foreground transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
-        </button>
-
-        {/* Dropdown Menu */}
-        {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-[12px] border border-border bg-card shadow-lg shadow-black/5 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 animate-in fade-in zoom-in-95 duration-200">
-            {/* User Header */}
-            <div className="px-4 py-3 border-b border-border">
-              <p className="text-[13px] font-bold text-foreground">
-                {user?.name || "User"}
-              </p>
-              <p className="text-[11px] font-medium text-muted-foreground truncate">
-                {user?.email || ""}
-              </p>
-            </div>
-            
-            {/* Menu Items */}
-            <div className="py-1">
-              <Link 
-                to="/profile"
-                onClick={() => setIsDropdownOpen(false)}
-                className="group flex w-full items-center gap-2 px-4 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
-              >
-                <User className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                My Profile
-              </Link>
-              <button 
-                onClick={() => setIsDropdownOpen(false)}
-                className="group flex w-full items-center gap-2 px-4 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
-              >
-                <Settings className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                Account Settings
-              </button>
-              <button 
-                onClick={() => setIsDropdownOpen(false)}
-                className="group flex w-full items-center gap-2 px-4 py-2 text-[13px] font-medium text-foreground transition-colors hover:bg-accent hover:text-primary"
-              >
-                <CreditCard className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                Billing
-              </button>
-            </div>
-            
-            <div className="border-t border-border py-1">
-              <button 
-                onClick={handleLogout}
-                className="group flex w-full items-center gap-2 px-4 py-2 text-[13px] font-bold text-red-600 transition-colors hover:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-400/10"
-              >
-                <LogOut className="h-4 w-4" />
-                Logout
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link to="/profile" className="cursor-pointer">
+              <User className="h-4 w-4 text-muted-foreground" />
+              My Profile
+            </Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            <Settings className="h-4 w-4 text-muted-foreground" />
+            Account Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
+            <CreditCard className="h-4 w-4 text-muted-foreground" />
+            Billing
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="cursor-pointer font-bold text-destructive focus:bg-destructive/10 focus:text-destructive"
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

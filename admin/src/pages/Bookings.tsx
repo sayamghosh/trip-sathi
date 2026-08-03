@@ -64,7 +64,7 @@ export default function Bookings() {
         value: totals.totalBookings.toLocaleString(),
         change: "",
         isUp: true,
-        color: "#3B82F6",
+        color: "var(--chart-1)",
         chartData: [{ val: 0 }, { val: totals.totalBookings }],
       },
       {
@@ -72,7 +72,7 @@ export default function Bookings() {
         value: totals.totalParticipants.toLocaleString(),
         change: "",
         isUp: true,
-        color: "#EF4444",
+        color: "var(--chart-2)",
         chartData: [{ val: 0 }, { val: totals.totalParticipants }],
       },
       {
@@ -80,7 +80,7 @@ export default function Bookings() {
         value: `₹${totals.totalRevenue.toLocaleString()}`,
         change: "",
         isUp: true,
-        color: "#3B82F6",
+        color: "var(--chart-1)",
         chartData: [{ val: 0 }, { val: totals.totalRevenue }],
       },
     ]
@@ -93,7 +93,7 @@ export default function Bookings() {
 
     const rawPackages = metrics?.topPackages || []
     const totalPings = rawPackages.reduce((acc, p) => acc + p.count, 0)
-    const colors = ["#1D4ED8", "#3B82F6", "#93C5FD", "#E0E7FF"]
+    const colors = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"]
 
     let packagesArray = rawPackages.map((p, i) => ({
       name: p.title,
@@ -104,7 +104,7 @@ export default function Bookings() {
     }))
 
     if (packagesArray.length === 0) {
-      packagesArray = [{ name: "No data", count: 0, participants: 0, value: 100, color: "#E5E7EB" }]
+      packagesArray = [{ name: "No data", count: 0, participants: 0, value: 100, color: "var(--muted)" }]
     }
 
     return { computedMetrics: metricsData, computedTrips: trips, computedPackages: packagesArray }

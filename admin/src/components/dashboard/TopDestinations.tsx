@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts"
 import api from "@/lib/axios"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 
 interface Destination {
   locations: string[]
@@ -12,7 +13,7 @@ interface BookingMetricsResponse {
   destinations: Destination[]
 }
 
-const COLORS = ["#2E7CF6", "#5BC5F0", "#818CF8", "#F472B6"]
+const COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"]
 
 export function TopDestinations() {
   const { data: metrics } = useQuery<BookingMetricsResponse>({
@@ -33,54 +34,56 @@ export function TopDestinations() {
         participants: d.participants,
         color: COLORS[i % COLORS.length],
       }))
-    : [{ name: "No confirmed bookings yet", pct: 100, participants: 0, color: "#E5E7EB" }]
+    : [{ name: "No confirmed bookings yet", pct: 100, participants: 0, color: "var(--muted)" }]
 
   return (
-    <div className="rounded-[14px] border border-border bg-card p-4">
-      <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-[14px] font-semibold text-foreground">
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-semibold">
           Top Destinations
-        </h3>
-      </div>
+        </CardTitle>
+      </CardHeader>
 
-      <div className="flex items-center gap-5">
-        <div className="relative shrink-0" style={{ width: 140, height: 140 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                innerRadius={40}
-                outerRadius={65}
-                paddingAngle={3}
-                dataKey="pct"
-                strokeWidth={0}
-              >
-                {data.map((entry, i) => (
-                  <Cell key={i} fill={entry.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <CardContent>
+        <div className="flex items-center gap-5">
+          <div className="relative shrink-0" style={{ width: 140, height: 140 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={65}
+                  paddingAngle={3}
+                  dataKey="pct"
+                  strokeWidth={0}
+                >
+                  {data.map((entry, i) => (
+                    <Cell key={i} fill={entry.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-        <div className="flex flex-1 flex-col gap-[10px] min-w-0">
-          {data.map((d) => (
-            <div key={d.name} className="flex items-start gap-2">
-              <div className="mt-[4px] h-[8px] w-[8px] shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
-              <div className="min-w-0">
-                <p className="text-[12px] leading-tight font-medium text-foreground truncate">
-                  {d.name} {total > 0 && `(${d.pct}%)`}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  {d.participants} Participants
-                </p>
+          <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+            {data.map((d) => (
+              <div key={d.name} className="flex items-start gap-2">
+                <div className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
+                <div className="min-w-0">
+                  <p className="truncate text-xs leading-tight font-medium text-foreground">
+                    {d.name} {total > 0 && `(${d.pct}%)`}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {d.participants} Participants
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   )
 }

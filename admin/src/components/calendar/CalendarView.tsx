@@ -1,6 +1,10 @@
 import { useState, useMemo } from "react"
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, MapPin, Users, HelpCircle, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 
 export interface Event {
   id: string
@@ -35,12 +39,24 @@ interface CalendarViewProps {
 function paymentChipStyle(paymentStatus?: string): string {
   switch (paymentStatus) {
     case "fully_paid":
-      return "bg-[#e6f4ea] text-[#0d652d] dark:bg-green-900/30 dark:text-green-200"
+      return "bg-success/10 text-success"
     case "advance_paid":
-      return "bg-[#fef7e0] text-[#b06000] dark:bg-orange-900/30 dark:text-orange-200"
+      return "bg-warning/10 text-warning"
     default:
-      return "bg-[#f1f3f4] text-[#3c4043] dark:bg-gray-800/40 dark:text-gray-300"
+      return "bg-muted text-muted-foreground"
   }
+}
+
+// Week-view multi-day event color coding, keyed off the event's semantic
+// `color` tag (unrelated to payment status). Mapped to Tailwind's standard
+// palette so nothing falls back to raw hex values.
+function weekEventColorStyle(colorKey?: string): string {
+  if (colorKey?.includes("blue")) return "bg-blue-100 text-blue-900 border-blue-600 dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-700"
+  if (colorKey?.includes("green")) return "bg-green-100 text-green-900 border-green-600 dark:bg-green-900/30 dark:text-green-200 dark:border-green-700"
+  if (colorKey?.includes("purple")) return "bg-purple-100 text-purple-900 border-purple-600 dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-700"
+  if (colorKey?.includes("orange")) return "bg-orange-100 text-orange-900 border-orange-600 dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700"
+  if (colorKey?.includes("gray")) return "bg-muted text-foreground border-muted-foreground/40"
+  return "bg-pink-100 text-pink-900 border-pink-600 dark:bg-pink-900/30 dark:text-pink-200 dark:border-pink-700"
 }
 
 export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore }: CalendarViewProps) {
@@ -154,7 +170,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
   }, [events, currentDate, rowAssignments])
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col rounded-3xl border border-border bg-card/50 dark:bg-background p-6 shadow-sm backdrop-blur-sm">
+    <Card className="flex flex-1 min-h-0 flex-col rounded-3xl bg-card/50 dark:bg-background p-6 shadow-sm backdrop-blur-sm">
       {/* Calendar Header */}
       <div className="mb-6 flex items-center justify-between">
         <div className="flex items-center gap-6">
@@ -164,47 +180,59 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
           </div>
 
           <div className="flex items-center gap-4">
-            <button 
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => setCurrentDate(new Date())}
-              className="px-4 py-1.5 text-sm font-medium border border-border rounded-full hover:bg-accent transition-colors text-foreground"
+              className="rounded-full"
             >
               Today
-            </button>
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <button 
+            </Button>
+            <div className="flex items-center gap-1 text-muted-foreground">
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => handleNavigate("prev")}
-                className="p-1 hover:bg-accent hover:text-foreground rounded-full transition-all"
+                className="rounded-full"
               >
                 <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button 
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => handleNavigate("next")}
-                className="p-1 hover:bg-accent hover:text-foreground rounded-full transition-all"
+                className="rounded-full"
               >
                 <ChevronRight className="h-5 w-5" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2 text-foreground/70">
-             <button className="p-1.5 hover:bg-accent rounded-full text-muted-foreground hover:text-foreground transition-colors"><HelpCircle className="h-5 w-5" /></button>
-             <button className="p-1.5 hover:bg-accent rounded-full text-muted-foreground hover:text-foreground transition-colors"><Settings className="h-5 w-5" /></button>
+            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
+              <HelpCircle className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-foreground">
+              <Settings className="h-5 w-5" />
+            </Button>
           </div>
-          <div className="w-px h-5 bg-border mx-1"></div>
+          <Separator orientation="vertical" className="h-5 mx-1" />
           <div className="flex rounded-lg bg-accent/30 p-1 border border-border/50">
-            {["Day", "Week", "Month"].map((v) => (
-              <button
+            {(["Day", "Week", "Month"] as const).map((v) => (
+              <Button
                 key={v}
-                onClick={() => setView(v as any)}
+                variant="ghost"
+                size="sm"
+                onClick={() => setView(v)}
                 className={cn(
-                  "px-4 py-1.5 text-sm font-medium transition-all rounded-md",
-                  view === v ? "bg-background text-foreground shadow-sm border border-border/50" : "text-muted-foreground hover:text-foreground"
+                  "rounded-md font-medium",
+                  view === v ? "bg-background text-foreground shadow-sm border border-border/50 hover:bg-background" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 {v}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
@@ -261,7 +289,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                       <span className={cn(
                         "text-sm h-8 w-8 flex items-center justify-center shrink-0 rounded-full",
                         d.currentMonth ? "text-foreground font-normal" : "text-muted-foreground/40 font-normal",
-                        isToday && "bg-[#1a73e8] text-white font-medium"
+                        isToday && "bg-primary text-primary-foreground font-medium"
                       )}>
                         {d.day}
                       </span>
@@ -277,21 +305,31 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); onSelectEvent(dayEvents[0]) }}
-                            className={cn(
-                              "flex h-[22px] w-full items-center rounded px-2 text-left text-xs font-medium leading-none transition-opacity hover:opacity-80 active:opacity-60",
-                              paymentChipStyle(dayEvents[0].paymentStatus),
-                              selectedEvent?.id === dayEvents[0].id && "brightness-95 ring-1 ring-inset ring-black/5"
-                            )}
+                            className="block w-full text-left"
                           >
-                            <span className="truncate w-full">{dayEvents[0].travelerName}</span>
+                            <Badge
+                              variant="secondary"
+                              className={cn(
+                                "flex h-6 w-full items-center justify-start rounded px-2 text-left text-xs font-medium leading-none transition-opacity hover:opacity-80 active:opacity-60",
+                                paymentChipStyle(dayEvents[0].paymentStatus),
+                                selectedEvent?.id === dayEvents[0].id && "ring-1 ring-inset ring-ring brightness-95"
+                              )}
+                            >
+                              <span className="truncate w-full">{dayEvents[0].travelerName}</span>
+                            </Badge>
                           </button>
                         ) : (
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); onShowMore?.(dayDate, dayEvents) }}
-                            className="flex h-[22px] w-full items-center rounded bg-primary/10 px-2 text-left text-xs font-bold text-primary hover:bg-primary hover:text-white transition-colors"
+                            className="block w-full text-left"
                           >
-                            {dayEvents.length} bookings
+                            <Badge
+                              variant="secondary"
+                              className="flex h-6 w-full items-center justify-start rounded bg-primary/10 px-2 text-left text-xs font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
+                            >
+                              {dayEvents.length} bookings
+                            </Badge>
                           </button>
                         )}
                       </div>
@@ -313,10 +351,10 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                 
                 return (
                   <div key={i} className="flex flex-col items-center py-3 border-r border-border last:border-r-0">
-                    <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">{DAYS[i]}</span>
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{DAYS[i]}</span>
                     <span className={cn(
                       "mt-1 text-2xl h-12 w-12 flex items-center justify-center rounded-full font-normal transition-colors",
-                      isToday ? "bg-[#1a73e8] text-white" : "text-foreground"
+                      isToday ? "bg-primary text-primary-foreground" : "text-foreground"
                     )}>
                       {startOfWeek.getDate()}
                     </span>
@@ -352,35 +390,29 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                           const continuesNext = eEnd >= nDate
                           const continuesPrev = eStart <= pDate
                           
-                          // Custom pastel color mapping based on screenshot
-                          let colorStyle = "bg-[#fce8e6] text-[#8c1d18] border-[#c5221f] dark:bg-pink-900/30 dark:text-pink-200 dark:border-pink-700" 
                           const colorKey = event.color?.split(' ')[0]
-                          if (colorKey?.includes("blue")) colorStyle = "bg-[#d3e3fd] text-[#041e49] border-[#0b57d0] dark:bg-blue-900/30 dark:text-blue-200 dark:border-blue-700"
-                          if (colorKey?.includes("green")) colorStyle = "bg-[#e6f4ea] text-[#0d652d] border-[#137333] dark:bg-green-900/30 dark:text-green-200 dark:border-green-700"
-                          if (colorKey?.includes("purple")) colorStyle = "bg-[#f3e8fd] text-[#681fa2] border-[#8e24aa] dark:bg-purple-900/30 dark:text-purple-200 dark:border-purple-700"
-                          if (colorKey?.includes("orange")) colorStyle = "bg-[#fef7e0] text-[#b06000] border-[#e65100] dark:bg-orange-900/30 dark:text-orange-200 dark:border-orange-700"
-                          if (colorKey?.includes("gray")) colorStyle = "bg-[#f1f3f4] text-[#3c4043] border-[#5f6368] dark:bg-gray-800/40 dark:text-gray-300 dark:border-gray-600"
+                          const colorStyle = weekEventColorStyle(colorKey)
 
                           return (
                             <div
                               key={event.id}
                               onClick={() => onSelectEvent(event)}
                               className={cn(
-                                "cursor-pointer h-[38px] py-1 px-2.5 flex flex-col justify-center transition-opacity hover:opacity-80 active:opacity-60",
+                                "cursor-pointer h-9 py-1 px-2.5 flex flex-col justify-center transition-opacity hover:opacity-80 active:opacity-60",
                                 colorStyle,
-                                !continuesPrev ? "rounded-md ml-2 border-l-[4px]" : "border-l-0 ml-0",
+                                !continuesPrev ? "rounded-md ml-2 border-l-4" : "border-l-0 ml-0",
                                 !continuesNext ? "rounded-r-md mr-2" : "mr-0",
-                                selectedEvent?.id === event.id && "brightness-95 ring-1 ring-inset ring-black/5"
+                                selectedEvent?.id === event.id && "brightness-95 ring-1 ring-inset ring-ring"
                               )}
                             >
                               <span className="truncate w-full font-semibold text-xs text-current">{event.title}</span>
-                              <span className="truncate w-full text-[10px] opacity-70">
+                              <span className="truncate w-full text-xs opacity-70">
                                 {event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             </div>
                           )
                         }
-                        return <div key={rowIndex} className="h-[38px]" />
+                        return <div key={rowIndex} className="h-9" />
                       })}
                     </div>
                   </div>
@@ -396,19 +428,19 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
               {/* Time axis */}
               <div className="w-16 border-r border-border flex flex-col py-4">
                 {Array.from({ length: 12 }).map((_, i) => (
-                  <div key={i} className="h-20 text-[10px] font-bold text-muted-foreground text-center relative">
+                  <div key={i} className="h-20 text-xs font-bold text-muted-foreground text-center relative">
                     <span className="absolute -top-2 left-0 right-0">{i * 2}:00</span>
                   </div>
                 ))}
               </div>
-              
+
               {/* Timeline content */}
-              <div className="flex-1 relative overflow-y-auto p-8 bg-[radial-gradient(ellipse_at_top_right,rgba(46,124,246,0.05)_0%,transparent_70%)] custom-scrollbar">
+              <div className="flex-1 relative overflow-y-auto p-8 bg-accent/5 custom-scrollbar">
                 <div className="max-w-5xl mx-auto space-y-10">
                   <div className="flex items-center justify-between border-b border-border/50 pb-8 mb-12">
                     <div>
                         <h3 className="text-4xl font-black tracking-tight text-foreground mb-2">Focus Mode</h3>
-                        <p className="text-base font-bold text-muted-foreground uppercase tracking-[0.4em]">Agenda for {currentDate.toLocaleDateString('default', { day: 'numeric', month: 'long' })}</p>
+                        <p className="text-base font-bold text-muted-foreground uppercase tracking-widest">Agenda for {currentDate.toLocaleDateString('default', { day: 'numeric', month: 'long' })}</p>
                     </div>
                     <div className="px-6 py-3 rounded-2xl bg-primary/10 border-2 border-primary/20 shadow-md">
                         <span className="text-sm font-black text-primary uppercase tracking-widest">{getEventsForDay(currentDate).length} Experiences Scheduled</span>
@@ -426,7 +458,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                       key={event.id}
                       onClick={() => onSelectEvent(event)}
                       className={cn(
-                        "group rounded-[32px] p-10 shadow-xl transition-all duration-500 cursor-pointer overflow-hidden relative",
+                        "group rounded-3xl p-10 shadow-xl transition-all duration-500 cursor-pointer overflow-hidden relative",
                         "bg-card border-2 border-border hover:border-primary/50",
                         "hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-2",
                         selectedEvent?.id === event.id && "ring-4 ring-primary/20 border-primary"
@@ -435,19 +467,19 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                       <div className="relative z-10">
                         <div className="flex justify-between items-start mb-10">
                           <div className="space-y-3">
-                            <span className="text-xs font-black text-primary uppercase tracking-[0.5em] mb-2 block">{idx + 1}. Session</span>
+                            <span className="text-xs font-black text-primary uppercase tracking-widest mb-2 block">{idx + 1}. Session</span>
                             <h4 className="text-4xl font-black tracking-tight text-foreground group-hover:text-primary transition-colors leading-tight max-w-2xl">{event.title}</h4>
                           </div>
-                          <span className="text-xs font-black px-6 py-3 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/30 uppercase tracking-[0.2em]">{event.duration}</span>
+                          <Badge className="text-xs font-black px-6 py-3 rounded-2xl bg-primary text-primary-foreground shadow-xl shadow-primary/30 uppercase tracking-wide">{event.duration}</Badge>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
                           <div className="flex items-center gap-5 group/item">
                             <div className="p-4 rounded-2xl bg-accent group-hover/item:bg-primary/20 transition-all duration-300">
                                 <CalendarIcon className="h-6 w-6 text-primary" />
                             </div>
                             <div>
-                                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5 focus-ring">Schedule</p>
+                                <p className="text-xs font-black uppercase tracking-wide text-muted-foreground/60 mb-1.5">Schedule</p>
                                 <span className="text-lg font-bold text-foreground">{event.start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {event.end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                           </div>
@@ -458,7 +490,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                                   <Users className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5">Traveler</p>
+                                  <p className="text-xs font-black uppercase tracking-wide text-muted-foreground/60 mb-1.5">Traveler</p>
                                   <span className="text-lg font-bold text-foreground line-clamp-1">{event.travelerName}</span>
                                   {event.travelerPhone && <span className="block text-sm font-medium text-muted-foreground">{event.travelerPhone}</span>}
                               </div>
@@ -471,7 +503,7 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                                   <MapPin className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5">Destination</p>
+                                  <p className="text-xs font-black uppercase tracking-wide text-muted-foreground/60 mb-1.5">Destination</p>
                                   <span className="text-lg font-bold text-foreground line-clamp-1">{event.destination}</span>
                               </div>
                             </div>
@@ -482,8 +514,11 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                                   <Users className="h-6 w-6 text-primary" />
                               </div>
                               <div>
-                                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1.5">Payment</p>
-                                  <span className="text-lg font-bold text-success flex items-center gap-2">
+                                  <p className="text-xs font-black uppercase tracking-wide text-muted-foreground/60 mb-1.5">Payment</p>
+                                  <span className={cn(
+                                    "text-lg font-bold flex items-center gap-2",
+                                    event.paymentStatus === "fully_paid" ? "text-success" : event.paymentStatus === "advance_paid" ? "text-warning" : "text-muted-foreground"
+                                  )}>
                                      <span className="h-2 w-2 rounded-full bg-current animate-pulse" />
                                      {event.paymentStatus === "fully_paid" ? "Fully Paid" : event.paymentStatus === "advance_paid" ? "Advance Paid" : "Unpaid"}
                                   </span>
@@ -493,9 +528,9 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
                       </div>
                     </div>
                   ))}
-                  
+
                   {getEventsForDay(currentDate).length === 0 && (
-                    <div className="flex flex-col items-center justify-center min-h-[400px] border-2 border-dashed border-border rounded-[40px] bg-accent/5">
+                    <div className="flex flex-col items-center justify-center min-h-96 border-2 border-dashed border-border rounded-3xl bg-accent/5">
                       <div className="h-20 w-20 rounded-full bg-accent flex items-center justify-center mb-6">
                         <CalendarIcon className="h-10 w-10 text-muted-foreground/30" />
                       </div>
@@ -509,6 +544,6 @@ export function CalendarView({ events, selectedEvent, onSelectEvent, onShowMore 
           </div>
         )}
       </div>
-    </div>
+    </Card>
   )
 }

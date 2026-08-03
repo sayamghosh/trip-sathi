@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query"
-import { TrendingUp, TrendingDown, IndianRupee } from "lucide-react"
+import { TrendingUp, TrendingDown, IndianRupee, Calendar, Users } from "lucide-react"
 import api from "@/lib/axios"
 import { cn } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface BookingMetricsResponse {
   totals: { totalRevenue: number; totalBookings: number; totalParticipants: number; totalTravelers: number }
@@ -38,76 +39,71 @@ export function MetricCards() {
       value: totals.totalBookings.toLocaleString(),
       change: formatChange(bookingsChange),
       positive: (bookingsChange ?? 0) >= 0,
-      iconBg: "bg-[#D4E8FC]",
-      icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2E7CF6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" />
-          <line x1="16" x2="16" y1="2" y2="6" />
-          <line x1="8" x2="8" y1="2" y2="6" />
-          <line x1="3" x2="21" y1="10" y2="10" />
-          <path d="m9 16 2 2 4-4" />
-        </svg>
-      ),
+      iconBg: "bg-primary/10",
+      iconColor: "text-primary",
+      icon: <Calendar className="h-[18px] w-[18px]" strokeWidth={1.8} />,
     },
     {
       label: "Total Travelers",
       value: totals.totalTravelers.toLocaleString(),
       change: null as string | null,
       positive: true,
-      iconBg: "bg-[#C9EFDA]",
-      icon: (
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22B357" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-          <circle cx="9" cy="7" r="4" />
-          <line x1="19" x2="19" y1="8" y2="14" />
-          <line x1="22" x2="16" y1="11" y2="11" />
-        </svg>
-      ),
+      iconBg: "bg-success/10",
+      iconColor: "text-success",
+      icon: <Users className="h-[18px] w-[18px]" strokeWidth={1.8} />,
     },
     {
       label: "Total Earnings",
       value: `₹${totals.totalRevenue.toLocaleString('en-IN')}`,
       change: formatChange(revenueChange),
       positive: (revenueChange ?? 0) >= 0,
-      iconBg: "bg-[#DDD4FC]",
-      icon: <IndianRupee width={18} height={18} stroke="#7C5CE7" strokeWidth={1.8} />,
+      iconBg: "bg-accent",
+      iconColor: "text-accent-foreground",
+      icon: <IndianRupee className="h-[18px] w-[18px]" strokeWidth={1.8} />,
     },
   ]
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {metricsList.map((m) => (
-        <div
+        <Card
           key={m.label}
-          className="relative rounded-[14px] bg-card border border-border px-5 py-4 transition-transform duration-200 hover:scale-[1.015]"
+          className="relative transition-transform duration-200 hover:scale-[1.015]"
         >
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-[11px] font-medium text-muted-foreground">
-                {m.label}
-              </p>
-              <p className="mt-[2px] text-[26px] leading-tight font-bold text-foreground">
-                {m.value}
-              </p>
+          <CardContent className="px-5 py-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">
+                  {m.label}
+                </p>
+                <p className="mt-0.5 text-2xl leading-tight font-bold text-foreground">
+                  {m.value}
+                </p>
+              </div>
+              <div className={cn("flex h-9 w-9 items-center justify-center rounded-lg", m.iconBg, m.iconColor)}>
+                {m.icon}
+              </div>
             </div>
-            <div className={cn("flex h-[36px] w-[36px] items-center justify-center rounded-[10px]", m.iconBg, "dark:bg-primary/10")}>
-              {m.icon}
-            </div>
-          </div>
-          {m.change && (
-            <div className="mt-1.5 flex items-center gap-1.5">
-              {m.positive ? (
-                <TrendingUp className="h-3 w-3 text-[#22B357]" />
-              ) : (
-                <TrendingDown className="h-3 w-3 text-[#EF4444]" />
-              )}
-              <span className={`rounded-full px-[8px] py-[2px] text-[10px] font-semibold ${m.positive ? "bg-[#C9EFDA]/20 text-[#22B357]" : "bg-[#FDD]/20 text-[#EF4444]"}`}>
-                {m.change}
-              </span>
-              <span className="text-muted-foreground">from last month</span>
-            </div>
-          )}
-        </div>
+            {m.change && (
+              <div className="mt-1.5 flex items-center gap-1.5">
+                {m.positive ? (
+                  <TrendingUp className="h-3 w-3 text-success" />
+                ) : (
+                  <TrendingDown className="h-3 w-3 text-destructive" />
+                )}
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                    m.positive ? "bg-success/10 text-success" : "bg-destructive/10 text-destructive"
+                  )}
+                >
+                  {m.change}
+                </span>
+                <span className="text-xs text-muted-foreground">from last month</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       ))}
     </div>
   )

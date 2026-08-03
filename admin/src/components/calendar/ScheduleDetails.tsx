@@ -6,6 +6,9 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { cn } from "@/lib/utils"
 import type { Event } from "./CalendarView"
 
 interface ScheduleDetailsProps {
@@ -14,12 +17,33 @@ interface ScheduleDetailsProps {
   onOpenChange: (open: boolean) => void
 }
 
+const paymentBadgeStyle: Record<string, string> = {
+  fully_paid: "bg-success/10 text-success",
+  advance_paid: "bg-warning/10 text-warning",
+  unpaid: "bg-muted text-muted-foreground",
+}
+
+const paymentLabel: Record<string, string> = {
+  fully_paid: "Fully Paid",
+  advance_paid: "Advance Paid",
+  unpaid: "Unpaid",
+}
+
 export function ScheduleDetails({ selectedEvent, open, onOpenChange }: ScheduleDetailsProps) {
+  const status = selectedEvent?.paymentStatus || "unpaid"
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full data-[side=right]:sm:max-w-md">
         <SheetHeader>
-          <SheetTitle className="text-xl">{selectedEvent?.title || "Schedule Details"}</SheetTitle>
+          <div className="flex items-start justify-between gap-2">
+            <SheetTitle className="text-xl">{selectedEvent?.title || "Schedule Details"}</SheetTitle>
+            {selectedEvent && (
+              <Badge variant="secondary" className={cn("shrink-0", paymentBadgeStyle[status])}>
+                {paymentLabel[status]}
+              </Badge>
+            )}
+          </div>
           <SheetDescription>Booking details for this trip</SheetDescription>
         </SheetHeader>
 
@@ -86,6 +110,7 @@ export function ScheduleDetails({ selectedEvent, open, onOpenChange }: ScheduleD
 
             {selectedEvent.meetingPoints && selectedEvent.meetingPoints.length > 0 && (
               <div>
+                <Separator className="mb-6" />
                 <h4 className="text-sm font-bold text-foreground mb-4">Meeting Points</h4>
                 <div className="space-y-4">
                   {selectedEvent.meetingPoints.map((mp, index) => (
@@ -96,11 +121,11 @@ export function ScheduleDetails({ selectedEvent, open, onOpenChange }: ScheduleD
                         ) : (
                           <Train className="h-4 w-4 text-primary" />
                         )}
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{mp.type}</span>
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{mp.type}</span>
                       </div>
-                      <p className="text-[10px] font-bold text-primary mb-1 uppercase">{mp.isFinish ? "Finish" : "Start"}</p>
-                      <p className="text-[13px] font-bold text-foreground mb-1">{mp.name}</p>
-                      <p className="text-[11px] text-muted-foreground font-medium">{mp.time}</p>
+                      <p className="text-xs font-bold text-primary mb-1 uppercase">{mp.isFinish ? "Finish" : "Start"}</p>
+                      <p className="text-sm font-bold text-foreground mb-1">{mp.name}</p>
+                      <p className="text-xs text-muted-foreground font-medium">{mp.time}</p>
                     </div>
                   ))}
                 </div>

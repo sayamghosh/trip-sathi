@@ -144,7 +144,7 @@ export function AppSidebar() {
                       >
                         <item.icon className="shrink-0 size-5!" />
                         <span className={cn(
-                          "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                          "text-sm font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
                           isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
                         )}>
                           {item.label}
@@ -154,7 +154,7 @@ export function AppSidebar() {
                       <>
                         <item.icon className="shrink-0 size-5!" />
                         <span className={cn(
-                          "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                          "text-sm font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
                           isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
                         )}>
                           {item.label}
@@ -168,7 +168,7 @@ export function AppSidebar() {
                     </SidebarMenuBadge>
                   )}
                   {!isCollapsed && !item.isAvailable && (
-                    <SidebarMenuBadge className="right-4 bg-sidebar-accent text-sidebar-accent-foreground text-[10px] font-semibold tracking-wide">
+                    <SidebarMenuBadge className="right-4 bg-sidebar-accent text-sidebar-accent-foreground text-xs font-semibold tracking-wide">
                       Soon
                     </SidebarMenuBadge>
                   )}
@@ -184,14 +184,14 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               className={cn(
-                "h-10 text-sidebar-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors px-4 group",
+                "h-10 text-sidebar-foreground hover:bg-destructive/10 hover:text-destructive transition-colors px-4 group",
                 isCollapsed && "px-0 justify-center group-data-[collapsible=icon]:size-10!"
               )}
               onClick={handleLogout}
             >
-              <LogOut className={cn("size-5! transition-colors group-hover:text-red-500", !isCollapsed && "mr-3")} />
+              <LogOut className={cn("size-5! transition-colors group-hover:text-destructive", !isCollapsed && "mr-3")} />
               <span className={cn(
-                "text-[15px] font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
+                "text-sm font-medium transition-all duration-200 ease-in-out inline-block overflow-hidden whitespace-nowrap",
                 isCollapsed ? "opacity-0 invisible w-0 -translate-x-4 scale-95" : "opacity-100 visible w-auto translate-x-0 ml-3 scale-100 delay-100"
               )}>
                 Logout
